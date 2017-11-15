@@ -1,0 +1,329 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\UnrealFusion.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{88D955EE-C320-4D7A-B233-2DFE4DC89DD1}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\UnrealFusion.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusionEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <Filter Include="Config">
+      <UniqueIdentifier>{FA2B48A3-6738-4B5F-BEA6-042A4112D7C5}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEditorPerProjectUserSettings.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultInput.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultScalability.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Plugins">
+      <UniqueIdentifier>{FCEEA40E-7416-4EA3-BEAB-BFB80C4BA3AD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\MyBlankPlugin">
+      <UniqueIdentifier>{4FDD347C-8A57-4745-8326-1F9491513064}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\MyBlankPlugin\Source">
+      <UniqueIdentifier>{AC41130B-2F4A-4A05-9F4D-A2EFDC03CA42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\MyBlankPlugin\Source\MyBlankPlugin">
+      <UniqueIdentifier>{E34B80F2-13A2-4D26-A704-FAFA32033BF7}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Plugins\MyBlankPlugin\Source\MyBlankPlugin\MyBlankPlugin.Build.cs">
+      <Filter>Plugins\MyBlankPlugin\Source\MyBlankPlugin</Filter>
+    </None>
+    <Filter Include="Plugins\MyBlankPlugin\Source\MyBlankPlugin\Private">
+      <UniqueIdentifier>{86749A2E-8F3E-4AED-A925-8C6B91814C72}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Plugins\MyBlankPlugin\Source\MyBlankPlugin\Private\MyBlankPlugin.cpp">
+      <Filter>Plugins\MyBlankPlugin\Source\MyBlankPlugin\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\MyBlankPlugin\Source\MyBlankPlugin\Private\MyBlankPluginPrivatePCH.h">
+      <Filter>Plugins\MyBlankPlugin\Source\MyBlankPlugin\Private</Filter>
+    </ClInclude>
+    <Filter Include="Plugins\MyBlankPlugin\Source\MyBlankPlugin\Public">
+      <UniqueIdentifier>{C037AE37-53C1-413B-93ED-1285479E1F89}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Plugins\MyBlankPlugin\Source\MyBlankPlugin\Public\MyBlankPlugin.h">
+      <Filter>Plugins\MyBlankPlugin\Source\MyBlankPlugin\Public</Filter>
+    </ClInclude>
+    <None Include="..\..\Plugins\MyBlankPlugin\MyBlankPlugin.uplugin">
+      <Filter>Plugins\MyBlankPlugin</Filter>
+    </None>
+    <Filter Include="Plugins\MyBlankPlugin\Resources">
+      <UniqueIdentifier>{4D1F28E4-6812-4FD8-A83A-3EFEF42CB67C}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Plugins\MyBlankPlugin\Resources\Icon128.png">
+      <Filter>Plugins\MyBlankPlugin\Resources</Filter>
+    </None>
+    <Filter Include="Plugins\PerceptionNeuron">
+      <UniqueIdentifier>{D745131A-D5CF-4B72-B8BE-0B097F702F24}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Plugins\PerceptionNeuron\PerceptionNeuron.uplugin">
+      <Filter>Plugins\PerceptionNeuron</Filter>
+    </None>
+    <Filter Include="Plugins\PerceptionNeuron\Resources">
+      <UniqueIdentifier>{1276E4EF-F21C-410B-8E68-03D06D561878}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Plugins\PerceptionNeuron\Resources\Icon128.png">
+      <Filter>Plugins\PerceptionNeuron\Resources</Filter>
+    </None>
+    <Filter Include="Plugins\Spooky">
+      <UniqueIdentifier>{D2856051-B8A2-48EB-B607-C2B04225628D}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Plugins\Spooky\Spooky.uplugin">
+      <Filter>Plugins\Spooky</Filter>
+    </None>
+    <Filter Include="Plugins\Spooky\Resources">
+      <UniqueIdentifier>{4B7AD7A6-1E76-4147-9D45-722A1C756A8E}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Plugins\Spooky\Resources\Icon128.png">
+      <Filter>Plugins\Spooky\Resources</Filter>
+    </None>
+    <Filter Include="Plugins\PerceptionNeuron\Source">
+      <UniqueIdentifier>{D934638C-1053-4922-9E1C-2F9CF698E495}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\PerceptionNeuron\Source\PerceptionNeuronEditor">
+      <UniqueIdentifier>{21728F9D-871B-48E3-A718-2719725A84D9}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Plugins\PerceptionNeuron\Source\PerceptionNeuronEditor\PerceptionNeuronEditor.Build.cs">
+      <Filter>Plugins\PerceptionNeuron\Source\PerceptionNeuronEditor</Filter>
+    </None>
+    <Filter Include="Plugins\PerceptionNeuron\Source\PerceptionNeuronEditor\Public">
+      <UniqueIdentifier>{DF3E4284-7579-4448-A149-C4AF106F9B00}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Plugins\PerceptionNeuron\Source\PerceptionNeuronEditor\Public\AnimGraphNode_NewPoseCalc.h">
+      <Filter>Plugins\PerceptionNeuron\Source\PerceptionNeuronEditor\Public</Filter>
+    </ClInclude>
+    <Filter Include="Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime">
+      <UniqueIdentifier>{C4AFBCA3-F725-4922-84F1-245083001CB5}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime\PerceptionNeuronRuntime.Build.cs">
+      <Filter>Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime</Filter>
+    </None>
+    <Filter Include="Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime\Public">
+      <UniqueIdentifier>{5BE6C50C-D379-4253-9DD3-C6C6100222D8}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime\Public\AnimNode_NewPoseCalc.h">
+      <Filter>Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime\Public\BoneLists.h">
+      <Filter>Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime\Public\BoneMappingInfo.h">
+      <Filter>Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime\Public\BVHAsset.h">
+      <Filter>Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime\Public\IPerceptionNeuronModule.h">
+      <Filter>Plugins\PerceptionNeuron\Source\PerceptionNeuronRuntime\Public</Filter>
+    </ClInclude>
+    <Filter Include="Plugins\Spooky\Source">
+      <UniqueIdentifier>{95BD80BE-1DFB-4B9C-87BA-02BC1E023C7A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\Spooky\Source\Spooky">
+      <UniqueIdentifier>{74B99C53-38BB-42FC-89B0-A619B1637F8D}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Spooky.Build.cs">
+      <Filter>Plugins\Spooky\Source\Spooky</Filter>
+    </None>
+    <Filter Include="Plugins\Spooky\Source\Spooky\Private">
+      <UniqueIdentifier>{4F81DFE7-915D-478B-BBBB-C39C58D66083}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Private\Spooky.cpp">
+      <Filter>Plugins\Spooky\Source\Spooky\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Private\SpookyPrivatePCH.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Private</Filter>
+    </ClInclude>
+    <Filter Include="Plugins\Spooky\Source\Spooky\Public">
+      <UniqueIdentifier>{F353C86D-B206-419B-B48E-6A8CE4C9B1B7}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Public\Spooky.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Public</Filter>
+    </ClInclude>
+    <Filter Include="Source\UnrealFusion">
+      <UniqueIdentifier>{6BDF7159-C763-4DF7-9C45-B81F40576404}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\UnrealFusion\eigen.natvis">
+      <Filter>Source\UnrealFusion</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusion\LICENSE.txt">
+      <Filter>Source\UnrealFusion</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusion\UnrealFusion.Build.cs">
+      <Filter>Source\UnrealFusion</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\UnrealFusion\UnrealFusion.cpp">
+      <Filter>Source\UnrealFusion</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\UnrealFusion\UnrealFusion.h">
+      <Filter>Source\UnrealFusion</Filter>
+    </ClInclude>
+    <Filter Include="Source\UnrealFusion\sophus">
+      <UniqueIdentifier>{CC25FDEF-E4CB-4603-A687-4CB394CD30EC}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\UnrealFusion\sophus\average.hpp">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusion\sophus\common.hpp">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\UnrealFusion\sophus\example_ensure_handler.cpp">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </ClCompile>
+    <None Include="..\..\Source\UnrealFusion\sophus\interpolate.hpp">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusion\sophus\interpolate_details.hpp">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusion\sophus\LICENSE.txt">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusion\sophus\rxso3.hpp">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusion\sophus\se2.hpp">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusion\sophus\se3.hpp">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusion\sophus\sim3.hpp">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusion\sophus\so2.hpp">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusion\sophus\so3.hpp">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusion\sophus\test_macros.hpp">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </None>
+    <None Include="..\..\Source\UnrealFusion\sophus\types.hpp">
+      <Filter>Source\UnrealFusion\sophus</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\ArticulatedModel.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Articulation.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Calibration.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Core.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Correlator.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\FusionTypes.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\SaveManager.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\CalibrationUtilities.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\CommonMath.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\Conventions.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\CorrelationUtilities.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\DataStructures.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\TimeProfiling.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Public\Logging.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Public\SpookyFusionPlant.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Public\AnimGraphNode_GetSpookyResult.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Public\AnimNode_GetSpookyResult.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\ArticulatedModel.cpp">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Articulation.cpp">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Calibration.cpp">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\CalibrationProcedures.cpp">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Core.cpp">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\CorrelationProcedures.cpp">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Correlator.cpp">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\FusionTypes.cpp">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\SaveManager.cpp">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Private\SpookyFusionPlant.cpp">
+      <Filter>Plugins\Spooky\Source\Spooky\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Private\AnimGraphNode_GetSpookyResult.cpp">
+      <Filter>Plugins\Spooky\Source\Spooky\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Private\AnimNode_GetSpookyResult.cpp">
+      <Filter>Plugins\Spooky\Source\Spooky\Private</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Plugins\Spooky\Source\Spooky\Spooky">
+      <UniqueIdentifier>{605f1989-2bcf-4afb-852f-c5d20d2c0e55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\Spooky\Source\Spooky\Spooky\Utility">
+      <UniqueIdentifier>{a7483b74-4c8d-4131-8be1-ea590d117d20}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\LICENSE.txt">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
+    </Text>
+  </ItemGroup>
+</Project>

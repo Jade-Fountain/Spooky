@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1",
+	"FriendlyName": "Spooky",
+	"Description": "Sensor calibration and fusion for skeleton trackers",
+	"Category": "Virtual Reality",
+	"CreatedBy": "Jake Fountain",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": false,
+	"IsBetaVersion": true,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "Spooky",
+			"Type": "Developer",
+			"LoadingPhase": "Default"
+		}
+	]
+}

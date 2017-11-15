@@ -1,0 +1,16 @@
+LogBlueprintUserMessages: [FusionKitSpirit_107] 
+{"RigidBodies":
+	[
+	{
+	"isTracked":true,
+	"name":"RigidBody01",
+	"markers":[{"IsSolved":true,"Label":"Fused 12629","Position":{"X":-0.0071430853568017483,"Y":-0.22531543672084808,"Z":1.1110000610351563,"Length":1.1336398040441427},"PixelPositionX":0,"PixelPositionY":0},{"IsSolved":true,"Label":"Fused 12639","Position":{"
+	X":-0.12709768680706421,"Y":-0.22502641016247488,"Z":1.1237500368566957,"Length":1.1530849286144287},"PixelPositionX":0,"PixelPositionY":0},{"IsSolved":true,"Label":"Fused 12631","Position":{"X":-0.071549927459091348,"Y":-0.2031163096896435,"Z":1.1879912629247364,"Length":1.2073520067349253},"PixelPositionX":0,"PixelPositionY":0}],
+
+	"translation":{"X":0.090216748974965469,"Y":0.077645093829287345,"Z":0.045790684290063832,"Length":0.12753277680315389},
+	"quaternionRotation":{"_w":-0.35316538563826044,"_x":-0.11016428525617339,"_y":-0.19337781808123436,"_z":0.90870405529804721,"_abs":1,"_norm":1.0000000000000002,"_arg":1.9317486884553154,"Real":-0.35316538563826044,"ImagX":-0.11016428525617339,"ImagY":-0.19337781808123436,"ImagZ":0.90870405529804721,"Abs":1,"Norm":1.0000000000000002,"Arg":1.9317486884553154,"IsUnitQuaternion":true},
+	"rotationAsEuler":{"X":-0.29486734629796296,"Y":0.34351856965456273,"Z":-2.451742462585897,"Length":2.4931892953518546}
+	}
+	],
+	"timestamp":6.3631389905035482e+17,
+	"timestring":""}
