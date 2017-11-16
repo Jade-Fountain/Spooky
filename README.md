@@ -1,6 +1,9 @@
 # Spooky UE4
 Skeleton-centered Virtual Reality Sensor Fusion plugin for the Unreal Engine
 
+### Development History
+The full development history of Spooky can be found [here](https://www.github.com/jakefountain/spookyold)
+
 ## Aims and Introduction
 The rapidly improving quality and availability of head mounted displays (HMDs) has seen a large increase in public interest in virtual reality (VR). HMDs allow for a wide variety of immersive experiences unavailable to other display platforms. However, HMDs typically block out the real world, leaving the user feeling disembodied in the virtual space. Without tracking of the user’s body and hands, interactions within the environment are limited. Furthermore, without visual body and hand representation within the virtual environment, states of presence and immersion are impeded. If the virtual environment is multi-user, communication can also be impeded by inaccurate or limited body or hand tracking.
  
