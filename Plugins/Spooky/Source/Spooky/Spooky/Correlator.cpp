@@ -13,11 +13,11 @@ namespace spooky {
 		if (ambiguous_measurements.sensors.count(sensor) == 0) {
 			//Initialise ambiguous measurements for sensor
 			ambiguous_measurements.sensors[sensor] = std::vector<Measurement::Ptr>();
-			//Store relevant nodes for later in the add unambiguous measurement function
 		} else {
 			//Simply add measurement
 			ambiguous_measurements.sensors[sensor].push_back(m);
 		}
+		//Store relevant nodes for later in the add unambiguous measurement function
 		//TODO: optimise so this isnt done every measurement!
 		const std::set<NodeDescriptor>& nodes = sensor->getNodes();
 		relevant_nodes.insert(nodes.begin(), nodes.end());
@@ -101,11 +101,11 @@ namespace spooky {
 
 		//Decide if data is useful
 		//(if at least one stream has changed relative to previous measurements)
-		bool dataNovel = checkChanges(measurements);
+		// bool dataNovel = checkChanges(measurements);
 
 		if (dataNovel) {
 			//Store the (refs to) the relevant measurements
-			//SPOOKY_LOG("Adding calibration measurments!!");
+			//SPOOKY_LOG("Adding correlation measurments!!");
 			for (auto& m : measurements) {
 				addMeasurement(m);
 			}
