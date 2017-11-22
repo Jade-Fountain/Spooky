@@ -1,6 +1,8 @@
 # Spooky UE4
 Skeleton-centered Virtual Reality Sensor Fusion plugin for the Unreal Engine
 
+[Spooky Kinect-VR Example App (video)](https://youtu.be/2GHneLUlx-Y)
+
 ### Development History
 The full development history of Spooky can be found [here](https://www.github.com/jakefountain/spookyold)
 
