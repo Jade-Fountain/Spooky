@@ -49,6 +49,8 @@ namespace spooky {
 			Eigen::MatrixXf variance;
 			//Last update time
 			float last_update_time = 0;
+			//State is valid - false if state poorly initialised, etc...
+			bool valid = true;
 		};
 	
 		//Current state
@@ -92,6 +94,9 @@ namespace spooky {
 	
 	private:
 		Transform3D getGlobalPose();
+
+		State getNewState(int articulationNumber, const Measurement::Ptr& m, const Transform3D& parent_pose);
+
 
 		float initial_covariance = 3.14;
 

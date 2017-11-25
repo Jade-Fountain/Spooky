@@ -88,55 +88,60 @@ namespace spooky {
 			parent_pose = parent->getGlobalPose();
 		}
 
-		//TODO: support multiple articulations for scale
-		Articulation::Type articulationType = articulations[0].getType();
-		//If pose node or bone node
-		if(articulationType == Articulation::Type::BONE || articulationType == Articulation::Type::POSE){
-			
-			//For each measurement
-			for(auto& m : measurements){
+		for(auto& m : measurements){
+			//Throwout bad measurements
+			if (m->confidence < 0.75) {
+				continue;
+			}
 
-				//Throwout bad measurements
-				if (m->confidence < 0.75) {
-					continue;
-				}
+			//Get mapping to correct reference frame
+			//TODO: Optimise this access somehow?
+			CalibrationResult calibResult = calib.getResultsFor(referenceSystem, m->getSystem());
+			if (calibResult.calibrated()) {
+				parent_pose = calibResult.transform * parent_pose;
+			}
 
-				//Optimise this access somehow?
-				CalibrationResult calibResult = calib.getResultsFor(referenceSystem, m->getSystem());
-				if (calibResult.calibrated()) {
-					parent_pose = calibResult.transform * parent_pose;
-				}
-
-				//If measurement is rotation
-				if(m->type == Measurement::Type::ROTATION ||
-				(articulationType == Articulation::Type::BONE && m->type == Measurement::Type::RIGID_BODY) )
-				{
-					Node::State new_state;
-					//Simple update based on parent pose
-					new_state.expectation = Eigen::Quaternionf(parent_pose.rotation().inverse() * m->getRotation()).coeffs();
-					new_state.expectation.normalize();
-					//TODO: make names consitent
-					new_state.variance = m->getRotationVar();
-					updateState(new_state, m->getTimestamp(), m->getLatency());
-				} 
-				//If measurement also contains position
-				else if (m->type == Measurement::Type::RIGID_BODY && articulationType == Articulation::Type::POSE)
-				{
-					Node::State new_state;
-					new_state.variance = m->getPosQuatVar();
-					//Simple update based on parent pose
-					Eigen::Quaternionf qLocal= Eigen::Quaternionf(parent_pose.rotation().inverse() * m->getRotation());
-					Eigen::Vector3f posLocal = parent_pose.inverse() * m->getPosition();
-					new_state.expectation = Eigen::Matrix<float, 7, 1>::Zero();
-					new_state.expectation << posLocal, qLocal.coeffs();
-					updateState(new_state, m->getTimestamp(), m->getLatency());
-				} else if (m->type == Measurement::Type::SCALE && articulationType == Articulation::Type::SCALE){
-
-				}
+			for(int i = 0; i < articulations.size(); i++){
+				Node::State state = getNewState(i,m,parent_pose);
+				if(state.valid) updateState(state, m->getTimestamp(), m->getLatency());
 			}
 		}
 		//Dont use data twice
 		measurements.clear();
+	}
+
+	Node::State Node::getNewState(int articulationNumber, const Measurement::Ptr& m, const Transform3D& parent_pose){
+		Node::State new_state;
+		new_state.valid = false;
+		Articulation::Type articulationType = articulations[articulationNumber];
+		//If measurement is rotation
+		if(m->type == Measurement::Type::ROTATION ||
+		(articulationType == Articulation::Type::BONE && m->type == Measurement::Type::RIGID_BODY) )
+		{
+			//Simple update based on parent pose
+			new_state.expectation = Eigen::Quaternionf(parent_pose.rotation().inverse() * m->getRotation()).coeffs();
+			new_state.expectation.normalize();
+			//TODO: make names consitent
+			new_state.variance = m->getRotationVar();
+			new_state.valid = true;
+		} 
+		//If measurement also contains position
+		else if (m->type == Measurement::Type::RIGID_BODY && articulationType == Articulation::Type::POSE)
+		{
+			//Simple update based on parent pose
+			new_state.variance = m->getPosQuatVar();
+			Eigen::Quaternionf qLocal= Eigen::Quaternionf(parent_pose.rotation().inverse() * m->getRotation());
+			Eigen::Vector3f posLocal = parent_pose.inverse() * m->getPosition();
+			new_state.expectation = Eigen::Matrix<float, 7, 1>::Zero();
+			new_state.expectation << posLocal, qLocal.coeffs();
+			new_state.valid = true;
+		} else if (m->type == Measurement::Type::SCALE && articulationType == Articulation::Type::SCALE){
+			//Scales are ALWAYS LOCAL
+			new_state.variance = m->data.head(3);
+			new_state.expectation = m->uncertainty.topLeftCorner(3,3);
+			new_state.valid = true;
+		}
+		return new_state;
 	}
 
 	//-------------------------------------------------------------------------------------------------------
