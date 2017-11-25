@@ -130,6 +130,8 @@ namespace spooky {
 					new_state.expectation = Eigen::Matrix<float, 7, 1>::Zero();
 					new_state.expectation << posLocal, qLocal.coeffs();
 					updateState(new_state, m->getTimestamp(), m->getLatency());
+				} else if (m->type == Measurement::Type::SCALE && articulationType == Articulation::Type::SCALE){
+
 				}
 			}
 		}

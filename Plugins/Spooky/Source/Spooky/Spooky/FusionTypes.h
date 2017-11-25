@@ -32,6 +32,13 @@ namespace spooky {
 
 	//Mapping between two affine spaces
 	typedef Eigen::Transform<float, 3, Eigen::Affine> Transform3D;
+	
+	//Define isometry for fast inverses when possible
+	class Isometry3D : Transform3D {
+		override Isometry3D inverse(){
+			this->Transform3D::inverse(Eigen::Isometry);
+		}
+	};
 
 	/** System descriptor - abstraction for a string type to be used as a map key - might be changed later
 	*

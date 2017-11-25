@@ -94,7 +94,7 @@ namespace spooky{
 				Sophus::Vector6f vec = zeta.log();
 				result.v = vec.head(3);
 				result.w = vec.tail(3);
-				result.w.normalized();
+				result.w.normalize();
 				break;
 			}
 			case(BONE):
@@ -113,9 +113,9 @@ namespace spooky{
 			}
 			case(SCALE):
 			{
-				//Scales have no internal structure
+				//Find scale major axis
+				result.w = Eigen::Vector3f(1,0,0);
 				result.v = Eigen::Vector3f::Zero();
-				result.w = Eigen::Vector3f::Zero();
 			}
 		}
         return result;
@@ -152,11 +152,13 @@ namespace spooky{
 		return result;
 	}
 
-	Articulation Articulation::createScale() {
+	Articulation Articulation::createScale(const Eigen::Vector3f& direction,const Eigen::Vector3f& direction2) {
 		Articulation result;
 		result.type = SCALE;
-		result.w = Eigen::Vector3f::Identity();
-		result.v = Eigen::Vector3f::Identity();
+		result.w = direction.normalized();
+		Eigen::Vector3f unit2 = direction2.normalized();
+		//XxY=Z, ZxX=Y
+		result.v = Eigen::Vector3f::cross(Eigen::Vector3f::cross(result.w,unit2), result.w).normalized();
 		return result;
 	}
 
