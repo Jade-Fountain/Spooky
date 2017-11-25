@@ -67,16 +67,8 @@ namespace spooky{
 			}
 			case(SCALE):
 			{
-				//Theta is a scale vector
-				Eigen::Matrix3f::Identity() basis;
-				basis.col(0) = w;
-				basis.col(1) = v;
-				//TODO: optimise?
-				basis.col(2) = w.cross(v);
-				//T = Q*S*Q'
-				T.rotate(basis);//rotate: t*=rotation
+				//Theta is a scale vector in x,y and z
 				T.scale(Eigen::Vector3f(theta.head(3)));
-				T.rotate(basis.transpose());
 				break;
 			}
         }
@@ -120,28 +112,9 @@ namespace spooky{
 			}
 			case(SCALE):
 			{
-				//Find scale major axis
-				Eigen::EigenSolver<Matrix3f> eSolver(T.block<3,3>(0,0));
-				float max_eval = 0;
-				int i_max = 0;
-				for(int i = 0; i<3; i++){
-					if(eSolver.eigenvalues()[i] > max_eval){
-						max_eval = eSolver.eigenvalues()[i];
-						i_max = i;
-					}
-				}
-				if(max_eval>0){
-					result.w = eSolver.eigenvectors().col(i).real();
-				}
-				else {
-					result.w = Eigen::Vector3f(1,0,0);
-				}
-				//TODO: is there a way to avoid if statement?
-				if(result.w[0]>0){
-					result.v = Eigen::Vector3f(-result.w[1],result.w[0],0).normalized();
-				} else {
-					result.v = Eigen::Vector3f(0,result.w[2],-result.w[1]).normalized();
-				}
+				//Scales have no internal structure, they scale in their parent reference frame
+				result.v = Eigen::Vector3f::Zero();
+				result.w = Eigen::Vector3f::Zero();
 				break;
 			}
 		}
@@ -179,13 +152,12 @@ namespace spooky{
 		return result;
 	}
 
-	Articulation Articulation::createScale(const Eigen::Vector3f& direction, const Eigen::Vector3f& direction2) {
+	Articulation Articulation::createScale() {
 		Articulation result;
 		result.type = SCALE;
-		result.w = direction.normalized();
-		Eigen::Vector3f unit2 = direction2.normalized();
-		//XxY=Z, ZxX=Y
-		result.v = Eigen::Vector3f::cross(Eigen::Vector3f::cross(result.w,unit2), result.w).normalized();
+		//Scales have no internal structure, they scale in their parent reference frame
+		result.v = Eigen::Vector3f::Zero();
+		result.w = Eigen::Vector3f::Zero();
 		return result;
 	}
 
