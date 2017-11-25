@@ -36,7 +36,6 @@ namespace spooky{
 		switch(type){
 		case(CARTESIAN):
             {
-    			w.normalize();
     			R = Sophus::SO3f::exp(theta(0) * w).matrix(); // = e^(theta * ^w)
     			T.translate(v);
     			T.rotate(R);
@@ -69,7 +68,15 @@ namespace spooky{
 			case(SCALE):
 			{
 				//Theta is a scale vector
+				Eigen::Matrix3f::Identity() basis;
+				basis.col(0) = w;
+				basis.col(1) = v;
+				//TODO: optimise?
+				basis.col(2) = w.cross(v);
+				//T = Q*S*Q'
+				T.rotate(basis);//rotate: t*=rotation
 				T.scale(Eigen::Vector3f(theta.head(3)));
+				T.rotate(basis.transpose());
 				break;
 			}
         }
@@ -114,8 +121,28 @@ namespace spooky{
 			case(SCALE):
 			{
 				//Find scale major axis
-				result.w = Eigen::Vector3f(1,0,0);
-				result.v = Eigen::Vector3f::Zero();
+				Eigen::EigenSolver<Matrix3f> eSolver(T.block<3,3>(0,0));
+				float max_eval = 0;
+				int i_max = 0;
+				for(int i = 0; i<3; i++){
+					if(eSolver.eigenvalues()[i] > max_eval){
+						max_eval = eSolver.eigenvalues()[i];
+						i_max = i;
+					}
+				}
+				if(max_eval>0){
+					result.w = eSolver.eigenvectors().col(i).real();
+				}
+				else {
+					result.w = Eigen::Vector3f(1,0,0);
+				}
+				//TODO: is there a way to avoid if statement?
+				if(result.w[0]>0){
+					result.v = Eigen::Vector3f(-result.w[1],result.w[0],0).normalized();
+				} else {
+					result.v = Eigen::Vector3f(0,result.w[2],-result.w[1]).normalized();
+				}
+				break;
 			}
 		}
         return result;
@@ -152,7 +179,7 @@ namespace spooky{
 		return result;
 	}
 
-	Articulation Articulation::createScale(const Eigen::Vector3f& direction,const Eigen::Vector3f& direction2) {
+	Articulation Articulation::createScale(const Eigen::Vector3f& direction, const Eigen::Vector3f& direction2) {
 		Articulation result;
 		result.type = SCALE;
 		result.w = direction.normalized();
