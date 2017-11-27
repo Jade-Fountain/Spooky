@@ -122,6 +122,24 @@ namespace spooky {
 		}
 	}
 
+	Eigen::Vector3f Measurement::getScale () {
+		if (type == Type::SCALE) {
+			return data.head(3);
+		}
+		else {
+			return Eigen::Vector3f::Ones();
+		}
+	}
+
+	Eigen::Matrix3f Measurement::getScaleVar() {
+		if (type == Type::SCALE) {
+			return uncertainty.topLeftCorner(3, 3);
+		}
+		else {
+			return max_var * Eigen::Matrix3f::Identity();
+		}
+	}
+
 	Transform3D Measurement::getTransform(){
 		Transform3D T = Transform3D::Identity();
 		bool rigid = type == Type::RIGID_BODY;

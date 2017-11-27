@@ -40,43 +40,30 @@ namespace spooky {
 	Transform3D Node::getLocalPose(){
 		Transform3D pose = Transform3D::Identity();
 		for (int i = 0; i < articulations.size(); i++) {
-			pose = pose * articulations[i].getTransform(local_state.expectation.col(i));
+			pose = pose * articulations[i].getTransform(local_state.articulation[i].expectation);
 		}	
 		return pose;
 	}
 
 	void Node::updateState(const State& new_state, const float& timestamp, const float& latency) {
 		rechacheRequired = true;
-		if (true || timestamp == local_state.last_update_time) {
-			local_state = new_state;
-		}
-		else {
-			Eigen::VectorXf velocity = (new_state.expectation - local_state.expectation) / (timestamp - local_state.last_update_time);
-			local_state.expectation = new_state.expectation + velocity * latency;
-			assert(!std::isnan(local_state.expectation));
-
-			std::stringstream ss;
-			ss << "Prediction amount[" << desc.name << "] = " << velocity * latency << std::endl;
-			SPOOKY_LOG(ss.str());
-			//TODO: scale variance with extrapolation
-			local_state.variance = new_state.variance;
-		}
+		//TODO: add latency prediction
+		local_state = new_state;
 		local_state.last_update_time = timestamp;
 	}
 
 	void Node::setModel(std::vector<Articulation> art){
 		articulations = art;
-		std::vector<Eigen::VectorXf> state;
+		//Clear old model
+		local_state.articulation.clear();
 		int max_n_rows = 1;
 		for(int i = 0; i < articulations.size(); i++){	
-			state.push_back(Articulation::getInitialState(articulations[i].getType()));
-			max_n_rows = (max_n_rows < state.back().rows()) ? state.back().rows() : max_n_rows;
+			local_state.articulation.push_back(Node::State::Parameters());
+			local_state.articulation[i].expectation = Articulation::getInitialState(articulations[i].getType());
+			//TODO: generate covariance initial per aticulation
+			local_state.articulation[i].variance = initial_covariance * Eigen::MatrixXf::Identity(local_state.articulation[i].expectation.size(),
+																							      local_state.articulation[i].expectation.size());
 		}
-		local_state.expectation = Eigen::MatrixXf::Zero(max_n_rows, state.size());
-		for (int i = 0; i < articulations.size(); i++) {
-			local_state.expectation.col(i) = state[i];
-		}
-		local_state.variance = initial_covariance * Eigen::MatrixXf::Identity(max_n_rows*state.size(), max_n_rows*state.size());
 	}
 
 	void Node::fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem){
@@ -87,6 +74,8 @@ namespace spooky {
 			parent->fuse(calib, referenceSystem);
 			parent_pose = parent->getGlobalPose();
 		}
+		
+		//SPOOKY_LOG("Fusing node " + desc.name + " t = ");
 
 		for(auto& m : measurements){
 			//Throwout bad measurements
@@ -101,47 +90,50 @@ namespace spooky {
 				parent_pose = calibResult.transform * parent_pose;
 			}
 
+			Node::State new_state = local_state;
+			new_state.valid = false;
 			for(int i = 0; i < articulations.size(); i++){
-				Node::State state = getNewState(i,m,parent_pose);
-				if(state.valid) updateState(state, m->getTimestamp(), m->getLatency());
+				//Iteratively enters data into new_state
+				insertMeasurement(i,m,parent_pose,&new_state);
+				//If we can use the data, update the local state
 			}
+			if(new_state.valid) updateState(new_state, m->getTimestamp(), m->getLatency());
 		}
 		//Dont use data twice
 		measurements.clear();
 	}
 
-	Node::State Node::getNewState(int articulationNumber, const Measurement::Ptr& m, const Transform3D& parent_pose){
-		Node::State new_state;
-		new_state.valid = false;
-		Articulation::Type articulationType = articulations[articulationNumber];
+	void Node::insertMeasurement(const int& i, const Measurement::Ptr& m, const Transform3D& parent_pose, State* state){
+		Articulation::Type articulationType = articulations[i].getType();
 		//If measurement is rotation
 		if(m->type == Measurement::Type::ROTATION ||
 		(articulationType == Articulation::Type::BONE && m->type == Measurement::Type::RIGID_BODY) )
 		{
 			//Simple update based on parent pose
-			new_state.expectation = Eigen::Quaternionf(parent_pose.rotation().inverse() * m->getRotation()).coeffs();
-			new_state.expectation.normalize();
+			state->articulation[i].expectation = Eigen::Quaternionf(parent_pose.rotation().inverse() * m->getRotation()).coeffs();
+			state->articulation[i].expectation.normalize();
 			//TODO: make names consitent
-			new_state.variance = m->getRotationVar();
-			new_state.valid = true;
+			state->articulation[i].variance = m->getRotationVar();
+			state->valid = true;
 		} 
 		//If measurement also contains position
 		else if (m->type == Measurement::Type::RIGID_BODY && articulationType == Articulation::Type::POSE)
 		{
 			//Simple update based on parent pose
-			new_state.variance = m->getPosQuatVar();
 			Eigen::Quaternionf qLocal= Eigen::Quaternionf(parent_pose.rotation().inverse() * m->getRotation());
 			Eigen::Vector3f posLocal = parent_pose.inverse() * m->getPosition();
-			new_state.expectation = Eigen::Matrix<float, 7, 1>::Zero();
-			new_state.expectation << posLocal, qLocal.coeffs();
-			new_state.valid = true;
-		} else if (m->type == Measurement::Type::SCALE && articulationType == Articulation::Type::SCALE){
-			//Scales are ALWAYS LOCAL
-			new_state.variance = m->data.head(3);
-			new_state.expectation = m->uncertainty.topLeftCorner(3,3);
-			new_state.valid = true;
+			state->articulation[i].expectation = Eigen::Matrix<float, 7, 1>::Zero();
+			state->articulation[i].expectation << posLocal, qLocal.coeffs();
+			state->articulation[i].variance = m->getPosQuatVar();
+			state->valid = true;
 		}
-		return new_state;
+		//If scaling
+		else if (m->type == Measurement::Type::SCALE && articulationType == Articulation::Type::SCALE) {
+			//Scales are ALWAYS LOCAL
+			state->articulation[i].expectation = m->getPosition();
+			state->articulation[i].variance = m->getPositionVar();
+			state->valid = true;
+		}
 	}
 
 	//-------------------------------------------------------------------------------------------------------
@@ -232,7 +224,8 @@ namespace spooky {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createBone(boneTransform.translation()));
 		nodes[node]->setModel(art);
-		nodes[node]->local_state.expectation = Eigen::Quaternionf(boneTransform.rotation()).coeffs();
+		nodes[node]->local_state.articulation.push_back(Node::State::Parameters());
+		nodes[node]->local_state.articulation[0].expectation = Eigen::Quaternionf(boneTransform.rotation()).coeffs();
 	}
 
 
@@ -240,7 +233,8 @@ namespace spooky {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createPose());
 		nodes[node]->setModel(art);
-		nodes[node]->local_state.expectation = Measurement::getPosQuatFromTransform(poseTransform);
+		nodes[node]->local_state.articulation.push_back(Node::State::Parameters());
+		nodes[node]->local_state.articulation[0].expectation = Measurement::getPosQuatFromTransform(poseTransform);
 	}
 	
 	void ArticulatedModel::setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial) {
@@ -249,8 +243,10 @@ namespace spooky {
 		//Scale in local space x'=T*S*x
 		art.push_back(Articulation::createScale());
 		nodes[node]->setModel(art);
-		nodes[node]->local_state.expectation.col(0) = Measurement::getPosQuatFromTransform(poseTransform);
-		nodes[node]->local_state.expectation.col(1) = scaleInitial;
+		nodes[node]->local_state.articulation.push_back(Node::State::Parameters());
+		nodes[node]->local_state.articulation.push_back(Node::State::Parameters());
+		nodes[node]->local_state.articulation[0].expectation = Measurement::getPosQuatFromTransform(poseTransform);
+		nodes[node]->local_state.articulation[1].expectation = scaleInitial;
 	}
 
 
@@ -260,7 +256,8 @@ namespace spooky {
 			std::vector<Articulation> art;
 			art.push_back(Articulation::createPose());
 			nodes[node]->setModel(art);
-			nodes[node]->local_state.expectation = Measurement::getPosQuatFromTransform(Transform3D::Identity());
+			nodes[node]->local_state.articulation.push_back(Node::State::Parameters());
+			nodes[node]->local_state.articulation[0].expectation = Measurement::getPosQuatFromTransform(Transform3D::Identity());
 		}
 	}
 

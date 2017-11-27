@@ -110,11 +110,12 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh)
 		spooky::NodeDescriptor parent_desc = (bone.ParentIndex >= 0) ?
 			spooky::NodeDescriptor(TCHAR_TO_UTF8(*(boneInfo[bone.ParentIndex].Name.GetPlainNameString()))) :
 			spooky::NodeDescriptor();
-		//Set bone name
+		//Set bone name		
 		spooky::NodeDescriptor bone_desc = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
 		//TODO: find better way to do this check for pose nodes
 		if (bone.Name.GetPlainNameString() == "pelvis") {
-			plant.addPoseNode(bone_desc, parent_desc, bonePoseLocal);
+			//The pelvis has 6DoF pose and 3DoF scale
+			plant.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones());
 		}
 		else {
 			plant.addBoneNode(bone_desc, parent_desc, bonePoseLocal);

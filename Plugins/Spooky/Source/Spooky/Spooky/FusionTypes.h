@@ -35,7 +35,7 @@ namespace spooky {
 	
 	//Define isometry for fast inverses when possible
 	class Isometry3D : Transform3D {
-		override Isometry3D inverse(){
+		Isometry3D inverse(){
 			this->Transform3D::inverse(Eigen::Isometry);
 		}
 	};
@@ -342,6 +342,9 @@ namespace spooky {
 
 		Eigen::Matrix<float,7,1>  getPosQuat();
 		Eigen::Matrix<float,7,7> getPosQuatVar();
+
+		Eigen::Vector3f getScale();
+		Eigen::Matrix3f getScaleVar();
 
 		Transform3D getTransform();
 		Eigen::Matrix4f getTransformMatrix() { return getTransform().matrix(); }
