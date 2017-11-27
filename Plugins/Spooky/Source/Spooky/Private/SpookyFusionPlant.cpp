@@ -288,41 +288,6 @@ FVector4 USpookyFusionPlant::getRotatorAxisAngle(FRotator R) {
 	return FVector4(axis[0], axis[1], axis[2], angle * 180 / M_PI);
 }
 
-void USpookyFusionPlant::CopyPose(UPoseableMeshComponent* target, const UPoseableMeshComponent* input)
-{
-	if (target->RequiredBones.IsValid())
-	{
-		if (target->SkeletalMesh == input->SkeletalMesh)
-		{
-			check(target->BoneSpaceTransforms.Num() == input->BoneSpaceTransforms.Num());
-
-			// Quick path, we know everything matches, just copy the local atoms
-			target->BoneSpaceTransforms = input->BoneSpaceTransforms;
-		}
-		else
-		{
-			// The meshes don't match, search bone-by-bone (slow path)
-
-			// first set the localatoms to ref pose from our current mesh
-			target->BoneSpaceTransforms = target->SkeletalMesh->RefSkeleton.GetRefBonePose();
-
-			// Now overwrite any matching bones
-			const int32 NumSourceBones = input->SkeletalMesh->RefSkeleton.GetNum();
-
-			for (int32 SourceBoneIndex = 0; SourceBoneIndex < NumSourceBones; ++SourceBoneIndex)
-			{
-				const FName SourceBoneName = input->GetBoneName(SourceBoneIndex);
-				const int32 TargetBoneIndex = target->GetBoneIndex(SourceBoneName);
-
-				if (TargetBoneIndex != INDEX_NONE)
-				{
-					target->BoneSpaceTransforms[TargetBoneIndex] = input->BoneSpaceTransforms[SourceBoneIndex];
-				}
-			}
-		}
-		target->RefreshBoneTransforms();
-	}
-}
 //TODO: optimise with const ref
 Measurement::Ptr USpookyFusionPlant::CreatePositionMeasurement(FString system_name, int sensorID, float timestamp_sec, FVector position, FVector uncertainty, float confidence)
 {
