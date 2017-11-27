@@ -130,8 +130,8 @@ namespace spooky {
 		//If scaling
 		else if (m->type == Measurement::Type::SCALE && articulationType == Articulation::Type::SCALE) {
 			//Scales are ALWAYS LOCAL
-			state->articulation[i].expectation = m->getPosition();
-			state->articulation[i].variance = m->getPositionVar();
+			state->articulation[i].expectation = m->getScale();
+			state->articulation[i].variance = m->getScaleVar();
 			state->valid = true;
 		}
 	}
