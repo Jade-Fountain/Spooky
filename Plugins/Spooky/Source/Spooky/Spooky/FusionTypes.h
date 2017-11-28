@@ -40,6 +40,17 @@ namespace spooky {
 		}
 	};
 
+	static inline size_t hashTransform3D(const Transform3D& T) {
+		size_t result = 0;
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 4; j++) {
+				//XOR
+				result = result ^ (std::hash<float>{}(T.matrix()(i, j)) << 1);
+			}
+		}
+		return result;
+	}
+
 	/** System descriptor - abstraction for a string type to be used as a map key - might be changed later
 	*
 	*/

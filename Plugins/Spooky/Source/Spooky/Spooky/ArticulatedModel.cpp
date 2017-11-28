@@ -16,6 +16,7 @@
 #include "Spooky.h"
 #include "ArticulatedModel.h"
 #include "Utilities/Conventions.h"
+#include <functional>
 
 namespace spooky {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,8 +29,6 @@ namespace spooky {
 	Node::Node() {
 		homePose = Transform3D::Identity();
 		cachedPose = Transform3D::Identity();
-		lastParentCache = Transform3D::Identity();
-		 
 	}
 
 	Transform3D Node::getFinalGlobalPose(){
@@ -46,7 +45,7 @@ namespace spooky {
 	}
 
 	void Node::updateState(const State& new_state, const float& timestamp, const float& latency) {
-		rechacheRequired = true;
+		recacheRequired = true;
 		//TODO: add latency prediction
 		local_state = new_state;
 		local_state.last_update_time = timestamp;
@@ -141,18 +140,26 @@ namespace spooky {
 	//-------------------------------------------------------------------------------------------------------
 
 	Transform3D Node::getGlobalPose() {
+		//If this is a root node
+		if (parent == NULL) {
+			cachedPose = recacheRequired ? getLocalPose() : cachedPose;
+			cachedPoseHash = hashTransform3D(cachedPose);
+			recacheRequired = false;
+			return cachedPose;
+		}
+		//If we have a parent node
+		bool parentChanged =  parent->getCachedPoseHash() != lastParentHash;
 		//Check if cached
 		//If we need to recache, concatenate articulations
-		//TODO: optimise caching
-		bool parentChanged = (parent != NULL) ? !parent->getCachedPose().isApprox(lastParentCache) : false;
-		if(rechacheRequired || parentChanged){
+		if(recacheRequired || parentChanged){
 			//If root node, return identity
-			Transform3D parent_pose = (parent != NULL) ? (parent->getGlobalPose()) : (Transform3D::Identity());
+			Transform3D parent_pose = parent->getGlobalPose();
 			//Save cache
 			cachedPose = parent_pose * getLocalPose();
-			rechacheRequired = false;
+			cachedPoseHash = hashTransform3D(cachedPose);
+			recacheRequired = false;
 			//The latest transform of our parent
-			lastParentCache = parent_pose;
+			lastParentHash =  parent->getCachedPoseHash();
 		}
 		return cachedPose;
 	}
@@ -160,6 +167,12 @@ namespace spooky {
 	Transform3D Node::getCachedPose() {
 		return cachedPose;
 	}
+
+	size_t Node::getCachedPoseHash() {
+		return cachedPoseHash;
+	}
+
+
 
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////

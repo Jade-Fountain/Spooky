@@ -108,11 +108,13 @@ namespace spooky {
 		float initial_covariance = 3.14;
 
 		//Cached transforms
-		bool rechacheRequired = true;
+		bool recacheRequired = true;
 		//TODO: optimise traversal and caching
 		Transform3D cachedPose;
-		Transform3D lastParentCache;
+		size_t cachedPoseHash = 0;
+		size_t lastParentHash = 0;
 		Transform3D getCachedPose();
+		size_t getCachedPoseHash();
 	};
 
 	class ArticulatedModel{
