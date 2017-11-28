@@ -34,21 +34,29 @@ namespace spooky {
 		//Internal Info
 		//////////////////////////////////////////////////////////////////
 		struct State{
-			//Vectors of articulation states stored in columns
-			//		theta1	phi1 ...
-			//		theta2	phi2
-			//		theta3	phi3
-			//		..
-			//	e.g. quat: 	w
-			//				x
-			//				y
-			//				z
-			//	e.g. twists:(theta1	theta2 theta3)
-			Eigen::MatrixXf expectation;
-			//Covariance associated with vec(expectation)
-			Eigen::MatrixXf variance;
+			struct Parameters {
+				//Vectors of articulation states stored in columns
+				//		theta1	phi1 ...
+				//		theta2	phi2
+				//		theta3	phi3
+				//		..
+				//	e.g. quat: 	w
+				//				x
+				//				y
+				//				z
+				//	e.g. twists:(theta1	theta2 theta3)
+				Eigen::MatrixXf expectation;
+				//Covariance associated with vec(expectation)
+				Eigen::MatrixXf variance;
+			};
+
+			//Paramters for each articulation
+			std::vector<Parameters> articulation;
+
 			//Last update time
 			float last_update_time = 0;
+			//State is valid - false if state poorly initialised, etc...
+			bool valid = true;
 		};
 	
 		//Current state
@@ -93,14 +101,20 @@ namespace spooky {
 	private:
 		Transform3D getGlobalPose();
 
+		//Merges measurement m into state at slot i
+		void insertMeasurement(const int& i, const Measurement::Ptr& m, const Transform3D& parent_pose, State* state);
+
+
 		float initial_covariance = 3.14;
 
 		//Cached transforms
-		bool rechacheRequired = true;
+		bool recacheRequired = true;
 		//TODO: optimise traversal and caching
 		Transform3D cachedPose;
-		Transform3D lastParentCache;
+		size_t cachedPoseHash = 0;
+		size_t lastParentHash = 0;
 		Transform3D getCachedPose();
+		size_t getCachedPoseHash();
 	};
 
 	class ArticulatedModel{

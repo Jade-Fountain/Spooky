@@ -110,11 +110,12 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh)
 		spooky::NodeDescriptor parent_desc = (bone.ParentIndex >= 0) ?
 			spooky::NodeDescriptor(TCHAR_TO_UTF8(*(boneInfo[bone.ParentIndex].Name.GetPlainNameString()))) :
 			spooky::NodeDescriptor();
-		//Set bone name
+		//Set bone name		
 		spooky::NodeDescriptor bone_desc = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
 		//TODO: find better way to do this check for pose nodes
 		if (bone.Name.GetPlainNameString() == "pelvis") {
-			plant.addPoseNode(bone_desc, parent_desc, bonePoseLocal);
+			//The pelvis has 6DoF pose and 3DoF scale
+			plant.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones());
 		}
 		else {
 			plant.addBoneNode(bone_desc, parent_desc, bonePoseLocal);
@@ -168,6 +169,15 @@ void USpookyFusionPlant::AddPoseMeasurement(TArray<FString> nodeNames, FString s
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
+void USpookyFusionPlant::AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, float confidence)
+{
+	Measurement::Ptr m = CreateScaleMeasurement(systemName, sensorID, timestamp_sec, measurement, covariance, confidence);
+	//Scales always local to the node
+	m->globalSpace = false;
+	plant.addMeasurement(m, convertToNodeDescriptors(nodeNames));
+}
+
+UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 	//For each bone
 	auto& skeleton = skeletons[skel_index];
@@ -185,6 +195,7 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 		plant.addMeasurement(m, bone_name);
 	}
 }
+
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::Fuse()
 {
@@ -277,41 +288,6 @@ FVector4 USpookyFusionPlant::getRotatorAxisAngle(FRotator R) {
 	return FVector4(axis[0], axis[1], axis[2], angle * 180 / M_PI);
 }
 
-void USpookyFusionPlant::CopyPose(UPoseableMeshComponent* target, const UPoseableMeshComponent* input)
-{
-	if (target->RequiredBones.IsValid())
-	{
-		if (target->SkeletalMesh == input->SkeletalMesh)
-		{
-			check(target->BoneSpaceTransforms.Num() == input->BoneSpaceTransforms.Num());
-
-			// Quick path, we know everything matches, just copy the local atoms
-			target->BoneSpaceTransforms = input->BoneSpaceTransforms;
-		}
-		else
-		{
-			// The meshes don't match, search bone-by-bone (slow path)
-
-			// first set the localatoms to ref pose from our current mesh
-			target->BoneSpaceTransforms = target->SkeletalMesh->RefSkeleton.GetRefBonePose();
-
-			// Now overwrite any matching bones
-			const int32 NumSourceBones = input->SkeletalMesh->RefSkeleton.GetNum();
-
-			for (int32 SourceBoneIndex = 0; SourceBoneIndex < NumSourceBones; ++SourceBoneIndex)
-			{
-				const FName SourceBoneName = input->GetBoneName(SourceBoneIndex);
-				const int32 TargetBoneIndex = target->GetBoneIndex(SourceBoneName);
-
-				if (TargetBoneIndex != INDEX_NONE)
-				{
-					target->BoneSpaceTransforms[TargetBoneIndex] = input->BoneSpaceTransforms[SourceBoneIndex];
-				}
-			}
-		}
-		target->RefreshBoneTransforms();
-	}
-}
 //TODO: optimise with const ref
 Measurement::Ptr USpookyFusionPlant::CreatePositionMeasurement(FString system_name, int sensorID, float timestamp_sec, FVector position, FVector uncertainty, float confidence)
 {
@@ -348,7 +324,6 @@ Measurement::Ptr USpookyFusionPlant::CreateScaleMeasurement(FString system_name,
 {
 	//Create basic measurement
 	Eigen::Vector3f meas(&scale[0]);
-	meas = meas * plant.config.units.input_m;
 	Eigen::Matrix<float, 3, 3> un = Eigen::Matrix<float, 3, 3>::Identity();
 	un.diagonal() = Eigen::Vector3f(&uncertainty[0]);
 	Measurement::Ptr result = Measurement::createScaleMeasurement(meas, un);
@@ -382,7 +357,7 @@ void USpookyFusionPlant::SetCommonMeasurementData(Measurement::Ptr& m, FString s
 	plant.setMeasurementSensorInfo(m, spooky::SystemDescriptor(TCHAR_TO_UTF8(*system_name)), spooky::SensorID(sensorID));
 	bool measurementConsistent = m->setMetaData(timestamp_sec, confidence);
 	if (!measurementConsistent) {
-		std::cout << "WARNING - Measurement not created correctly - " << __LINE__ << std::endl;
+		std::cout << "WARNING - Measurement not created correctly - " << __FILE__ << " : " << __LINE__ << std::endl;
 	}
 }
 

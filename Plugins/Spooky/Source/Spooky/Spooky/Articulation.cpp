@@ -36,7 +36,6 @@ namespace spooky{
 		switch(type){
 		case(CARTESIAN):
             {
-    			w.normalize();
     			R = Sophus::SO3f::exp(theta(0) * w).matrix(); // = e^(theta * ^w)
     			T.translate(v);
     			T.rotate(R);
@@ -68,7 +67,7 @@ namespace spooky{
 			}
 			case(SCALE):
 			{
-				//Theta is a scale vector
+				//Theta is a scale vector in x,y and z
 				T.scale(Eigen::Vector3f(theta.head(3)));
 				break;
 			}
@@ -94,7 +93,7 @@ namespace spooky{
 				Sophus::Vector6f vec = zeta.log();
 				result.v = vec.head(3);
 				result.w = vec.tail(3);
-				result.w.normalized();
+				result.w.normalize();
 				break;
 			}
 			case(BONE):
@@ -113,9 +112,10 @@ namespace spooky{
 			}
 			case(SCALE):
 			{
-				//Scales have no internal structure
+				//Scales have no internal structure, they scale in their parent reference frame
 				result.v = Eigen::Vector3f::Zero();
 				result.w = Eigen::Vector3f::Zero();
+				break;
 			}
 		}
         return result;
@@ -155,8 +155,9 @@ namespace spooky{
 	Articulation Articulation::createScale() {
 		Articulation result;
 		result.type = SCALE;
-		result.w = Eigen::Vector3f::Identity();
-		result.v = Eigen::Vector3f::Identity();
+		//Scales have no internal structure, they scale in their parent reference frame
+		result.v = Eigen::Vector3f::Zero();
+		result.w = Eigen::Vector3f::Zero();
 		return result;
 	}
 
