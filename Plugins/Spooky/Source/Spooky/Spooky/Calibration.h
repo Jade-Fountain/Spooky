@@ -69,7 +69,7 @@ namespace spooky {
 		void addMeasurement(const Measurement::Ptr& m, const SystemDescriptor& system, const NodeDescriptor& node);
 		float compareMeasurement(const Measurement::Ptr& m, const SystemDescriptor& system, const NodeDescriptor& node);
 		std::string getStateSummary();
-
+		
 
 
 	};
@@ -80,6 +80,7 @@ namespace spooky {
 		//----------------
 		//PRIVATE MEMBERS
 		//----------------
+		bool fault_detection_disabled = true;
 
 
 		//Table for looking up data relevant to determining transforms

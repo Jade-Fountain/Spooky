@@ -68,6 +68,10 @@ namespace spooky {
 			case (CalibrationResult::State::CALIBRATED):
 			{
 				SPOOKY_LOG("CalibrationResult::State::CALIBRATED");
+				if (fault_detection_disabled) {
+					SPOOKY_LOG("WARNING: FAULT DETECTION IS DISABLED");
+					return currentCalibration;
+				}
 				//TODO: distinguish noise vs. actual movement
 				//TODO: implement that fault decay detection thing
 				//TODO: fix fault detection for new model
