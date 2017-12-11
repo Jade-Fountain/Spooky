@@ -108,24 +108,24 @@ namespace spooky {
 		utility::profiler.startTimer("All");
 		//SPOOKY_LOG("Fusing: " + std::to_string(measurement_buffer.size()) + "measurements");
 
-		correlator.addMeasurementGroup(measurement_buffer);
+		correlator.addMeasurementGroup(measurement_buffer.getNewSynchronizedMeasurements());
 		correlator.identify();
 		utility::profiler.endTimer("Correlator");
 		if(correlator.isStable() || true){
 			utility::profiler.startTimer("Calibrator add");
-			calibrator.addMeasurementGroup(measurement_buffer);
+			calibrator.addMeasurementGroup(measurement_buffer.getNewSynchronizedMeasurements());
 			utility::profiler.endTimer("Calibrator add");
 			utility::profiler.startTimer("Calibrate");
 			calibrator.calibrate();
 			utility::profiler.endTimer("Calibrate");
 			if(calibrator.isStable() || true){
 				utility::profiler.startTimer("Fuse");
-				skeleton.addMeasurementGroup(measurement_buffer);
+				skeleton.addMeasurementGroup(measurement_buffer.getNewSynchronizedMeasurements());
 				skeleton.fuse(calibrator);
 				utility::profiler.endTimer("Fuse");
 			}
 		}	
-		measurement_buffer.clear();
+		measurement_buffer.clearLast();
 		//TODO: do this less often
 		utility::profiler.endTimer("All");
 	}
