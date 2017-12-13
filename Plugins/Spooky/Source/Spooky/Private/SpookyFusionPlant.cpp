@@ -197,13 +197,13 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::Fuse()
+void USpookyFusionPlant::Fuse(float current_time)
 {
 	spooky::utility::profiler.startTimer("AAA FUSION TIME");
 	for (int i = 0; i < skeletons.size(); i++) {
 		addSkeletonMeasurement(i);
 	}
-	plant.fuse();
+	plant.fuse(current_time);
 	spooky::utility::profiler.endTimer("AAA FUSION TIME");
 	//SPOOKY_LOG(spooky::utility::profiler.getReport());
 }

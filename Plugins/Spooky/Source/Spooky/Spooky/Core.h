@@ -35,7 +35,7 @@ namespace spooky {
 		SaveManager saveManager;
 
 		//Measurement buffer for this frame
-		std::vector<Measurement::Ptr> measurement_buffer;
+		MeasurementBuffer measurement_buffer;
 
 		//Class responsible for distinguishing ambiguous sensors
 		Correlator correlator;
@@ -100,7 +100,7 @@ namespace spooky {
 		void addMeasurement(const Measurement::Ptr & m, const std::vector<NodeDescriptor>& nodes);
 		
 		//Computes data added since last fuse() call. Should be called repeatedly	
-		void fuse();
+		void fuse(const float& time);
 
 		////////////////////////////////////////////////////
 		//					Results

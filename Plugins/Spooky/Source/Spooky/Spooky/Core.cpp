@@ -101,7 +101,7 @@ namespace spooky {
 	}
 
 	//Computes data added since last fuse() call. Should be called repeatedly	
-	void Core::fuse() {
+	void Core::fuse(const float& time) {
 		//TODO: add ifdefs for profiling
 		//Add new data to calibration, with checking for usefulness
 		utility::profiler.startTimer("Correlator");
@@ -109,7 +109,7 @@ namespace spooky {
 		//SPOOKY_LOG("Fusing: " + std::to_string(measurement_buffer.size()) + "measurements");
 
 		//Get measurements offset by the largest latency so all measurements are valid
-		std::vector<Measurement::Ptr> sync_measurements = measurement_buffer.getOffsetSynchronizedMeasurements(t)
+		std::vector<Measurement::Ptr> sync_measurements = measurement_buffer.getOffsetSynchronizedMeasurements(time);
 		correlator.addMeasurementGroup(sync_measurements);
 		correlator.identify();
 		utility::profiler.endTimer("Correlator");
@@ -122,7 +122,7 @@ namespace spooky {
 			utility::profiler.endTimer("Calibrate");
 			if(calibrator.isStable() || true){
 				utility::profiler.startTimer("Fuse");
-				skeleton.addMeasurementGroup(measurement_buffer.getMeasurements(t));
+				skeleton.addMeasurementGroup(measurement_buffer.getMeasurements(time));
 				skeleton.fuse(calibrator);
 				utility::profiler.endTimer("Fuse");
 			}

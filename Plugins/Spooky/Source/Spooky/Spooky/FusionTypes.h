@@ -477,27 +477,28 @@ namespace spooky {
 		float expiry = 0.01; 
 		
 		//Data
-		std::map<SystemDescriptor,std::map<float,std::vector<Measurement::Ptr>>> measurements;
+		std::map<SystemDescriptor,std::map<double,std::vector<Measurement::Ptr>>> measurements;
 		
 		//Latencies
-		std::map<SystemDescriptor,float> latencies;
+		std::map<SystemDescriptor,double> latencies;
 		
 		//Add data
 		void push_back(const Measurement::Ptr& m){
 			//TODO: replace safeAccess with some kind of global check early on
-			safeAccess(safeAccess(measurements, m->system),m->timestamp).push_back(m);
-			if(measurements[m->system].size() > max_buffer_length){
-				measurements[m->system].erase(measurements[m->system].begin());
+			auto meas = utility::safeAccess(measurements, m->getSystem());
+			utility::safeAccess(meas,m->getTimestamp()).push_back(m);
+			if(measurements[m->getSystem()].size() > max_buffer_length){
+				measurements[m->getSystem()].erase(measurements[m->getSystem()].begin());
 			}
 		}
 
-		void insertMeasurements(std::vector<Measurement::Ptr> output, const SystemDescriptor& system, const float& t){
+		void insertMeasurements(std::vector<Measurement::Ptr> output, const SystemDescriptor& system, const double& t){
 			//If we have no measurements for this system
 			if(measurements.count(system) == 0) return;
 			
 			//Otherwise get the measurements
 			//Timestamp-->vec<Measurements>
-			std::map<float,std::vector<Measurement::Ptr>> m = measurements[system];
+			std::map<double,std::vector<Measurement::Ptr>> m = measurements[system];
 			
 			//Binary search for closest values to the requested time t
 			auto lb = m.lower_bound(t);
@@ -525,16 +526,16 @@ namespace spooky {
 		}
 
 		//Gets measurements naively for all systems at time t
-		std::vector<Measurement::Ptr> getMeasurements(const float& t){
+		std::vector<Measurement::Ptr> getMeasurements(const double& t){
 			std::vector<Measurement::Ptr> result;
 			for(auto& m : measurements){
-				insertMeasurements(result, m->system,t);
+				insertMeasurements(result, m->getSystem(),t);
 			}
 			return result;
 		}
 		
 		//Gets measurements for time t by seeking ahead in time for sensors with latency
-		std::vector<Measurement::Ptr> getSynchronizedMeasurements(const float& t){
+		std::vector<Measurement::Ptr> getSynchronizedMeasurements(const double& t){
 			std::vector<Measurement::Ptr> result;
 			for(auto& m : measurements){
 				if(latencies.count(m.first) > 0){
@@ -548,7 +549,7 @@ namespace spooky {
 		}
 		
 		//Gets latest complete measurement set for time t.
-		std::vector<Measurement::Ptr> getOffsetSynchronizedMeasurements(const float& t){
+		std::vector<Measurement::Ptr> getOffsetSynchronizedMeasurements(const double& t){
 			std::vector<Measurement::Ptr> result;
 			float max_l = 0;
 			for(auto& l : latencies){

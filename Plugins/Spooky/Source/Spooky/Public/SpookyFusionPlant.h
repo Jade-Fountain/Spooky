@@ -129,7 +129,7 @@ public:
 
 	//Align, calibrate and fuse all added data
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void Fuse();
+	void Fuse(float current_time);
 
 	//Gets animation details for driving the skeleton
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
