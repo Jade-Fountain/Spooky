@@ -80,7 +80,7 @@ namespace spooky {
 		//----------------
 		//PRIVATE MEMBERS
 		//----------------
-		bool fault_detection_disabled = true;
+		bool fault_detection_disabled = false;
 
 
 		//Table for looking up data relevant to determining transforms
