@@ -469,5 +469,94 @@ namespace spooky {
 
 	};
 
+	class MesurementBuffer {
+		//maximum storage for each system
+		int max_buffer_length = 1000;
+		
+		// time in seconds before last measurement is ignored
+		float expiry = 0.01; 
+		
+		//Data
+		std::map<SystemDescriptor,std::map<float,std::vector<Measurement::Ptr>>> measurements;
+		
+		//Latencies
+		std::map<SystemDescriptor,float> latencies;
+		
+		//Add data
+		void push_back(const Measurement::Ptr& m){
+			//TODO: replace safeAccess with some kind of global check early on
+			safeAccess(safeAccess(measurements, m->system),m->timestamp).push_back(m);
+			if(measurements[m->system].size() > max_buffer_length){
+				measurements[m->system].erase(measurements[m->system].begin());
+			}
+		}
 
+		void insertMeasurements(std::vector<Measurement::Ptr> output, const SystemDescriptor& system, const float& t){
+			//If we have no measurements for this system
+			if(measurements.count(system) == 0) return;
+			
+			//Otherwise get the measurements
+			//Timestamp-->vec<Measurements>
+			std::map<float,std::vector<Measurement::Ptr>> m = measurements[system];
+			
+			//Binary search for closest values to the requested time t
+			auto lb = m.lower_bound(t);
+			//If we are looking before our records for this stream
+			if(lb == m.end()){
+				continue;
+			}
+			auto ub = std::next(lb);
+			//If lb is the last measurement and its timestamp is close enough to this time
+			if(ub == m.end() && std::abs(m.end()->first - t) < expiry 
+				//Or if left and right dont have same number of sensors
+				//TODO: handle these cases better!
+				|| (lb->second.size() != lb->first.size())){
+				for(auto& m : lb->second){
+					result.push_back(m);
+				}
+				continue;
+			}
+			//Interpolate otherwise
+			//TODO: check lb and ub are close together?
+			float alpha = (t - lb->first) / (ub->first - lb->first);
+			for(int i = 0; i < lb->second.size(); i++){
+				result.push_back(Measurement::interpolate(lb->second[i],ub->second[i], alpha));
+			}
+		}
+
+		//Gets measurements naively for all systems at time t
+		std::vector<Measurement::Ptr> getMeasurements(const float& t){
+			std::vector<Measurement::Ptr> result;
+			for(auto& m : measurements){
+				insertMeasurements(result, m->system,t);
+			}
+			return result;
+		}
+		
+		//Gets measurements for time t by seeking ahead in time for sensors with latency
+		std::vector<Measurement::Ptr> getSynchronizedMeasurements(const float& t){
+			std::vector<Measurement::Ptr> result;
+			for(auto& m : measurements){
+				if(latencies.count(m.first) > 0){
+					insertMeasurements(result, m.first, t + latencies[m.first]);
+				} else {
+					//Assume latency 0
+					insertMeasurements(result, m.first, t);
+				}
+			}
+			return result;					
+		}
+		
+		//Gets latest complete measurement set for time t.
+		std::vector<Measurement::Ptr> getOffsetSynchronizedMeasurements(const float& t){
+			std::vector<Measurement::Ptr> result;
+			float max_l = 0;
+			for(auto& l : latencies){
+				if(l.second > max_l){
+					max_l = l.second;
+				}
+			}
+			return getSynchronizedMeasurements(t-max_l);
+		}
+	};
 }

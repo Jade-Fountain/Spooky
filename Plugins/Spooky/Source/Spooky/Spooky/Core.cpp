@@ -108,19 +108,21 @@ namespace spooky {
 		utility::profiler.startTimer("All");
 		//SPOOKY_LOG("Fusing: " + std::to_string(measurement_buffer.size()) + "measurements");
 
-		correlator.addMeasurementGroup(measurement_buffer.getNewSynchronizedMeasurements());
+		//Get measurements offset by the largest latency so all measurements are valid
+		std::vector<Measurement::Ptr> sync_measurements = measurement_buffer.getOffsetSynchronizedMeasurements(t)
+		correlator.addMeasurementGroup(sync_measurements);
 		correlator.identify();
 		utility::profiler.endTimer("Correlator");
 		if(correlator.isStable() || true){
 			utility::profiler.startTimer("Calibrator add");
-			calibrator.addMeasurementGroup(measurement_buffer.getNewSynchronizedMeasurements());
+			calibrator.addMeasurementGroup(sync_measurements);
 			utility::profiler.endTimer("Calibrator add");
 			utility::profiler.startTimer("Calibrate");
 			calibrator.calibrate();
 			utility::profiler.endTimer("Calibrate");
 			if(calibrator.isStable() || true){
 				utility::profiler.startTimer("Fuse");
-				skeleton.addMeasurementGroup(measurement_buffer.getNewSynchronizedMeasurements());
+				skeleton.addMeasurementGroup(measurement_buffer.getMeasurements(t));
 				skeleton.fuse(calibrator);
 				utility::profiler.endTimer("Fuse");
 			}

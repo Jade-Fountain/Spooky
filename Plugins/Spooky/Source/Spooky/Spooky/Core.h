@@ -64,21 +64,6 @@ namespace spooky {
 			Calibrator::Config calibrator;
 		} config;
 
-		class MesurementBuffer {
-			int max_buffer_length = 1000;
-			std::map<SystemDescriptor, std::vector<Measurement::Ptr>> measurements;
-			void push_back(const Measurement::Ptr& m){
-				//TODO: replace safeAccess with some kind of global check early on
-				safeAccess(measurements, m->system).push_back(m);
-				if(measurement[m->system].size() > max_buffer_length){
-					measurement[m->system].erase(measurement[m->system].begin());
-				}
-			}
-
-			const std::vector<Measurement::Ptr>& getNewSynchronizedMeasurements(){
-
-			}
-		};
 
 
 		////////////////////////////////////////////////////
