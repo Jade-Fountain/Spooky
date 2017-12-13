@@ -127,7 +127,6 @@ namespace spooky {
 				utility::profiler.endTimer("Fuse");
 			}
 		}	
-		measurement_buffer.clearLast();
 		//TODO: do this less often
 		utility::profiler.endTimer("All");
 	}
