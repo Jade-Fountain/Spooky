@@ -43,6 +43,27 @@ namespace spooky {
 		skeleton.setReferenceSystem(system);
 	}
 
+	void initSensor(SystemDescriptor system, int sensorID){
+		//If we haven't seen this sensor already, initialise
+		if (utility::safeAccess(sensors, system).count(sensorID) == 0) {
+			sensors[system][sensorID] = std::make_unique<Sensor>();
+			sensors[system][sensorID]->system = system;
+			sensors[system][sensorID]->sensorID = sensorID;
+			//If we have system latencies for this system, use those and override with individual sensor latencies
+			sensors[system][sensorID]->latency = sysLatencies.count(system) == 0 ? 0 : sysLatencies[system];
+		}
+	}
+
+	void setSensorLatency(SystemDescriptor system, int sensorID, float latency){
+		initSensor(system,sensorID);
+		utility::safeAccess(sensors, system)[sensorID] = latency;
+	}
+
+	void setSystemLatency(SystemDescriptor system, float latency){
+		sysLatencies[system] = latency;
+	}
+
+
 	// =================
 	//Saving and loading
 	// =================
@@ -155,15 +176,11 @@ namespace spooky {
 			return "UNKNOWN";
 		}
 	}
+
 	//Called by owner of the Core object
 	void Core::setMeasurementSensorInfo(Measurement::Ptr & m, SystemDescriptor system, SensorID id)
 	{
-		//If we haven't seen this sensor already, initialise
-		if (utility::safeAccess(sensors, system).count(id) == 0) {
-			utility::safeAccess(sensors, system)[id] = std::make_unique<Sensor>();
-			utility::safeAccess(sensors, system)[id]->system = system;
-			utility::safeAccess(sensors, system)[id]->id = id;
-		}
+
 		//Set pointer in measurement
 		m->setSensor(sensors[system][id]);
 	}

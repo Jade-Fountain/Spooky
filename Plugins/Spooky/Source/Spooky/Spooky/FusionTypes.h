@@ -111,7 +111,7 @@ namespace spooky {
 		//Maps systems.first to systems.second
 		Transform3D transform;
 		//Latency in ms of systems.second compared to systems.first
-		float latency = 0;
+		// float latency = 0;
 		//Time when calibration was carried out
 		double timestamp = 0;
 
@@ -165,7 +165,7 @@ namespace spooky {
 			transform = utility::getMeanTransform(trans, weights);
 
 			//new timestamps
-			latency = new_cal.latency;
+			//latency = new_cal.latency;
 			timestamp = new_cal.timestamp;
 			state = new_cal.state;
 			relevance = new_cal.relevance;
@@ -213,7 +213,7 @@ namespace spooky {
 		//Stats for node scores:
 		float meanScore = 1; // computed and set by correlator
 		//=================================================
-		//Latency of this sensor relative to the main system (sec)
+		//Latency of this sensor relative to the game engine (sec)
 		float latency = 0;
 		//=================================================
 		//Typedef ptr to this class for neater code later

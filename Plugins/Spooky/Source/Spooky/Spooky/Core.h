@@ -50,6 +50,9 @@ namespace spooky {
 
 		//Sensor list
 		std::map<SystemDescriptor, std::map<SensorID, Sensor::Ptr>> sensors;
+
+		//Latency data per system
+		std::map<SystemDescriptor, float> sysLatencies;
 		
 	public:
 
@@ -89,6 +92,14 @@ namespace spooky {
 
 		//Computes necessary metadata after setup
 		void finaliseSetup();
+		
+		//If we haven't seen this sensor, add it to list
+		void initSensor(SystemDescriptor system, int sensorID);
+
+		//Latency config
+		void setSensorLatency(SystemDescriptor system, int sensorID, float latency);
+		void setSystemLatency(SystemDescriptor system, float latency);
+
 
 		////////////////////////////////////////////////////
 		//					Input at runtime
