@@ -136,12 +136,14 @@ void USpookyFusionPlant::SetReferenceFrame(FString system_name) {
 	spookyCore.setReferenceSystem(spooky::SystemDescriptor(TCHAR_TO_UTF8(*system_name)));
 }
 
-void SetSensorLatency(FString system_name, int sensorID, float latency){
-	spookyCore.setSensorLatency(spooky::SystemDescriptor(TCHAR_TO_UTF8(*system_name)), sensorID, float latency);
+UFUNCTION(BlueprintCallable, Category = "Spooky")
+void USpookyFusionPlant::SetSensorLatency(FString system_name, int sensorID, float latency) {
+	spookyCore.setSensorLatency(spooky::SystemDescriptor(TCHAR_TO_UTF8(*system_name)), sensorID, latency);
 }
 
-void SetSystemLatency(FString system_name, float latency){
-	spookyCore.setSystemLatency(spooky::SystemDescriptor(TCHAR_TO_UTF8(*system_name)), float latency);
+UFUNCTION(BlueprintCallable, Category = "Spooky")
+void USpookyFusionPlant::SetSystemLatency(FString system_name, float latency){
+	spookyCore.setSystemLatency(spooky::SystemDescriptor(TCHAR_TO_UTF8(*system_name)), latency);
 }
 
 //===========================

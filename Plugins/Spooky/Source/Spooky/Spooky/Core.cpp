@@ -43,23 +43,23 @@ namespace spooky {
 		skeleton.setReferenceSystem(system);
 	}
 
-	void initSensor(SystemDescriptor system, int sensorID){
+	void Core::initSensor(SystemDescriptor system, int sensorID){
 		//If we haven't seen this sensor already, initialise
 		if (utility::safeAccess(sensors, system).count(sensorID) == 0) {
 			sensors[system][sensorID] = std::make_unique<Sensor>();
 			sensors[system][sensorID]->system = system;
-			sensors[system][sensorID]->sensorID = sensorID;
+			sensors[system][sensorID]->id = sensorID;
 			//If we have system latencies for this system, use those and override with individual sensor latencies
 			sensors[system][sensorID]->latency = sysLatencies.count(system) == 0 ? 0 : sysLatencies[system];
 		}
 	}
 
-	void setSensorLatency(SystemDescriptor system, int sensorID, float latency){
+	void Core::setSensorLatency(SystemDescriptor system, int sensorID, float latency){
 		initSensor(system,sensorID);
-		utility::safeAccess(sensors, system)[sensorID] = latency;
+		utility::safeAccess(sensors, system)[sensorID]->latency = latency;
 	}
 
-	void setSystemLatency(SystemDescriptor system, float latency){
+	void Core::setSystemLatency(SystemDescriptor system, float latency){
 		sysLatencies[system] = latency;
 	}
 

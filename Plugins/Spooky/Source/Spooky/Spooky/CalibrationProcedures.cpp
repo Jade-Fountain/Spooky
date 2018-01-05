@@ -153,7 +153,7 @@ namespace spooky {
 		//Initialise current results
 		CalibrationResult result;
 		result.systems = SystemPair(m1.front()->getSystem(), m2.front()->getSystem());
-		result.latency = currentCalibration.latency;
+		//result.latency = currentCalibration.latency;
 		//TODO: get current time since start, perhaps with use of a Platform.h?
 		result.timestamp = m1.back()->getTimestamp();
 		

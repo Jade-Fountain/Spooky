@@ -55,7 +55,7 @@ namespace spooky {
 		SPOOKY_LOG(dummy + " " + ss.str());
 
 		//Other
-		s >> dummy; s >> r.latency;		SPOOKY_LOG(dummy + " " + std::to_string(r.latency));
+//		s >> dummy; s >> r.latency;		SPOOKY_LOG(dummy + " " + std::to_string(r.latency));
 		s >> dummy; s >> r.timestamp;	SPOOKY_LOG(dummy + " " + std::to_string(r.timestamp));
 		s >> dummy; s >> r.error;		SPOOKY_LOG(dummy + " " + std::to_string(r.error));
 		s >> dummy; s >> r.quality;		SPOOKY_LOG(dummy + " " + std::to_string(r.quality));
@@ -71,7 +71,7 @@ namespace spooky {
 		Eigen::Matrix4f M = r.transform.matrix();
 		Eigen::Map<Eigen::RowVectorXf> v(M.data(), 16);
 		ss << "transform: " << v << std::endl;
-		ss << "latency: " << r.latency << std::endl;
+//		ss << "latency: " << r.latency << std::endl;
 		ss << "timestamp: " << r.timestamp << std::endl;
 		ss << "error: " << r.error << std::endl;
 		ss << "quality: " << r.quality << std::endl;
