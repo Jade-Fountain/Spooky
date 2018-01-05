@@ -43,7 +43,7 @@ namespace spooky {
 		skeleton.setReferenceSystem(system);
 	}
 
-	void Core::initSensor(SystemDescriptor system, int sensorID){
+	void Core::initSensor(const SystemDescriptor& system, const int& sensorID){
 		//If we haven't seen this sensor already, initialise
 		if (utility::safeAccess(sensors, system).count(sensorID) == 0) {
 			sensors[system][sensorID] = std::make_unique<Sensor>();
@@ -54,12 +54,12 @@ namespace spooky {
 		}
 	}
 
-	void Core::setSensorLatency(SystemDescriptor system, int sensorID, float latency){
+	void Core::setSensorLatency(const SystemDescriptor& system, const int& sensorID, const float& latency){
 		initSensor(system,sensorID);
 		utility::safeAccess(sensors, system)[sensorID]->latency = latency;
 	}
 
-	void Core::setSystemLatency(SystemDescriptor system, float latency){
+	void Core::setSystemLatency(const SystemDescriptor& system, const float& latency){
 		sysLatencies[system] = latency;
 	}
 
@@ -178,9 +178,9 @@ namespace spooky {
 	}
 
 	//Called by owner of the Core object
-	void Core::setMeasurementSensorInfo(Measurement::Ptr & m, SystemDescriptor system, SensorID id)
+	void Core::setMeasurementSensorInfo(Measurement::Ptr & m, const SystemDescriptor& system, const SensorID& id)
 	{
-
+		initSensor(system,id);
 		//Set pointer in measurement
 		m->setSensor(sensors[system][id]);
 	}

@@ -94,12 +94,11 @@ namespace spooky {
 		void finaliseSetup();
 		
 		//If we haven't seen this sensor, add it to list
-		void initSensor(SystemDescriptor system, int sensorID);
+		void initSensor(const SystemDescriptor& system, const int& sensorID);
 
 		//Latency config
-		void setSensorLatency(SystemDescriptor system, int sensorID, float latency);
-		void setSystemLatency(SystemDescriptor system, float latency);
-
+		void setSensorLatency(const SystemDescriptor& system, const int& sensorID, const float& latency);
+		void setSystemLatency(const SystemDescriptor& system, const float& latency);
 
 		////////////////////////////////////////////////////
 		//					Input at runtime
@@ -131,7 +130,7 @@ namespace spooky {
 		NodeDescriptor getCorrelationResult(SystemDescriptor system, SensorID id);
 
 		//Called by owner of the Core object to set a measurement sensor pointer
-		void setMeasurementSensorInfo(Measurement::Ptr& m, SystemDescriptor system, SensorID id);
+		void setMeasurementSensorInfo(Measurement::Ptr& m, const SystemDescriptor& system, const SensorID& id);
 
 		//Returns a string summarising the state of calibration in the system
 		std::string getCalibratorStateSummary();
