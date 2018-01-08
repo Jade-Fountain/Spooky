@@ -508,13 +508,13 @@ namespace spooky {
 				return;
 			} else if(ub == m.end()){
 				//Dont include old data
-				if (std::abs(lb->first - t) < expiry) return;
+				if (std::abs(lb->first - t) > expiry) return;
 				//If lb is the last measurement, return it
 				output.push_back(lb->second);
 			}
 			else if (lb == m.end()) {
 				//Dont include data from too far in the future
-				if (std::abs(ub->first - t) < expiry) return;
+				if (std::abs(ub->first - t) > expiry) return;
 				//If ub is the next measurement, return it
 				output.push_back(ub->second);
 			}
