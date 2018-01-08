@@ -477,11 +477,12 @@ namespace spooky {
 		// time in seconds before last measurement is ignored
 		float expiry = 0.1; 
 		
-		//Data
-		std::map<Sensor::Ptr,std::map<double,std::vector<Measurement::Ptr>>> measurements;
+		//Data : Sensor x Time --> Measurement
+		// measurements[sensor][time] = meas
+		std::map<Sensor::Ptr,std::map<double,Measurement::Ptr>> measurements;
 		
 		//Latencies
-		std::map<Sensor::Ptr,double> latencies;
+		float maximum_latency = 0;
 
 	private:
 
@@ -489,34 +490,39 @@ namespace spooky {
 		//Interpolates between available timestamps
 		void insertMeasurements(std::vector<Measurement::Ptr>& output, const Sensor::Ptr& sensor, const double& t) {
 			//If we have no measurements for this system
-			if (measurements.count(sensor) == 0) return;
+			//TODO disable this check for private method
+			//if (measurements.count(sensor) == 0) return;
 
 			//Otherwise get the measurements
 			//Timestamp-->vec<Measurements>
-			std::map<double, std::vector<Measurement::Ptr>> m = measurements[sensor];
+			const std::map<double, Measurement::Ptr>& m = measurements[sensor];
 
 			//Binary search for closest values to the requested time t
-			auto lb = m.lower_bound(t);
+			//WARNING: cpp lower_bound(t) gets "container whose key is not considered to go before t"
+			//I would call that the upper bound if you ask me (ub)
+			auto ub = m.lower_bound(t);
 			//If we are looking before our records for this stream
-			if (lb == m.end()) {
+			auto lb = std::prev(ub);
+			
+			if (lb == m.end() && ub == m.end()) {
 				return;
+			} else if(ub == m.end()){
+				//Dont include old data
+				if (std::abs(lb->first - t) < expiry) return;
+				//If lb is the last measurement, return it
+				output.push_back(lb->second);
 			}
-			auto ub = std::next(lb);
-			//If lb is the last measurement and its timestamp is close enough to this time
-			if (ub == m.end() && std::abs(m.end()->first - t) < expiry
-				//Or if left and right dont have same number of sensors
-				//TODO: handle these cases better!
-				|| (lb->second.size() != ub->second.size())) {
-				for (auto& meas : lb->second) {
-					output.push_back(meas);
-				}
-				return;
+			else if (lb == m.end()) {
+				//Dont include data from too far in the future
+				if (std::abs(ub->first - t) < expiry) return;
+				//If ub is the next measurement, return it
+				output.push_back(ub->second);
 			}
-			//Interpolate otherwise
-			//TODO: check lb and ub are close together?
-			float alpha = (t - lb->first) / (ub->first - lb->first);
-			for (int i = 0; i < lb->second.size(); i++) {
-				output.push_back(Measurement::interpolate(lb->second[i], ub->second[i], alpha));
+			else {
+				//Interpolate otherwise
+				//TODO: check lb and ub are close together?
+				float alpha = (t - lb->first) / (ub->first - lb->first);
+				output.push_back(Measurement::interpolate(lb->second, ub->second, alpha));
 			}
 		}
 
@@ -524,11 +530,14 @@ namespace spooky {
 		//Add data
 		void push_back(const Measurement::Ptr& m){
 			//TODO: replace safeAccess with some kind of global check early on
-			auto& meas = utility::safeAccess(measurements, m->getSensor());
-			utility::safeAccess(meas,m->getTimestamp()).push_back(m);
+			auto& sensor_measurements = utility::safeAccess(measurements, m->getSensor());
+			sensor_measurements[m->getTimestamp()] = m;
 			if(measurements[m->getSensor()].size() > max_buffer_length){
+				//Erase old measurements
 				measurements[m->getSensor()].erase(measurements[m->getSensor()].begin());
 			}
+			//Compute max latency
+			maximum_latency = std::fmax(maximum_latency, m->getSensor()->latency);
 		}
 
 		//Gets measurements naively for all systems at time t
@@ -546,12 +555,7 @@ namespace spooky {
 			std::vector<Measurement::Ptr> result;
 			for(auto& m : measurements){
 				const Sensor::Ptr& sensor = m.first;
-				if(latencies.count(sensor) > 0){
-					insertMeasurements(result, sensor, t + latencies[sensor]);
-				} else {
-					//Assume latency 0
-					insertMeasurements(result, sensor, t);
-				}
+				insertMeasurements(result, sensor, t + sensor->latency);
 			}
 			return result;					
 		}
@@ -562,14 +566,7 @@ namespace spooky {
 		//This is used for calibration and correlation to make sure data corresponds correctly.
 		//Fusion should just use the latest data available
 		std::vector<Measurement::Ptr> getOffsetSynchronizedMeasurements(const double& t){
-			std::vector<Measurement::Ptr> result;
-			float max_l = 0;
-			for(auto& l : latencies){
-				if(l.second > max_l){
-					max_l = l.second;
-				}
-			}
-			return getSynchronizedMeasurements(t-max_l);
+			return getSynchronizedMeasurements(t-maximum_latency);
 		}
 	};
 }

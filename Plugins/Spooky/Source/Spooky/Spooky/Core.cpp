@@ -131,10 +131,13 @@ namespace spooky {
 		//SPOOKY_LOG("Fusing: " + std::to_string(measurement_buffer.size()) + "measurements");
 
 		//Get measurements offset by the largest latency so all measurements are valid
- 		std::vector<Measurement::Ptr> sync_measurements = measurement_buffer.getOffsetSynchronizedMeasurements(time);
+		utility::profiler.startTimer("Sync (Offset)");
+		std::vector<Measurement::Ptr> sync_measurements = measurement_buffer.getOffsetSynchronizedMeasurements(time);
+		utility::profiler.endTimer("Sync (Offset)");
 		correlator.addMeasurementGroup(sync_measurements);
 		correlator.identify();
 		utility::profiler.endTimer("Correlator");
+		SPOOKY_LOG("Sync_Measurements count = " + std::to_string(sync_measurements.size()));
 		if(correlator.isStable() || true){
 			utility::profiler.startTimer("Calibrator add");
 			calibrator.addMeasurementGroup(sync_measurements);
