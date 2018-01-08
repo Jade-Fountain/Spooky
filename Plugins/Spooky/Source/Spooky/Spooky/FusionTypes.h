@@ -477,9 +477,17 @@ namespace spooky {
 		// time in seconds before last measurement is ignored
 		float expiry = 0.1; 
 		
+
+		//TODO: support multiple measurements per sensor OR add another sensor for hip scale... wait it already has its own sensor id. WTF
+		struct MeasurementsWithCounter {
+			Measurement::Ptr meas;
+			int count = 0;
+			MeasurementsWithCounter(){}
+			MeasurementsWithCounter(Measurement::Ptr meas_) { meas = meas_; }
+		};
 		//Data : Sensor x Time --> Measurement
 		// measurements[sensor][time] = meas
-		std::map<Sensor::Ptr,std::map<double,Measurement::Ptr>> measurements;
+		std::map<Sensor::Ptr,std::map<double,MeasurementsWithCounter>> measurements;
 		
 		//Latencies
 		float maximum_latency = 0;
@@ -495,7 +503,7 @@ namespace spooky {
 
 			//Otherwise get the measurements
 			//Timestamp-->vec<Measurements>
-			const std::map<double, Measurement::Ptr>& m = measurements[sensor];
+			const std::map<double, MeasurementsWithCounter>& m = measurements[sensor];
 
 			//Binary search for closest values to the requested time t
 			//WARNING: cpp lower_bound(t) gets "container whose key is not considered to go before t"
@@ -510,19 +518,20 @@ namespace spooky {
 				//Dont include old data
 				if (std::abs(lb->first - t) > expiry) return;
 				//If lb is the last measurement, return it
-				output.push_back(lb->second);
+				output.push_back(lb->second.meas);
 			}
 			else if (lb == m.end()) {
 				//Dont include data from too far in the future
 				if (std::abs(ub->first - t) > expiry) return;
 				//If ub is the next measurement, return it
-				output.push_back(ub->second);
+				output.push_back(ub->second.meas);
 			}
 			else {
 				//Interpolate otherwise
 				//TODO: check lb and ub are close together?
 				float alpha = (t - lb->first) / (ub->first - lb->first);
-				output.push_back(Measurement::interpolate(lb->second, ub->second, alpha));
+				assert(alpha >= 0 && alpha <= 1);
+				output.push_back(Measurement::interpolate(lb->second.meas, ub->second.meas, alpha));
 			}
 		}
 
@@ -531,7 +540,7 @@ namespace spooky {
 		void push_back(const Measurement::Ptr& m){
 			//TODO: replace safeAccess with some kind of global check early on
 			auto& sensor_measurements = utility::safeAccess(measurements, m->getSensor());
-			sensor_measurements[m->getTimestamp()] = m;
+			sensor_measurements[m->getTimestamp()] = MeasurementsWithCounter(m);
 			if(measurements[m->getSensor()].size() > max_buffer_length){
 				//Erase old measurements
 				measurements[m->getSensor()].erase(measurements[m->getSensor()].begin());
@@ -541,15 +550,29 @@ namespace spooky {
 		}
 
 		//Gets measurements naively for all systems at time t
-		std::vector<Measurement::Ptr> getMeasurements(const double& t){
+		std::vector<Measurement::Ptr> getLatestMeasurements(){
 			std::vector<Measurement::Ptr> result;
 			for(auto& m : measurements){
+				const Sensor::Ptr& sensor = m.first;
+				//If we have done a basic get operation on this measurement before, ignore
+				if (measurements[sensor].rbegin()->second.count < 1) {
+					//Get latest measurement for this sensor
+					result.push_back(measurements[sensor].rbegin()->second.meas);
+					measurements[sensor].rbegin()->second.count++;
+				}
+			}
+			return result;
+		}
+
+		//Gets measurements for time t by seeking ahead in time for sensors with latency
+		std::vector<Measurement::Ptr> getMeasurements(const double& t) {
+			std::vector<Measurement::Ptr> result;
+			for (auto& m : measurements) {
 				const Sensor::Ptr& sensor = m.first;
 				insertMeasurements(result, sensor, t);
 			}
 			return result;
 		}
-		
 		//Gets measurements for time t by seeking ahead in time for sensors with latency
 		std::vector<Measurement::Ptr> getSynchronizedMeasurements(const double& t){
 			std::vector<Measurement::Ptr> result;

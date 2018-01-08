@@ -147,7 +147,7 @@ namespace spooky {
 			utility::profiler.endTimer("Calibrate");
 			if(calibrator.isStable() || true){
 				utility::profiler.startTimer("Fuse");
-				skeleton.addMeasurementGroup(measurement_buffer.getMeasurements(time));
+				skeleton.addMeasurementGroup(measurement_buffer.getLatestMeasurements());
 				skeleton.fuse(calibrator);
 				utility::profiler.endTimer("Fuse");
 			}

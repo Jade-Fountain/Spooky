@@ -265,9 +265,6 @@ namespace spooky {
 			Eigen::Quaternionf q1 = x->getRotation();
 			Eigen::Quaternionf q2 = y->getRotation();
 			Eigen::Quaternionf q = q1.slerp(t, q2);
-			if (type == Measurement::Type::ROTATION) {
-				return q.coeffs();
-			}
 			result.tail(4) = q.coeffs();
 		}
 		return result;
