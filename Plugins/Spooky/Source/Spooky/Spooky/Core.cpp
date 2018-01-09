@@ -137,7 +137,6 @@ namespace spooky {
 		correlator.addMeasurementGroup(sync_measurements);
 		correlator.identify();
 		utility::profiler.endTimer("Correlator");
-		SPOOKY_LOG("Sync_Measurements count = " + std::to_string(sync_measurements.size()));
 		if(correlator.isStable() || true){
 			utility::profiler.startTimer("Calibrator add");
 			calibrator.addMeasurementGroup(sync_measurements);
@@ -152,7 +151,6 @@ namespace spooky {
 					std::stringstream ss;
 					ss << (void *)m->getSensor().get() << ") = ";
 					ss << m->getData().transpose();
-					SPOOKY_LOG("m[" + m->getSystem().name + ", " + m->getNode().name + ", " + std::to_string(m->getSensor()->id) + "] at (" + ss.str());
 				}
 				skeleton.addMeasurementGroup(lastMeasurements);
 				skeleton.fuse(calibrator);
