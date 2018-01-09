@@ -147,12 +147,10 @@ namespace spooky {
 			if(calibrator.isStable() || true){
 				utility::profiler.startTimer("Fuse");
 				auto lastMeasurements = measurement_buffer.getLatestMeasurements();
-				for (auto& m : lastMeasurements) {
-					std::stringstream ss;
-					ss << (void *)m->getSensor().get() << ") = ";
-					ss << m->getData().transpose();
-				}
 				skeleton.addMeasurementGroup(lastMeasurements);
+
+				//FOR LATENCY TESTING:
+				//skeleton.addMeasurementGroup(sync_measurements);
 				skeleton.fuse(calibrator);
 				utility::profiler.endTimer("Fuse");
 			}
