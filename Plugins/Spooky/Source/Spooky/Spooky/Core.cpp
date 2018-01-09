@@ -147,7 +147,14 @@ namespace spooky {
 			utility::profiler.endTimer("Calibrate");
 			if(calibrator.isStable() || true){
 				utility::profiler.startTimer("Fuse");
-				skeleton.addMeasurementGroup(measurement_buffer.getLatestMeasurements());
+				auto lastMeasurements = measurement_buffer.getLatestMeasurements();
+				for (auto& m : lastMeasurements) {
+					std::stringstream ss;
+					ss << (void *)m->getSensor().get() << ") = ";
+					ss << m->getData().transpose();
+					SPOOKY_LOG("m[" + m->getSystem().name + ", " + m->getNode().name + ", " + std::to_string(m->getSensor()->id) + "] at (" + ss.str());
+				}
+				skeleton.addMeasurementGroup(lastMeasurements);
 				skeleton.fuse(calibrator);
 				utility::profiler.endTimer("Fuse");
 			}
