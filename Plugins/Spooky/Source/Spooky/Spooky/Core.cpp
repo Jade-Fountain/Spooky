@@ -43,6 +43,27 @@ namespace spooky {
 		skeleton.setReferenceSystem(system);
 	}
 
+	void Core::initSensor(const SystemDescriptor& system, const int& sensorID){
+		//If we haven't seen this sensor already, initialise
+		if (utility::safeAccess(sensors, system).count(sensorID) == 0) {
+			sensors[system][sensorID] = std::make_unique<Sensor>();
+			sensors[system][sensorID]->system = system;
+			sensors[system][sensorID]->id = sensorID;
+			//If we have system latencies for this system, use those and override with individual sensor latencies
+			sensors[system][sensorID]->latency = sysLatencies.count(system) == 0 ? 0 : sysLatencies[system];
+		}
+	}
+
+	void Core::setSensorLatency(const SystemDescriptor& system, const int& sensorID, const float& latency){
+		initSensor(system,sensorID);
+		utility::safeAccess(sensors, system)[sensorID]->latency = latency;
+	}
+
+	void Core::setSystemLatency(const SystemDescriptor& system, const float& latency){
+		sysLatencies[system] = latency;
+	}
+
+
 	// =================
 	//Saving and loading
 	// =================
@@ -102,31 +123,38 @@ namespace spooky {
 	}
 
 	//Computes data added since last fuse() call. Should be called repeatedly	
-	void Core::fuse() {
+	void Core::fuse(const float& time) {
 		//TODO: add ifdefs for profiling
 		//Add new data to calibration, with checking for usefulness
 		utility::profiler.startTimer("Correlator");
 		utility::profiler.startTimer("All");
 		//SPOOKY_LOG("Fusing: " + std::to_string(measurement_buffer.size()) + "measurements");
 
-		correlator.addMeasurementGroup(measurement_buffer);
+		//Get measurements offset by the largest latency so all measurements are valid
+		utility::profiler.startTimer("Sync (Offset)");
+		std::vector<Measurement::Ptr> sync_measurements = measurement_buffer.getOffsetSynchronizedMeasurements(time);
+		utility::profiler.endTimer("Sync (Offset)");
+		correlator.addMeasurementGroup(sync_measurements);
 		correlator.identify();
 		utility::profiler.endTimer("Correlator");
 		if(correlator.isStable() || true){
 			utility::profiler.startTimer("Calibrator add");
-			calibrator.addMeasurementGroup(measurement_buffer);
+			calibrator.addMeasurementGroup(sync_measurements);
 			utility::profiler.endTimer("Calibrator add");
 			utility::profiler.startTimer("Calibrate");
 			calibrator.calibrate();
 			utility::profiler.endTimer("Calibrate");
 			if(calibrator.isStable() || true){
 				utility::profiler.startTimer("Fuse");
-				skeleton.addMeasurementGroup(measurement_buffer);
+				auto lastMeasurements = measurement_buffer.getLatestMeasurements();
+				skeleton.addMeasurementGroup(lastMeasurements);
+
+				//FOR LATENCY TESTING:
+				//skeleton.addMeasurementGroup(sync_measurements);
 				skeleton.fuse(calibrator);
 				utility::profiler.endTimer("Fuse");
 			}
 		}	
-		measurement_buffer.clear();
 		//TODO: do this less often
 		utility::profiler.endTimer("All");
 	}
@@ -154,15 +182,11 @@ namespace spooky {
 			return "UNKNOWN";
 		}
 	}
+
 	//Called by owner of the Core object
-	void Core::setMeasurementSensorInfo(Measurement::Ptr & m, SystemDescriptor system, SensorID id)
+	void Core::setMeasurementSensorInfo(Measurement::Ptr & m, const SystemDescriptor& system, const SensorID& id)
 	{
-		//If we haven't seen this sensor already, initialise
-		if (utility::safeAccess(sensors, system).count(id) == 0) {
-			utility::safeAccess(sensors, system)[id] = std::make_unique<Sensor>();
-			utility::safeAccess(sensors, system)[id]->system = system;
-			utility::safeAccess(sensors, system)[id]->id = id;
-		}
+		initSensor(system,id);
 		//Set pointer in measurement
 		m->setSensor(sensors[system][id]);
 	}

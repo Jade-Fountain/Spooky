@@ -50,8 +50,8 @@ class USpookyFusionPlant : public UActorComponent
 {
 	GENERATED_BODY()
 
-	//Fusionplant
-	spooky::Core plant;
+	//FusionspookyCore
+	spooky::Core spookyCore;
 
 	//Input Skeletons
 	std::vector<USkeletalMeshComponent*> skeletons;
@@ -92,8 +92,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void SetReferenceFrame(FString system_name);
 
+	UFUNCTION(BlueprintCallable, Category = "Spooky")
+	void SetSensorLatency(FString system_name, int sensorID, float latency);
 
-
+	UFUNCTION(BlueprintCallable, Category = "Spooky")
+	void SetSystemLatency(FString system_name, float latency);
 //TODO: Contruction of sensor nodes
 
 	////Add a new sensor node model
@@ -129,7 +132,7 @@ public:
 
 	//Align, calibrate and fuse all added data
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void Fuse();
+	void Fuse(float current_time);
 
 	//Gets animation details for driving the skeleton
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
@@ -180,7 +183,7 @@ public:
 	//Method to copy data from one poseable mesh to another
 	void CopyPose(UPoseableMeshComponent* target, const UPoseableMeshComponent* input);
 
-	//Methods for creating measurements which can then be sent to the fusion plant
+	//Methods for creating measurements which can then be sent to the fusion spookyCore
 	spooky::Measurement::Ptr CreatePositionMeasurement(FString system_name, int sensorID, float timestamp_sec, FVector position, FVector uncertainty, float confidence = 1);
 	spooky::Measurement::Ptr CreateRotationMeasurement(FString system_name, int sensorID, float timestamp_sec, FQuat rotation, FVector4 uncertainty, float confidence = 1);
 	spooky::Measurement::Ptr CreateScaleMeasurement(FString system_name, int sensorID, float timestamp_sec, FVector scale, FVector uncertainty, float confidence = 1);

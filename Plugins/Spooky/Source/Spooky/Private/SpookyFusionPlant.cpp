@@ -55,28 +55,28 @@ void USpookyFusionPlant::TickComponent( float DeltaTime, ELevelTick TickType, FA
 
 UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::Configure(float input_units_m, float output_units_m)
 {
-	plant.config.units.input_m = input_units_m;
-	plant.config.units.output_m = output_units_m;
+	spookyCore.config.units.input_m = input_units_m;
+	spookyCore.config.units.output_m = output_units_m;
 	/*
-	plant.config.correlator.ambiguous_threshold = correlator_ambiguous_threshold;
-	plant.config.correlator.elimination_threshold = correlator_elimination_threshold;
-	plant.config.correlator.diff_threshold = correlator_diff_threshold;
+	spookyCore.config.correlator.ambiguous_threshold = correlator_ambiguous_threshold;
+	spookyCore.config.correlator.elimination_threshold = correlator_elimination_threshold;
+	spookyCore.config.correlator.diff_threshold = correlator_diff_threshold;
 
-	plant.config.calibrator.diff_threshold = calibration_diff_threshold;
-	plant.config.calibrator.min_count_per_node = calibration_min_count_per_node;
-	plant.config.calibrator.count_threshold = 
+	spookyCore.config.calibrator.diff_threshold = calibration_diff_threshold;
+	spookyCore.config.calibrator.min_count_per_node = calibration_min_count_per_node;
+	spookyCore.config.calibrator.count_threshold = 
 		{	
 			{spooky::CalibrationResult::State::UNCALIBRATED,100},
 			{spooky::CalibrationResult::State::REFINING,100 },
 			{spooky::CalibrationResult::State::CALIBRATED,100}
 		};
-	plant.config.calibrator.initial_quality_threshold = calibration_initial_quality_threshold;
-	plant.config.calibrator.quality_convergence_threshold = calibration_quality_convergence_threshold;
-	plant.config.calibrator.fault_hysteresis_rate = calibration_fault_hysteresis_rate;
-	plant.config.calibrator.relevance_decay_rate = calibration_relevance_decay_rate;
-	plant.config.calibrator.settle_threshold = calibration_settle_threshold;
-	plant.config.calibrator.fault_angle_threshold = calibration_fault_angle_threshold;
-	plant.config.calibrator.fault_distance_threshold = calibration_fault_distance_threshold;*/
+	spookyCore.config.calibrator.initial_quality_threshold = calibration_initial_quality_threshold;
+	spookyCore.config.calibrator.quality_convergence_threshold = calibration_quality_convergence_threshold;
+	spookyCore.config.calibrator.fault_hysteresis_rate = calibration_fault_hysteresis_rate;
+	spookyCore.config.calibrator.relevance_decay_rate = calibration_relevance_decay_rate;
+	spookyCore.config.calibrator.settle_threshold = calibration_settle_threshold;
+	spookyCore.config.calibrator.fault_angle_threshold = calibration_fault_angle_threshold;
+	spookyCore.config.calibrator.fault_distance_threshold = calibration_fault_distance_threshold;*/
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::AddSkeleton(USkeletalMeshComponent* skeletal_mesh, FVector position_var, FVector4 quaternion_var)
@@ -105,7 +105,7 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh)
 		//TODO: make more efficient
 		FTransform b = FTransform(skeletal_mesh->SkeletalMesh->GetRefPoseMatrix(i));
 		//Scale to spooky units
-		b.SetTranslation(b.GetTranslation() * plant.config.units.input_m);
+		b.SetTranslation(b.GetTranslation() * spookyCore.config.units.input_m);
 		spooky::Transform3D bonePoseLocal = convert(b.ToMatrixNoScale());
 		//Set parent
 		spooky::NodeDescriptor parent_desc = (bone.ParentIndex >= 0) ?
@@ -116,10 +116,10 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh)
 		//TODO: find better way to do this check for pose nodes
 		if (bone.Name.GetPlainNameString() == "pelvis") {
 			//The pelvis has 6DoF pose and 3DoF scale
-			plant.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones());
+			spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones());
 		}
 		else {
-			plant.addBoneNode(bone_desc, parent_desc, bonePoseLocal);
+			spookyCore.addBoneNode(bone_desc, parent_desc, bonePoseLocal);
 		}
 		SPOOKY_LOG("Adding Bone: " + bone_desc.name + ", parent = " + parent_desc.name);
 	}
@@ -127,13 +127,23 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh)
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::FinaliseSetup() {
-	plant.finaliseSetup();
+	spookyCore.finaliseSetup();
 }
 
 //Set the reference frame for the skeleton
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::SetReferenceFrame(FString system_name) {
-	plant.setReferenceSystem(spooky::SystemDescriptor(TCHAR_TO_UTF8(*system_name)));
+	spookyCore.setReferenceSystem(spooky::SystemDescriptor(TCHAR_TO_UTF8(*system_name)));
+}
+
+UFUNCTION(BlueprintCallable, Category = "Spooky")
+void USpookyFusionPlant::SetSensorLatency(FString system_name, int sensorID, float latency) {
+	spookyCore.setSensorLatency(spooky::SystemDescriptor(TCHAR_TO_UTF8(*system_name)), sensorID, latency);
+}
+
+UFUNCTION(BlueprintCallable, Category = "Spooky")
+void USpookyFusionPlant::SetSystemLatency(FString system_name, float latency){
+	spookyCore.setSystemLatency(spooky::SystemDescriptor(TCHAR_TO_UTF8(*system_name)), latency);
 }
 
 //===========================
@@ -146,7 +156,7 @@ void USpookyFusionPlant::AddPositionMeasurement(TArray<FString> nodeNames, FStri
 {
 	Measurement::Ptr m = CreatePositionMeasurement(systemName, sensorID, timestamp_sec, measurement, covariance, confidence);
 	m->globalSpace = globalSpace;
-	plant.addMeasurement(m, convertToNodeDescriptors(nodeNames));
+	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
@@ -154,7 +164,7 @@ void USpookyFusionPlant::AddRotationMeasurement(TArray<FString> nodeNames, FStri
 {
 	Measurement::Ptr m = CreateRotationMeasurement(systemName,sensorID,timestamp_sec, measurement.Quaternion(),covariance,confidence);
 	m->globalSpace = globalSpace;
-	plant.addMeasurement(m, convertToNodeDescriptors(nodeNames));
+	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
@@ -166,7 +176,7 @@ void USpookyFusionPlant::AddPoseMeasurement(TArray<FString> nodeNames, FString s
 	uncertainty << vv, vq;
 	Measurement::Ptr m = CreatePoseMeasurement(systemName, sensorID, timestamp_sec, measurement.GetTranslation(), measurement.GetRotation(), uncertainty, confidence);
 	m->globalSpace = globalSpace;
-	plant.addMeasurement(m, convertToNodeDescriptors(nodeNames));
+	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
@@ -175,7 +185,7 @@ void USpookyFusionPlant::AddScaleMeasurement(TArray<FString> nodeNames, FString 
 	Measurement::Ptr m = CreateScaleMeasurement(systemName, sensorID, timestamp_sec, measurement, covariance, confidence);
 	//Scales always local to the node
 	m->globalSpace = false;
-	plant.addMeasurement(m, convertToNodeDescriptors(nodeNames));
+	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
@@ -193,18 +203,18 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 		float timestamp_sec = 0;// skeleton->getLatestMeasurementTime();
 		Measurement::Ptr m = CreatePoseMeasurement(skeleton->GetName(), i, timestamp_sec, measurement.GetTranslation(), measurement.GetRotation(), skeletonCovariances[skel_index], 1);
 		m->globalSpace = false;
-		plant.addMeasurement(m, bone_name);
+		spookyCore.addMeasurement(m, bone_name);
 	}
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::Fuse()
+void USpookyFusionPlant::Fuse(float current_time)
 {
 	spooky::utility::profiler.startTimer("AAA FUSION TIME");
 	for (int i = 0; i < skeletons.size(); i++) {
 		addSkeletonMeasurement(i);
 	}
-	plant.fuse();
+	spookyCore.fuse(current_time);
 	spooky::utility::profiler.endTimer("AAA FUSION TIME");
 	//SPOOKY_LOG(spooky::utility::profiler.getReport());
 }
@@ -212,9 +222,9 @@ void USpookyFusionPlant::Fuse()
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 FTransform USpookyFusionPlant::getBoneTransform(const FString& name) {
 	spooky::NodeDescriptor bone_name = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(name)));
-	spooky::Transform3D T = plant.getNodeLocalPose(bone_name);
+	spooky::Transform3D T = spookyCore.getNodeLocalPose(bone_name);
 	FTransform result(convert(T));
-	result.SetTranslation(result.GetTranslation() / plant.config.units.output_m);
+	result.SetTranslation(result.GetTranslation() / spookyCore.config.units.output_m);
 	return result;
 }
 
@@ -225,9 +235,9 @@ FTransform USpookyFusionPlant::getBoneTransform(const FString& name) {
 
 FCalibrationResult USpookyFusionPlant::getCalibrationResult(FString s1, FString s2)
 {
-	spooky::CalibrationResult T = plant.getCalibrationResult(spooky::SystemDescriptor(TCHAR_TO_UTF8(*s1)),spooky::SystemDescriptor(TCHAR_TO_UTF8(*s2)));
+	spooky::CalibrationResult T = spookyCore.getCalibrationResult(spooky::SystemDescriptor(TCHAR_TO_UTF8(*s1)),spooky::SystemDescriptor(TCHAR_TO_UTF8(*s2)));
 	Eigen::Quaternionf q(T.transform.matrix().block<3,3>(0,0));
-	Eigen::Vector3f v(T.transform.matrix().block<3, 1>(0, 3) / plant.config.units.output_m);
+	Eigen::Vector3f v(T.transform.matrix().block<3, 1>(0, 3) / spookyCore.config.units.output_m);
 	FQuat fq(q.x(), q.y(), q.z(), q.w());
 	
 	FCalibrationResult result;
@@ -243,14 +253,14 @@ FCalibrationResult USpookyFusionPlant::getCalibrationResult(FString s1, FString 
 
 FString USpookyFusionPlant::getCorrelationResult(FString s1, int sensorID)
 {
-	return plant.getCorrelationResult(spooky::SystemDescriptor(TCHAR_TO_UTF8(*s1)),sensorID).name.c_str();
+	return spookyCore.getCorrelationResult(spooky::SystemDescriptor(TCHAR_TO_UTF8(*s1)),sensorID).name.c_str();
 }
 
 FTransform USpookyFusionPlant::getNodeGlobalPose(FString node)
 {
-	spooky::Transform3D result = plant.getNodeGlobalPose(spooky::NodeDescriptor(TCHAR_TO_UTF8(*node)));
+	spooky::Transform3D result = spookyCore.getNodeGlobalPose(spooky::NodeDescriptor(TCHAR_TO_UTF8(*node)));
 	FMatrix unrealMatrix = convert(result);
-	unrealMatrix.ScaleTranslation(FVector(1,1,1) * 1 / plant.config.units.output_m);
+	unrealMatrix.ScaleTranslation(FVector(1,1,1) * 1 / spookyCore.config.units.output_m);
 	//UE_LOG(LogTemp, Warning, TEXT("getNodePose : %s"), *(unrealMatrix.ToString()));
 	return FTransform(unrealMatrix);
 }
@@ -261,19 +271,19 @@ FTransform USpookyFusionPlant::getNodeGlobalPose(FString node)
 //Sets save/load location	
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::setSaveDirectory(FString dir) {
-	plant.setSaveDirectory(TCHAR_TO_UTF8(*dir));
+	spookyCore.setSaveDirectory(TCHAR_TO_UTF8(*dir));
 }
 
 //Saves the calibration result mapping T:s1->s2
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::saveCalibrationResult(FString s1, FString s2){
-	plant.saveCalibration(spooky::SystemDescriptor(TCHAR_TO_UTF8(*s1)),spooky::SystemDescriptor(TCHAR_TO_UTF8(*s2)));
+	spookyCore.saveCalibration(spooky::SystemDescriptor(TCHAR_TO_UTF8(*s1)),spooky::SystemDescriptor(TCHAR_TO_UTF8(*s2)));
 }
 
 //Loads the calibration result mapping T:s1->s2
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::loadCalibrationResult(FString s1, FString s2){
-	plant.loadCalibration(spooky::SystemDescriptor(TCHAR_TO_UTF8(*s1)), spooky::SystemDescriptor(TCHAR_TO_UTF8(*s2)));
+	spookyCore.loadCalibration(spooky::SystemDescriptor(TCHAR_TO_UTF8(*s1)), spooky::SystemDescriptor(TCHAR_TO_UTF8(*s2)));
 }
 
 //===========================
@@ -294,7 +304,7 @@ Measurement::Ptr USpookyFusionPlant::CreatePositionMeasurement(FString system_na
 {
 	//Create basic measurement
 	Eigen::Vector3f meas(position[0],position[1],position[2]);
-	meas = meas * plant.config.units.input_m;
+	meas = meas * spookyCore.config.units.input_m;
 
 	Eigen::Matrix<float, 3, 3> un = Eigen::Matrix<float,3,3>::Identity();
 	un.diagonal() = Eigen::Vector3f(uncertainty[0], uncertainty[1], uncertainty[2]);
@@ -339,7 +349,7 @@ Measurement::Ptr USpookyFusionPlant::CreatePoseMeasurement(FString system_name, 
 {
 	//Convert transform to state vector (v,q)
 	Eigen::Vector3f ev(&v[0]);
-	ev = ev * plant.config.units.input_m;
+	ev = ev * spookyCore.config.units.input_m;
 	//BEWARE: dumb format mismatch:
 	Eigen::Quaternionf eq(q.W,q.X,q.Y,q.Z);
 	//Create basic measurement
@@ -355,7 +365,7 @@ Measurement::Ptr USpookyFusionPlant::CreatePoseMeasurement(FString system_name, 
 
 void USpookyFusionPlant::SetCommonMeasurementData(Measurement::Ptr& m, FString system_name, int sensorID, float timestamp_sec, float confidence){
 	//Add metadata
-	plant.setMeasurementSensorInfo(m, spooky::SystemDescriptor(TCHAR_TO_UTF8(*system_name)), spooky::SensorID(sensorID));
+	spookyCore.setMeasurementSensorInfo(m, spooky::SystemDescriptor(TCHAR_TO_UTF8(*system_name)), spooky::SensorID(sensorID));
 	bool measurementConsistent = m->setMetaData(timestamp_sec, confidence);
 	if (!measurementConsistent) {
 		std::cout << "WARNING - Measurement not created correctly - " << __FILE__ << " : " << __LINE__ << std::endl;
@@ -389,13 +399,13 @@ spooky::Transform3D USpookyFusionPlant::convert(const FMatrix& T) {
 //For testing blueprints: TODO delete
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 FString USpookyFusionPlant::GetCalibrationStateSummary() {
-	std::string s = plant.getCalibratorStateSummary();
+	std::string s = spookyCore.getCalibratorStateSummary();
 	return s.c_str();
 }
 //For testing blueprints: TODO delete
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 FString USpookyFusionPlant::GetCalibrationTimingSummary() {
-	std::string s = plant.getTimingSummary();
+	std::string s = spookyCore.getTimingSummary();
 	return s.c_str();
 }
 

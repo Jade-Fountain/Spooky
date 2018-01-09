@@ -36,7 +36,7 @@ namespace spooky {
 		SaveManager saveManager;
 
 		//Measurement buffer for this frame
-		std::vector<Measurement::Ptr> measurement_buffer;
+		MeasurementBuffer measurement_buffer;
 
 		//Class responsible for distinguishing ambiguous sensors
 		Correlator correlator;
@@ -50,6 +50,9 @@ namespace spooky {
 
 		//Sensor list
 		std::map<SystemDescriptor, std::map<SensorID, Sensor::Ptr>> sensors;
+
+		//Latency data per system
+		std::map<SystemDescriptor, float> sysLatencies;
 		
 	public:
 
@@ -64,6 +67,7 @@ namespace spooky {
 			//Calibrator config
 			Calibrator::Config calibrator;
 		} config;
+
 
 
 		////////////////////////////////////////////////////
@@ -88,6 +92,13 @@ namespace spooky {
 
 		//Computes necessary metadata after setup
 		void finaliseSetup();
+		
+		//If we haven't seen this sensor, add it to list
+		void initSensor(const SystemDescriptor& system, const int& sensorID);
+
+		//Latency config
+		void setSensorLatency(const SystemDescriptor& system, const int& sensorID, const float& latency);
+		void setSystemLatency(const SystemDescriptor& system, const float& latency);
 
 		////////////////////////////////////////////////////
 		//					Input at runtime
@@ -100,7 +111,7 @@ namespace spooky {
 		void addMeasurement(const Measurement::Ptr & m, const std::vector<NodeDescriptor>& nodes);
 		
 		//Computes data added since last fuse() call. Should be called repeatedly	
-		void fuse();
+		void fuse(const float& time);
 
 		////////////////////////////////////////////////////
 		//					Results
@@ -119,7 +130,7 @@ namespace spooky {
 		NodeDescriptor getCorrelationResult(SystemDescriptor system, SensorID id);
 
 		//Called by owner of the Core object to set a measurement sensor pointer
-		void setMeasurementSensorInfo(Measurement::Ptr& m, SystemDescriptor system, SensorID id);
+		void setMeasurementSensorInfo(Measurement::Ptr& m, const SystemDescriptor& system, const SensorID& id);
 
 		//Returns a string summarising the state of calibration in the system
 		std::string getCalibratorStateSummary();

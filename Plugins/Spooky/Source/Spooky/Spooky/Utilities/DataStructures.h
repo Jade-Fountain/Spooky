@@ -60,7 +60,6 @@ namespace spooky {
 		    return diff;
 		}
 
-
 		//A vector that takes multiple clears
 		template <class T,class Counter>
 		class MultiUseStream {
