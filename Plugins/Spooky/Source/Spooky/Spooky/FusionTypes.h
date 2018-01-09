@@ -395,7 +395,6 @@ namespace spooky {
 			std::vector<std::vector<ReturnType>> * m1_out, std::vector<std::vector<ReturnType>> * m2_out)
 		{
 			std::map<NodeDescriptor, int> nodes;
-			SPOOKY_LOG("node 0 = " + m1.front()->getNode().name);
 			for (int i = 0; i < m1.size(); i++) {
 				const auto& currentNode = m1[i]->getNode();
 				assert(currentNode.name == m2[i]->getNode().name);
@@ -451,12 +450,12 @@ namespace spooky {
 
 		//Returns the global timestamp corresponding to this measurement, compensating for latency
 		double getTimestamp() {
-			return timestamp - sensor->getLatency();
+			return timestamp;
 		}
 
 		//Sets the local timestamp from a global timestamp
 		void setTimestamp(double global_t) {
-			timestamp = global_t + sensor->getLatency();
+			timestamp = global_t;
 		}
 
 		void setLatency(const float& l) {
