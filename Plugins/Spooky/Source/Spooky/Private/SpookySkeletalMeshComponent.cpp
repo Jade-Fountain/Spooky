@@ -19,11 +19,6 @@ limitations under the License.
 #include "Spooky.h"
 #include "SpookySkeletalMeshComponent.h"
 
-USpookySkeletalMeshComponent::USpookySkeletalMeshComponent()
-{
-}
-
-
-USpookySkeletalMeshComponent::~USpookySkeletalMeshComponent()
+USpookySkeletalMeshComponent::USpookySkeletalMeshComponent(class FObjectInitializer const &)
 {
 }

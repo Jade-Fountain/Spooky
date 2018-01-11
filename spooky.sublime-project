@@ -3,6 +3,9 @@
 	[
 		{
 			"path": "."
+		},
+		{
+			"path": "D:\\Epic Games\\UE_4.14\\Engine\\Source"
 		}
 	]
 }

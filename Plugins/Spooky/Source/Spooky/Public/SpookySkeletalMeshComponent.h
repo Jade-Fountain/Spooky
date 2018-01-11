@@ -18,12 +18,13 @@ limitations under the License.
 
 #pragma once
 #include <../Classes/Components/SkeletalMeshComponent.h>
+#include "SpookySkeletalMeshComponent.generated.h"
 
+UCLASS(ClassGroup=(Rendering, Spooky), hidecategories=Object, config=Engine, editinlinenew, meta=(BlueprintSpawnableComponent))
 class USpookySkeletalMeshComponent :
 	public USkeletalMeshComponent
 {
-public:
-	USpookySkeletalMeshComponent();
-	~USpookySkeletalMeshComponent();
+	GENERATED_UCLASS_BODY()
+	
 };
 
