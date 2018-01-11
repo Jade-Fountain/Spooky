@@ -23,6 +23,7 @@
 
 #include "Spooky/Core.h"
 #include "Spooky/FusionTypes.h"
+#include "SpookySkeletalMeshComponent.h"
 
 #include <iostream>
 #include <vector>
@@ -54,8 +55,7 @@ class USpookyFusionPlant : public UActorComponent
 	spooky::Core spookyCore;
 
 	//Input Skeletons
-	std::vector<USkeletalMeshComponent*> skeletons;
-	std::vector<Eigen::Matrix<float, 7, 1>> skeletonCovariances;
+	std::vector<USpookySkeletalMeshComponent*> skeletal_spirits;
 
 public:	
 
@@ -78,7 +78,7 @@ public:
 
 	//Add complete skeleton to list of fusion objects
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddSkeleton(USkeletalMeshComponent* skeletal_mesh, FVector position_var, FVector4 quaternion_var);
+	void AddSkeleton(USpookySkeletalMeshComponent* spooky_skeletal_mesh);
 
 	//Set the output target which will have the complete fused skeleton pose applied
 	UFUNCTION(BlueprintCallable, Category = "Spooky")

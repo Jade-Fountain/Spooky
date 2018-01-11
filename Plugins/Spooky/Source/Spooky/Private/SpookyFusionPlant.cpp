@@ -79,18 +79,10 @@ UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::Confi
 	spookyCore.config.calibrator.fault_distance_threshold = calibration_fault_distance_threshold;*/
 }
 
-UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::AddSkeleton(USkeletalMeshComponent* skeletal_mesh, FVector position_var, FVector4 quaternion_var)
+UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::AddSkeleton(USpookySkeletalMeshComponent* spooky_skeletal_mesh)
 {
-	//TODO: enable complete skeleton fusion
 	//Add skeleton reference
-	skeletons.push_back(skeletal_mesh);
-
-	//Store uncertainties for later
-	Eigen::Vector3f vv(&position_var[0]);
-	Eigen::Vector4f vq(&quaternion_var[0]);
-	Eigen::Matrix<float, 7, 1> uncertainty;
-	uncertainty << vv, vq;
-	skeletonCovariances.push_back(uncertainty);
+	skeletal_spirits.push_back(spooky_skeletal_mesh);
 	return;
 }
 
@@ -98,7 +90,6 @@ UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::AddSk
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh)
 {
-	skeletal_mesh = skeletal_mesh;
 	TArray<FMeshBoneInfo> boneInfo = skeletal_mesh->SkeletalMesh->RefSkeleton.GetRefBoneInfo();
 	for (int i = 0; i < boneInfo.Num(); i++) {
 		FMeshBoneInfo& bone = boneInfo[i];
@@ -191,19 +182,39 @@ void USpookyFusionPlant::AddScaleMeasurement(TArray<FString> nodeNames, FString 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 	//For each bone
-	auto& skeleton = skeletons[skel_index];
+	auto& skeleton = skeletal_spirits[skel_index];
 	TArray<FMeshBoneInfo> boneInfo = skeleton->SkeletalMesh->RefSkeleton.GetRefBoneInfo();
 	for (int i = 0; i < boneInfo.Num(); i++) {
+		//Bone info
 		FMeshBoneInfo& bone = boneInfo[i];
 		spooky::NodeDescriptor bone_name = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
-		FTransform measurement = skeleton->BoneSpaceTransforms[i];
-		//TODO: support confidences
-		//TODO: doesnt seem like the best way to do this!
-		//TODO: support skeleton group measurement input properly: need skeleton->getUncertianty(i), get confidence, time stamp, etc
-		float timestamp_sec = 0;// skeleton->getLatestMeasurementTime();
-		Measurement::Ptr m = CreatePoseMeasurement(skeleton->GetName(), i, timestamp_sec, measurement.GetTranslation(), measurement.GetRotation(), skeletonCovariances[skel_index], 1);
-		m->globalSpace = false;
-		spookyCore.addMeasurement(m, bone_name);
+		//If this bone is active then make new measurement
+		if (skeleton->isBoneActive(bone_name.name) {
+			FTransform measurement = skeleton->BoneSpaceTransforms[i];
+			FSpookySkeletonBoneInfo spookyBoneInfo = skeleton.getSpookyBoneInfo(bone_name.name);
+
+			//Create measurement
+			Measurement::Ptr m;
+			switch (FSpookySkeletonBoneInfo.measurementType) {
+				case(ESpookyMeasurementType::GENERIC):
+					m = CreateGenericMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec, measurement.GetTranslation(), spookyBoneInfo.pos_variance, spookyBoneInfo.confidence);
+					break;
+				case(ESpookyMeasurementType::POSITION):
+					m = CreatePositionMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec,measurement.GetTranslation(), spookyBoneInfo.pos_variance, spookyBoneInfo.confidence);
+					break;
+				case(ESpookyMeasurementType::ROTATION):
+					m = CreateRotationMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec, measurement.GetRotation(), spookyBoneInfo.quat_var, spookyBoneInfo.confidence);
+					break;
+				case(ESpookyMeasurementType::RIGID_BODY):
+					m = CreatePoseMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec, measurement.GetTranslation(), measurement.GetRotation(),  spookyBoneInfo.pos_variance,  spookyBoneInfo.quat_variance, spookyBoneInfo.confidence);
+					break;
+				case(ESpookyMeasurementType::SCALE):
+					m = CreateScaleMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec, measurement.GetScale(),  spookyBoneInfo.scale_variance,, spookyBoneInfo.confidence);
+					break;
+			}
+			m->globalSpace = false;
+			spookyCore.addMeasurement(m, bone_name);
+		}
 	}
 }
 
@@ -211,7 +222,7 @@ UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::Fuse(float current_time)
 {
 	spooky::utility::profiler.startTimer("AAA FUSION TIME");
-	for (int i = 0; i < skeletons.size(); i++) {
+	for (int i = 0; i < skeletal_spirits.size(); i++) {
 		addSkeletonMeasurement(i);
 	}
 	spookyCore.fuse(current_time);
