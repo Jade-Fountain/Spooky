@@ -196,6 +196,7 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 			//Create measurement
 			Measurement::Ptr m;
 			switch (FSpookySkeletonBoneInfo.measurementType) {
+				//TODO: local vs global variance?
 				case(ESpookyMeasurementType::GENERIC):
 					m = CreateGenericMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec, measurement.GetTranslation(), spookyBoneInfo.pos_variance, spookyBoneInfo.confidence);
 					break;

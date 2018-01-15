@@ -17,8 +17,32 @@ limitations under the License.
 */
 
 #include "Spooky.h"
+#include "Spooky/Logging.h"
 #include "SpookySkeletalMeshComponent.h"
 
 USpookySkeletalMeshComponent::USpookySkeletalMeshComponent(class FObjectInitializer const &)
 {
+}
+
+
+
+void USpookySkeletalMeshComponent::SetDefaultBoneInfo(const FSpookySkeletonBoneInfo& info){
+	defaultBoneInfo = std::make_unique<FSpookySkeletonBoneInfo>(info);
+}
+
+
+void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FString>& bones, ESpookyReturnStatus& branch){
+	if(!defaultBoneInfo){
+		branch = ESpookyReturnStatus::Failure;
+		SPOOKY_LOG("ERROR: NO DEFAULT BONE INFO SET SO CANNOT ADD ACTIVE BONES");
+		return;	
+	}
+	for(int i = 0; i < bones.Num(); i++){
+
+	}
+	branch = ESpookyReturnStatus::Success;
+}
+
+void USpookySkeletalMeshComponent::SetBoneInfo(const FSpookySkeletonBoneInfo& info){
+
 }
