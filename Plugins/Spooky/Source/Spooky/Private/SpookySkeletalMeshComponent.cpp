@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 #include "Spooky.h"
-#include "Spooky/Logging.h"
+#include "Logging.h"
 #include "SpookySkeletalMeshComponent.h"
 
 USpookySkeletalMeshComponent::USpookySkeletalMeshComponent(class FObjectInitializer const &)
@@ -31,18 +31,53 @@ void USpookySkeletalMeshComponent::SetDefaultBoneInfo(const FSpookySkeletonBoneI
 }
 
 
-void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FString>& bones, ESpookyReturnStatus& branch){
+void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, ESpookyReturnStatus& branch){
+	bool bones_exist = true;
 	if(!defaultBoneInfo){
 		branch = ESpookyReturnStatus::Failure;
 		SPOOKY_LOG("ERROR: NO DEFAULT BONE INFO SET SO CANNOT ADD ACTIVE BONES");
 		return;	
 	}
 	for(int i = 0; i < bones.Num(); i++){
-
+		bool thisBoneExists = this->SkeletalMesh->RefSkeleton.FindBoneIndex(bones[i]) != INDEX_NONE;
+		if (thisBoneExists) {
+			activeBones[bones[i]] = *defaultBoneInfo;
+		}
+		bones_exist = bones_exist && thisBoneExists;
 	}
-	branch = ESpookyReturnStatus::Success;
+	if (!bones_exist) {
+		branch = ESpookyReturnStatus::Failure;
+		SPOOKY_LOG("ERROR: NO DEFAULT BONE INFO SET SO CANNOT ADD ACTIVE BONES");
+	}
+	else {
+		branch = ESpookyReturnStatus::Success;
+	}
 }
 
-void USpookySkeletalMeshComponent::SetBoneInfo(const FSpookySkeletonBoneInfo& info){
-
+void USpookySkeletalMeshComponent::SetBoneInfo(const FSpookySkeletonBoneInfo& info, ESpookyReturnStatus& branch){
+	if(activeBones.count(info.name) == 0){
+		branch = ESpookyReturnStatus::Failure;
+	} else {
+		branch = ESpookyReturnStatus::Success;
+		activeBones[info.name] = info;
+	}
 }
+
+
+
+void USpookySkeletalMeshComponent::UpdateTimestamp(const FName& bone,const float& t_sec){
+	activeBones[bone].timestamp_sec = t_sec;
+}
+
+
+void USpookySkeletalMeshComponent::UpdateAllTimestamps(const float& t_sec){
+	for(auto& bone : activeBones){
+		bone.second.timestamp_sec = t_sec;
+	}
+}
+
+
+void USpookySkeletalMeshComponent::UpdateConfidence(const FName& bone,const float& confidence){
+	activeBones[bone].confidence = confidence;
+}
+

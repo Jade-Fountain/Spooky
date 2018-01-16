@@ -161,11 +161,7 @@ void USpookyFusionPlant::AddRotationMeasurement(TArray<FString> nodeNames, FStri
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::AddPoseMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FTransform measurement, FVector position_var, FVector4 quaternion_var, bool globalSpace, float confidence)
 {
-	Eigen::Vector3f vv(&position_var[0]);
-	Eigen::Vector4f vq(&quaternion_var[0]);
-	Eigen::Matrix<float, 7, 1> uncertainty;
-	uncertainty << vv, vq;
-	Measurement::Ptr m = CreatePoseMeasurement(systemName, sensorID, timestamp_sec, measurement.GetTranslation(), measurement.GetRotation(), uncertainty, confidence);
+	Measurement::Ptr m = CreatePoseMeasurement(systemName, sensorID, timestamp_sec, measurement.GetTranslation(), measurement.GetRotation(), position_var, quaternion_var, confidence);
 	m->globalSpace = globalSpace;
 	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
@@ -189,28 +185,29 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 		FMeshBoneInfo& bone = boneInfo[i];
 		spooky::NodeDescriptor bone_name = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
 		//If this bone is active then make new measurement
-		if (skeleton->isBoneActive(bone_name.name) {
-			FTransform measurement = skeleton->BoneSpaceTransforms[i];
-			FSpookySkeletonBoneInfo spookyBoneInfo = skeleton.getSpookyBoneInfo(bone_name.name);
+		if (skeleton->isBoneActive(bone.Name)) {
+			const FTransform& localTransform = skeleton->BoneSpaceTransforms[i];
+			const FSpookySkeletonBoneInfo& spookyBoneInfo = skeleton->getSpookyBoneInfo(bone.Name);
 
 			//Create measurement
 			Measurement::Ptr m;
-			switch (FSpookySkeletonBoneInfo.measurementType) {
+			switch (spookyBoneInfo.measurementType) {
 				//TODO: local vs global variance?
 				case(ESpookyMeasurementType::GENERIC):
-					m = CreateGenericMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec, measurement.GetTranslation(), spookyBoneInfo.pos_variance, spookyBoneInfo.confidence);
+					//TODO: support generic measurement
+					m = CreatePositionMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec, localTransform.GetTranslation(), spookyBoneInfo.position_var, spookyBoneInfo.confidence);
 					break;
 				case(ESpookyMeasurementType::POSITION):
-					m = CreatePositionMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec,measurement.GetTranslation(), spookyBoneInfo.pos_variance, spookyBoneInfo.confidence);
+					m = CreatePositionMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec,localTransform.GetTranslation(), spookyBoneInfo.position_var, spookyBoneInfo.confidence);
 					break;
 				case(ESpookyMeasurementType::ROTATION):
-					m = CreateRotationMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec, measurement.GetRotation(), spookyBoneInfo.quat_var, spookyBoneInfo.confidence);
+					m = CreateRotationMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec, localTransform.GetRotation(), spookyBoneInfo.quaternion_var, spookyBoneInfo.confidence);
 					break;
 				case(ESpookyMeasurementType::RIGID_BODY):
-					m = CreatePoseMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec, measurement.GetTranslation(), measurement.GetRotation(),  spookyBoneInfo.pos_variance,  spookyBoneInfo.quat_variance, spookyBoneInfo.confidence);
+					m = CreatePoseMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec, localTransform.GetTranslation(), localTransform.GetRotation(), spookyBoneInfo.position_var, spookyBoneInfo.quaternion_var, spookyBoneInfo.confidence);
 					break;
 				case(ESpookyMeasurementType::SCALE):
-					m = CreateScaleMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec, measurement.GetScale(),  spookyBoneInfo.scale_variance,, spookyBoneInfo.confidence);
+					m = CreateScaleMeasurement(skeleton->GetName(), i, spookyBoneInfo.timestamp_sec, localTransform.GetScale3D(),  spookyBoneInfo.scale_var, spookyBoneInfo.confidence);
 					break;
 			}
 			m->globalSpace = false;
@@ -373,6 +370,15 @@ Measurement::Ptr USpookyFusionPlant::CreatePoseMeasurement(FString system_name, 
 	SetCommonMeasurementData(result, system_name, sensorID, timestamp_sec, confidence);
 
 	return std::move(result);
+}
+
+Measurement::Ptr USpookyFusionPlant::CreatePoseMeasurement(FString system_name, int sensorID, float timestamp_sec, FVector v, FQuat q, FVector position_var, FVector4 quaternion_var, float confidence)
+{
+	Eigen::Vector3f vv(&position_var[0]);
+	Eigen::Vector4f vq(&quaternion_var[0]);
+	Eigen::Matrix<float, 7, 1> uncertainty;
+	uncertainty << vv, vq;
+	return CreatePoseMeasurement(system_name, sensorID, timestamp_sec, v, q, uncertainty, confidence);
 }
 
 void USpookyFusionPlant::SetCommonMeasurementData(Measurement::Ptr& m, FString system_name, int sensorID, float timestamp_sec, float confidence){

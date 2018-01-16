@@ -23,8 +23,8 @@ limitations under the License.
 #include "SpookySkeletalMeshComponent.generated.h"
 
 
-UENUM()
-enum ESpookyMeasurementType {
+UENUM(BlueprintType)
+enum class ESpookyMeasurementType : uint8 {
 	GENERIC = 0,
 	POSITION = 1,
 	ROTATION = 2,
@@ -40,42 +40,62 @@ enum class ESpookyReturnStatus : uint8
 	Failure
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FSpookySkeletonBoneInfo{
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
+	//--------------------------------
+	//		FIXED PARAMETERS
+	//--------------------------------
 	//Name of the bone in the skeleton heirarchy
-	FString name;
-	//Variances
-	struct {
-		//Variance = sigma = diagonal of pos def variance matrix
-		//TODO: support full matrix variance - currently not supported because unreal matrix types are limited
-		struct {
-			FVector sigma;
-			bool isGlobal = false;
-		} position;
-
-		struct {
-			FVector4 sigma;
-			bool isGlobal = false;
-		} quaternion;
-
-		struct {
-			FVector sigma;
-			bool isGlobal = false;
-		} scale;
-
-	} variance;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FName name;
 
 	//Index of bone in skeleton->BoneSpaceTransforms[i]
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
 	int bone_index;
-	//A weighting of how reliable the measurement is
-	float confidence;
-	//When the measurement was recorded, relative to start of program
-	double timestamp_sec;
+
 	//The type of measurement provided by this bone.
 	//Effectively masks out bone information which is known from being fused during runtime
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
 	ESpookyMeasurementType measurementType;
+
+	//--------------------------------
+	//		UPDATABLE PARAMETERS
+	//--------------------------------
+	//(these parameters will change frequently, every frame even)
+
+	//Variances
+	//.........................
+	//Variance = sigma = diagonal of pos def variance matrix
+	//TODO: support full matrix variance - currently not supported because unreal matrix types are limited
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FVector position_var;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	bool position_var_global = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FVector4 quaternion_var;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	bool quaternion_var_global = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FVector scale_var;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	bool scale_var_global = false;
+
+	//Confidence
+	//.........................
+	//A weighting of how reliable the measurement is
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	float confidence;
+
+	//Timestamp
+	//.........................
+	//When the measurement was recorded, relative to start of program
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	float timestamp_sec; 	
+
 };
 
 UCLASS(ClassGroup=(Rendering, Spooky), hidecategories=Object, Config=Spooky, editinlinenew, meta=(BlueprintSpawnableComponent))
@@ -86,24 +106,50 @@ class USpookySkeletalMeshComponent :
 
 private: 
 	//List of bones which carry measurements of  with associated meta info
-	std::map<std::string,FSpookySkeletonBoneInfo> activeBones;
+	std::map<FName,FSpookySkeletonBoneInfo> activeBones;
 
 	std::unique_ptr<FSpookySkeletonBoneInfo> defaultBoneInfo;
+
 public:
 
+
+	//--------------------------------
+	//		INITIALISATION
+	//--------------------------------
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void SetDefaultBoneInfo(const FSpookySkeletonBoneInfo& info);
 
-	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddActiveBones(const TArray<FString>& bones, ESpookyReturnStatus& branch);
+	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
+	void AddActiveBones(const TArray<FName>& bones, ESpookyReturnStatus& branch);
+
+	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
+	void SetBoneInfo(const FSpookySkeletonBoneInfo& info, ESpookyReturnStatus& branch);
+
+
+	//--------------------------------
+	//		INPUT
+	//--------------------------------
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void SetBoneInfo(const FSpookySkeletonBoneInfo& info);
+	void UpdateTimestamp(const FName& bone,const float& t_sec);
 
-	//TODO: read from config file?
-	// UFUNCTION(BlueprintCallable, Category = "Spooky")
-	// void LoadBoneConfig(const FString& filename);
+	UFUNCTION(BlueprintCallable, Category = "Spooky")
+	void UpdateAllTimestamps(const float& t_sec);
 
+	UFUNCTION(BlueprintCallable, Category = "Spooky")
+	void UpdateConfidence(const FName& bone,const float& confidence);
+
+
+	//--------------------------------
+	//		OUTPUT
+	//--------------------------------
 	
+	bool isBoneActive(const FName& name) {
+		return activeBones.count(name) > 0;
+	}
+
+	const FSpookySkeletonBoneInfo& getSpookyBoneInfo(const FName& name) {
+		return activeBones[name];
+	}
 };
 
