@@ -38,16 +38,23 @@ void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, ES
 		SPOOKY_LOG("ERROR: NO DEFAULT BONE INFO SET SO CANNOT ADD ACTIVE BONES");
 		return;	
 	}
+	std::vector<FName> missingBones;
 	for(int i = 0; i < bones.Num(); i++){
 		bool thisBoneExists = this->SkeletalMesh->RefSkeleton.FindBoneIndex(bones[i]) != INDEX_NONE;
 		if (thisBoneExists) {
 			activeBones[bones[i]] = *defaultBoneInfo;
 		}
-		bones_exist = bones_exist && thisBoneExists;
+		else {
+			missingBones.push_back(bones[i]);
+			bones_exist = false;
+		}
 	}
 	if (!bones_exist) {
 		branch = ESpookyReturnStatus::Failure;
-		SPOOKY_LOG("ERROR: NO DEFAULT BONE INFO SET SO CANNOT ADD ACTIVE BONES");
+		SPOOKY_LOG("ERROR: THE FOLLOWING REQUESTED ACTIVE BONES DO NOT EXIST: ");
+		for (auto& b : missingBones) {
+			SPOOKY_LOG(TCHAR_TO_UTF8(*(b.ToString())));
+		}
 	}
 	else {
 		branch = ESpookyReturnStatus::Success;

@@ -47,6 +47,10 @@ struct FSpookySkeletonBoneInfo{
 	//--------------------------------
 	//		FIXED PARAMETERS
 	//--------------------------------
+	//Name of the system which the sensor belongs to
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FString system_name;
+
 	//Name of the bone in the skeleton heirarchy
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
 	FName name;
