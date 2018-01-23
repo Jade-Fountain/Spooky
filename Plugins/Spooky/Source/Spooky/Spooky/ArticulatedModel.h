@@ -95,8 +95,15 @@ namespace spooky {
 		void updateState(const State& new_state, const float& timestamp, const float& latency);
 		//Sets the model for the articulations associated with this node
 		void setModel(std::vector<Articulation> art);
-		//Local fusion of buffered measurements
+		//Local fusion of all buffered measurements
 		void fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem);
+
+		//Fusion of particular mesurement types (defined in FusionProcedures.cpp)
+		void fusePositionMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
+		void fuseRotationMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
+		void fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
+		void fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
+
 	
 	private:
 		Transform3D getGlobalPose();

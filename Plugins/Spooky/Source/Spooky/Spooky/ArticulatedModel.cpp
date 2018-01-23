@@ -67,28 +67,43 @@ namespace spooky {
 	}
 
 	void Node::fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem){
-		Transform3D parent_pose = Transform3D::Identity();
+		Transform3D toFusionSpace = Transform3D::Identity();
 		
 		//If this node has a parent, recursively fuse until we know its transform
 		if (parent != NULL) {
 			parent->fuse(calib, referenceSystem);
-			parent_pose = parent->getGlobalPose();
 		}
-		
-		//SPOOKY_LOG("Fusing node " + desc.name + " t = ");
 
 		for(auto& m : measurements){
 			//Throwout bad measurements
+			//TODO: use confidence better
 			if (m->confidence < 0.75) {
 				continue;
 			}
 
 			//Get mapping to correct reference frame
 			//TODO: Optimise this access somehow?
-			CalibrationResult calibResult = calib.getResultsFor(referenceSystem, m->getSystem());
+			CalibrationResult calibResult = calib.getResultsFor(m->getSystem(),referenceSystem);
 			if (calibResult.calibrated()) {
-				parent_pose = calibResult.transform * parent_pose;
+				toFusionSpace = calibResult.transform;
 			}
+
+			switch(m->getType()){
+				case(MeasurementType::POSITION):
+					fusePositionMeasurement(m,toFusionSpace);
+					break;
+				case(MeasurementType::ROTATION):
+					fuseRotationMeasurement(m,toFusionSpace);
+					break;
+				case(MeasurementType::RIGID_BODY):
+					fuseRigidMeasurement(m,toFusionSpace);
+					break;
+				case(MeasurementType::SCALE):
+					fuseMeasurement(m,toFusionSpace);
+					break;
+
+			}
+			Transform3D error = utilites::getError(m,parent_pose * getLocalPose());
 
 			Node::State new_state = local_state;
 			new_state.valid = false;
@@ -112,7 +127,6 @@ namespace spooky {
 			//Simple update based on parent pose
 			state->articulation[i].expectation = Eigen::Quaternionf(parent_pose.rotation().inverse() * m->getRotation()).coeffs();
 			state->articulation[i].expectation.normalize();
-			//TODO: make names consitent
 			state->articulation[i].variance = m->getRotationVar();
 			state->valid = true;
 		} 
