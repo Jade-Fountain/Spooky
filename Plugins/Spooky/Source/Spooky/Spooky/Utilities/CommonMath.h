@@ -484,6 +484,26 @@ namespace spooky{
 				}
 				return result.cast<float>();
 			}
+
 		}
+		//TODO: template complex vs etc
+		static inline Eigen::Matrix3f skewSymmetric(const Eigen::Vector3f& w) {
+			Eigen::Matrix3f result;
+			result << 0, -w[2], w[1],
+				w[2], 0, -w[0],
+				-w[1], w[0], 0;
+			return result;
+		}
+		static inline Eigen::Matrix3f rodriguezFormula(const Eigen::Vector3f& w) {
+			Eigen::Matrix3f skewW = skewSymmetric(w);
+			double normW = w.norm();
+			return Eigen::Matrix3f::Identity() + skewW * std::sin(normW) / normW + skewW * skewW * (1 - cos(normW)) / (normW * normW);
+		}
+
+		static inline Eigen::Matrix3f getPositionVarianceFromRotation(const Eigen::Vector3f& w, const Eigen::Vector3f& p, const Eigen::Matrix3f& sigmaW) {
+			Eigen::Matrix3f J = complex::jacobianExp(w, p);
+			return J * sigmaW * J.transpose();
+		}
+
 	}
 }

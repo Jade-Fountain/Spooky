@@ -293,5 +293,26 @@ namespace FusionTesting
 
 		}
 
+		TEST_METHOD(RotationJacobian) {
+			Eigen::Vector3f w(M_PI / 2, 0, 0);
+			Eigen::Matrix3f sigmaw;
+			sigmaw << 0.1, 0, 0,
+				0, 0, 0,
+				0, 0, 0;
+			Eigen::Vector3f p(0, 1, 0);
+
+
+			std::stringstream ss2;
+			ss2 << "w " << w.transpose() << std::endl;
+			ss2 << "p = " << p.transpose() << std::endl;
+			ss2 << "rodriguesW * p = " << spooky::utility::rodriguezFormula(w) * p << std::endl;
+			ss2 << "sigmaw = \n" << sigmaw << std::endl;
+			ss2 << "sigmap = \n" << spooky::utility::getPositionVarianceFromRotation(w, p, sigmaw) << std::endl;
+			std::wstring widestr2 = utf8_decode(ss2.str());
+
+			Assert::AreEqual(false, true, widestr2.c_str());
+		}
+
+
 	};
 }
