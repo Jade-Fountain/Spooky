@@ -23,6 +23,8 @@
 #include<Eigen/Geometry>
 #include<Eigen/Eigenvalues>
 #include<Eigen/unsupported/KroneckerProduct>
+#include "sophus/so3.hpp"
+
 //#include "Logging.h"
 #pragma once
 
@@ -453,55 +455,24 @@ namespace spooky{
 			tnorm.distance = T.translation().norm();
 			return tnorm;
 		}
-	
-		namespace complex{
-			//Complex math functions
 
-			static inline Eigen::Matrix3cd skewSymmetric(const Eigen::Vector3cd& w){
-				Eigen::Matrix3cd result;
-				result << 0    , - w[2] ,  w[1],
-						  w[2] ,   0    , -w[0],
-						 -w[1] ,   w[0] ,  0;
-				return result;
+		static inline Eigen::Matrix3f jacobianExp(const Eigen::Vector3f& w, const Eigen::Vector3f& p){
+			double h = 1e-20;
+			Eigen::Matrix3d W_im = Eigen::Matrix3d::Identity() * h;
+			Eigen::Matrix3d result = Eigen::Matrix3d::Identity();
+			for(int i = 0; i < 3; i++){
+				Eigen::Vector3cd W;
+				W.real() = w.cast<double>();
+				W.imag() = W_im.col(i);
+				Eigen::Vector3cd exp = Sophus::SO3<std::complex<double>>::exp(W).matrix() * p.cast<std::complex<double>>() / h;
+				result.col(i) = exp.imag();
 			}
-
-			static inline Eigen::Matrix3cd rodriguezFormula(const Eigen::Vector3cd& w){
-				Eigen::Matrix3cd skewW = skewSymmetric(w);
-				double normW = w.norm();
-				return Eigen::Matrix3cd::Identity() + skewW * std::sin(normW) / normW + skewW * skewW * (1-cos(normW)) / (normW * normW); 
-			}		
-
-			static inline Eigen::Matrix3f jacobianExp(const Eigen::Vector3f& w, const Eigen::Vector3f& p){
-				double h = 1e-20;
-				Eigen::Matrix3d W_im = Eigen::Matrix3d::Identity() * h;
-				Eigen::Matrix3d result = Eigen::Matrix3d::Identity();
-				for(int i = 0; i < 3; i++){
-					Eigen::Vector3cd W;
-					W.real() = w.cast<double>();
-					W.imag() = W_im.col(i);
-					Eigen::Vector3cd exp = rodriguezFormula(W) * p.cast<std::complex<double>>() / h;
-					result.col(i) = exp.imag();
-				}
-				return result.cast<float>();
-			}
-
+			return result.cast<float>();
 		}
-		//TODO: template complex vs etc
-		static inline Eigen::Matrix3f skewSymmetric(const Eigen::Vector3f& w) {
-			Eigen::Matrix3f result;
-			result << 0, -w[2], w[1],
-				w[2], 0, -w[0],
-				-w[1], w[0], 0;
-			return result;
-		}
-		static inline Eigen::Matrix3f rodriguezFormula(const Eigen::Vector3f& w) {
-			Eigen::Matrix3f skewW = skewSymmetric(w);
-			double normW = w.norm();
-			return Eigen::Matrix3f::Identity() + skewW * std::sin(normW) / normW + skewW * skewW * (1 - cos(normW)) / (normW * normW);
-		}
+
 
 		static inline Eigen::Matrix3f getPositionVarianceFromRotation(const Eigen::Vector3f& w, const Eigen::Vector3f& p, const Eigen::Matrix3f& sigmaW) {
-			Eigen::Matrix3f J = complex::jacobianExp(w, p);
+			Eigen::Matrix3f J = jacobianExp(w, p);
 			return J * sigmaW * J.transpose();
 		}
 

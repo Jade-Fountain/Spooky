@@ -16,15 +16,17 @@
 */
 #include "Spooky.h"
 #include "ArticulatedModel.h"
+#include "sophus/so3.hpp"
 
 namespace spooky{
 
-    Vector3f getPositionFlex(){
+    Vector3f ArticulatedModel::getPositionFlex(){
 
         for(int i = 0; i < articulations.size(); i++){
             variance = state->articulation[i].variance;
         }
     }
+
     void ArticulatedModel::fusePositionMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace){
         //Calculate error
         Eigen::Vector3f error = toFusionSpace * m->getPosition() - getGlobalPose().translation();

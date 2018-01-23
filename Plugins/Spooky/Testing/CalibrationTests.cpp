@@ -4,6 +4,8 @@
 #include "../Source/Spooky/Spooky/Utilities/CalibrationUtilities.h"
 #include "../Source/Spooky/Spooky/Utilities/DataStructures.h"
 #include "../Source/Spooky/Spooky/Utilities/CommonMath.h"
+#include "../Spooky/Eigen/Core"
+#include "../Spooky/sophus/so3.hpp"
 #include <Windows.h>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -305,7 +307,7 @@ namespace FusionTesting
 			std::stringstream ss2;
 			ss2 << "w " << w.transpose() << std::endl;
 			ss2 << "p = " << p.transpose() << std::endl;
-			ss2 << "rodriguesW * p = " << spooky::utility::rodriguezFormula(w) * p << std::endl;
+			ss2 << "rodriguesW * p = " << Sophus::SO3f::exp(w).matrix() * p << std::endl;
 			ss2 << "sigmaw = \n" << sigmaw << std::endl;
 			ss2 << "sigmap = \n" << spooky::utility::getPositionVarianceFromRotation(w, p, sigmaw) << std::endl;
 			std::wstring widestr2 = utf8_decode(ss2.str());

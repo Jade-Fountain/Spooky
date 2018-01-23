@@ -51,19 +51,19 @@ namespace spooky{
             }
     		case(BONE):
             {
-                //Theta is a quaternion
-    			Eigen::Quaternionf q = Eigen::Quaternionf(Eigen::Vector4f(theta));
+                //Theta is an axis-angle
+				Eigen::Vector3f rw = theta;
     			T.translate(v);
-    			T.rotate(q);
+    			T.rotate(Sophus::SO3f::exp(rw).matrix());
     			break;
             }
 			case(POSE):
 			{
-				//Theta is a quaternion
-				Eigen::Quaternionf q = Eigen::Quaternionf(Eigen::Vector4f(theta.tail(4)));
+				//Theta is an axis-angle
+				Eigen::Vector3f rw = theta.tail(3);
 				Eigen::Vector3f pos = theta.head(3);
 				T.translate(pos);
-				T.rotate(q);
+				T.rotate(Sophus::SO3f::exp(rw).matrix());
 				break;
 			}
 			case(SCALE):
@@ -179,14 +179,14 @@ namespace spooky{
             case(BONE):
             {
                 //quaternion representation
-                return Eigen::Vector4f(0,0,0,1);
+                return Eigen::Vector3f(0,0,0);
                 break;
             }
 			case(POSE):
 			{
 				//pos_quat representation
-				Eigen::VectorXf vec = Eigen::Matrix<float,7,1>::Zero();
-				vec << 0, 0, 0, 0, 0, 0, 1;
+				Eigen::VectorXf vec = Eigen::Matrix<float,6,1>::Zero();
+				vec << 0, 0, 0, 0, 0, 0;
 				return vec;
 				break;
 			}
