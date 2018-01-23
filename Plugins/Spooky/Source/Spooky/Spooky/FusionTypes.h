@@ -467,6 +467,36 @@ namespace spooky {
 			return sensor->getLatency();
 		}
 
+		int getRequiredPDoF(){
+			switch(type){
+				case(Type::POSITION):
+					return 3;
+				case(Type::GENERIC):
+					return data.getSize();
+				case(Type::RIGID_BODY):
+					return 3;
+				case(ROTATION):
+					return 0;
+				case(SCALE):
+					return 3;
+			}
+
+		}
+		int getRequiredRDoF(){
+			switch(type){
+				case(Type::POSITION):
+					return 0;
+				case(Type::GENERIC):
+					return data.getSize();
+				case(Type::RIGID_BODY):
+					return 3;
+				case(ROTATION):
+					return 3;
+				case(SCALE):
+					return 0;
+			}
+		}
+
 	};
 
 	class MeasurementBuffer {
