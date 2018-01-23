@@ -44,6 +44,35 @@ namespace spooky {
 		}	
 		return pose;
 	}
+	
+	Eigen::Matrix<float,6> Node::getLocalPoseVariance(){
+		Eigen::Matrix<float,6> var = Eigen::Matrix<float,6>::Zero();
+		for (int i = 0; i < articulations.size(); i++) {
+			//Assume decoupling of variances between articulations - only true for linear cases (position only)
+			//TODO: implement this method in articulation
+			assert(false);
+			var += articulations[i].getPoseVariance(local_state.articulation[i].expectation,local_state.articulation[i].variance);
+		}	
+		return var;
+	}
+
+	
+	int Node::getPDoF(){
+		int pdof = 0;
+		for (int i = 0; i < articulations.size(); i++) {
+			pdof += articulations[i].getPDoF();
+		}
+		return pdof;
+	}
+	
+	int Node::getRDoF(){
+		int rdof = 0;
+		for (int i = 0; i < articulations.size(); i++) {
+			rdof += articulations[i].getRDoF();
+		}
+		return rdof;
+	}
+
 
 	void Node::updateState(const State& new_state, const float& timestamp, const float& latency) {
 		recacheRequired = true;

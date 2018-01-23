@@ -90,6 +90,12 @@ namespace spooky {
 		Transform3D getFinalGlobalPose();
 		//Returns final local transform relative to parent transform
 		Transform3D getLocalPose();
+		//Returns variance associated with pose
+		Eigen::Matrix<float,6> getLocalPoseVariance();
+
+		//Get rotational and translational degrees of freedom
+		int getPDoF();
+		int getRDoF();
 
 		//Updates the state of this node (e.g. angle, quaternion, etc.)
 		void updateState(const State& new_state, const float& timestamp, const float& latency);

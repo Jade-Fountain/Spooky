@@ -45,7 +45,7 @@ namespace spooky{
 		Articulation();
 
 		//Get the transform associated with this articulation
-		Transform3D getTransform(Eigen::VectorXf theta);
+		Transform3D getTransform(const Eigen::VectorXf& theta);
 
 		//Constructor functions:
 		static Articulation createFromTransform(const Transform3D& T, const Type& type);
@@ -54,6 +54,10 @@ namespace spooky{
 		static Articulation createCartesian(const Eigen::Vector3f & axis, const Eigen::Vector3f & position);
 		static Articulation createPose();
 		static Articulation createScale();
+
+		//Get rotational and translational degrees of freedom
+		int getPDoF();
+		int getRDoF();
 
 		//Returns the initial state vector to operate this articulation
 		static Eigen::VectorXf getInitialState(const Articulation::Type & type);

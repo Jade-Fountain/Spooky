@@ -26,7 +26,7 @@ namespace spooky{
     }
 
 
-    Transform3D Articulation::getTransform(Eigen::VectorXf theta){
+    Transform3D Articulation::getTransform(const Eigen::VectorXf& theta){
 
 		//TODO: make these cases into methods
 		Transform3D T = Transform3D::Identity();
@@ -161,6 +161,34 @@ namespace spooky{
 		result.w = Eigen::Vector3f::Zero();
 		return result;
 	}
+
+	int Articulation::getPDoF(bool hasLeverChild){
+		  switch (type) {
+            case(CARTESIAN):
+            	return 3;
+            case(TWIST):
+            	return hasLeverChild ? 5 : 2;
+            case(BONE):
+            //Roll doesnt help with position
+            	return hasLeverChild ? 2 : 0;
+			case(POSE):
+			//Roll doesnt help with position
+            	return hasLeverChild ? 5 : 2;
+			case(SCALE):
+				return 3;
+		}
+		return 0;
+	}
+	int Articulation::getRDoF(){
+		if(type == CARTESIAN || type == SCALE){
+			return 0;
+		}
+		else
+		{
+			return 3;
+		}
+	}
+
 
     Eigen::VectorXf Articulation::getInitialState(const Articulation::Type& type){
         switch (type) {
