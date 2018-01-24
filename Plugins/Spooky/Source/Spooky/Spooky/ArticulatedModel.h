@@ -104,6 +104,8 @@ namespace spooky {
 		//Local fusion of all buffered measurements
 		void fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem);
 
+		//Get required parents for fusing measurement m
+	    std::vector<Node::Ptr> getRequiredParents(const Measurement::Ptr& m);
 		//Fusion of particular mesurement types (defined in FusionProcedures.cpp)
 		void fusePositionMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
 		void fuseRotationMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);

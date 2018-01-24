@@ -65,6 +65,11 @@ namespace spooky{
             //Assume decoupling between nodes
             p_dof += parent.back()->getPDoF(hasLeverChild);
             r_dof += parent.back()->getRDoF();
+
+            if(!hasLeverChild){
+                //If there is much of a translation then it creates a lever which can cause position change
+                hasLeverChild = parent.back()->getPose().translation().norm() > 0.01;
+            }
             
             if(p_dof>=p_dof_req && r_dof>=r_dof_req || parents.back()->parent == NULL){
                 //We dont need anymore nodes to fuse data, or we are out of nodes
@@ -81,6 +86,9 @@ namespace spooky{
         //Calculate error
         if(m->isGlobal){
             std::vector<Node::Ptr> fusion_chain = getRequiredParents(m);
+            fuse
+        } else {
+            insertMeasurement()
         }
         //TODO: fuse chain
     }
