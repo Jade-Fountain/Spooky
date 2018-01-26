@@ -91,7 +91,7 @@ namespace spooky {
 		//Returns final local transform relative to parent transform
 		Transform3D getLocalPose();
 		//Returns variance associated with pose
-		Eigen::Matrix<float,6> getLocalPoseVariance();
+		Eigen::Matrix<float,6,6> getLocalPoseVariance();
 
 		//Get rotational and translational degrees of freedom
 		int getPDoF();

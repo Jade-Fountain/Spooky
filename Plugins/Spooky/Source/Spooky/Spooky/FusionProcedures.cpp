@@ -88,7 +88,7 @@ namespace spooky{
             std::vector<Node::Ptr> fusion_chain = getRequiredParents(m);
             fuse
         } else {
-            insertMeasurement()
+			insertMeasurement(m);
         }
         //TODO: fuse chain
     }

@@ -45,8 +45,8 @@ namespace spooky {
 		return pose;
 	}
 	
-	Eigen::Matrix<float,6> Node::getLocalPoseVariance(){
-		Eigen::Matrix<float,6> var = Eigen::Matrix<float,6>::Zero();
+	Eigen::Matrix<float,6,6> Node::getLocalPoseVariance(){
+		Eigen::Matrix<float,6,6> var = Eigen::Matrix<float,6>::Zero();
 		for (int i = 0; i < articulations.size(); i++) {
 			//Assume decoupling of variances between articulations - only true for linear cases (position only)
 			//TODO: implement this method in articulation

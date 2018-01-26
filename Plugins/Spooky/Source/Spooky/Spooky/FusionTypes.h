@@ -472,7 +472,7 @@ namespace spooky {
 				case(Type::POSITION):
 					return 3;
 				case(Type::GENERIC):
-					return data.getSize();
+					return data.size();
 				case(Type::RIGID_BODY):
 					return 3;
 				case(ROTATION):
@@ -487,7 +487,7 @@ namespace spooky {
 				case(Type::POSITION):
 					return 0;
 				case(Type::GENERIC):
-					return data.getSize();
+					return data.size();
 				case(Type::RIGID_BODY):
 					return 3;
 				case(ROTATION):

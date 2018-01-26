@@ -35,7 +35,7 @@ namespace spooky{
 		Eigen::Matrix3f W = Eigen::Matrix3f::Identity();
 
 		switch(type){
-		case(CARTESIAN):
+			case(AXIAL):
             {
     			R = Sophus::SO3f::exp(theta(0) * w).matrix(); // = e^(theta * ^w)
     			T.translate(v);
@@ -81,7 +81,7 @@ namespace spooky{
 		result.type = type;
 
 		switch (type) {
-			case(CARTESIAN):
+			case(AXIAL):
 			{
 				result.v = T.matrix().col(3).head(3);
 				result.w = Sophus::SO3f::log(Sophus::SO3f(T.matrix().topLeftCorner(3, 3)));
@@ -139,7 +139,7 @@ namespace spooky{
 
 	Articulation Articulation::createCartesian(const Eigen::Vector3f& axis, const Eigen::Vector3f& position) {
 		Articulation result;
-		result.type = CARTESIAN;
+		result.type = AXIAL;
 		result.w = axis;
 		result.v = position;
 		return result;
@@ -164,10 +164,11 @@ namespace spooky{
 
 	int Articulation::getPDoF(bool hasLeverChild){
 		  switch (type) {
-            case(CARTESIAN):
-            	return 3;
+            case(AXIAL):
+            	return hasLeverChild ? 1 : 0;
             case(TWIST):
-            	return hasLeverChild ? 5 : 2;
+				//Twist rotates and translates simultaneously
+            	return 1;
             case(BONE):
             //Roll doesnt help with position
             	return hasLeverChild ? 2 : 0;
@@ -180,8 +181,12 @@ namespace spooky{
 		return 0;
 	}
 	int Articulation::getRDoF(){
-		if(type == CARTESIAN || type == SCALE){
+		if(type == SCALE){
 			return 0;
+		}
+		else if (type == AXIAL || type == TWIST)
+		{
+			return 1;
 		}
 		else
 		{
@@ -189,10 +194,56 @@ namespace spooky{
 		}
 	}
 
+	Eigen::Matrix<float, 6, Eigen::Dynamic> Articulation::getPoseJacobian(const Eigen::VectorXf& expectation, const Eigen::MatrixXf& variance) {
+	switch (type) {
+		case(AXIAL):
+		{
+			//Single angle per articulation
+
+			break;
+		}
+		case(TWIST):
+		{
+			//Single angle per articulation
+			return Eigen::VectorXf::Zero(1);
+			break;
+		}
+		case(BONE):
+		{
+			//quaternion representation
+			return Eigen::Vector3f(0, 0, 0);
+			break;
+		}
+		case(POSE):
+		{
+			//pos_quat representation
+			Eigen::VectorXf vec = Eigen::Matrix<float, 6, 1>::Zero();
+			vec << 0, 0, 0, 0, 0, 0;
+			return vec;
+			break;
+		}
+		case(SCALE):
+		{
+			return Eigen::Vector3f(1, 1, 1);
+			break;
+		}
+		}
+		return Eigen::VectorXf::Zero(1);
+	}
+	}
+
+	Eigen::Matrix<float, 6, 6> Articulation::getPoseVariance(const Eigen::VectorXf& expectation, const Eigen::MatrixXf& variance) {
+		Eigen::Matrix<float, 6, 6> result = Eigen::Matrix<float, 6, 6>::Identity();
+		Eigen::Matrix<float, 6, Eigen::Dynamic> jacobian = getPoseJacobian(expectation);
+		return jacobian * variance * jacobian.transpose();
+		
+
+	}
+
 
     Eigen::VectorXf Articulation::getInitialState(const Articulation::Type& type){
         switch (type) {
-            case(CARTESIAN):
+            case(AXIAL):
             {
 				//Single angle per articulation
 				return Eigen::VectorXf::Zero(1);
@@ -226,5 +277,4 @@ namespace spooky{
         }
 		return Eigen::VectorXf::Zero(1);
     }
-
 }

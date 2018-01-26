@@ -24,7 +24,7 @@ namespace spooky{
 	public:
 		//Type of articulation
 		enum Type {
-			CARTESIAN = 0,
+			AXIAL = 0,
 			TWIST = 1,
 			BONE = 2,
 			POSE = 3,
@@ -58,6 +58,9 @@ namespace spooky{
 		//Get rotational and translational degrees of freedom
 		int getPDoF();
 		int getRDoF();
+
+		//Get pose variance
+		Eigen::Matrix<float, 6, 6> getPoseVariance(const Eigen::VectorXf& expectation, const Eigen::MatrixXf& variance);
 
 		//Returns the initial state vector to operate this articulation
 		static Eigen::VectorXf getInitialState(const Articulation::Type & type);
