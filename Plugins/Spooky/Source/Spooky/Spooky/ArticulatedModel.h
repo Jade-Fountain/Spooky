@@ -48,6 +48,25 @@ namespace spooky {
 				Eigen::VectorXf expectation;
 				//Covariance associated with vec(expectation)
 				Eigen::MatrixXf variance;
+
+				Parameters getSubstate(const int& position, const int& size) const {
+					Parameters substate(size);
+					substate.expectation = expectation.block(position, 0, size, 1);
+					substate.variance = variance.block(position, position, size, size);
+					return substate;
+				}
+
+				void insertSubstate(const int& position, const Parameters& p) {
+					int size = p.expectation.size();
+					expectation.block(position, 0, size, 1) = p.expectation;
+					variance.block(position, position, size, size) = p.variance;
+				}
+
+				size_t size(){
+					return expectation.size();
+				}
+
+				Parameters(int size) : expectation(size), variance(size, size) {}
 			};
 
 			//Paramters for each articulation
@@ -100,6 +119,17 @@ namespace spooky {
 		//Get the total number of variables describing this node
 		int getDimension();
 
+		//Split and merging of state parameters:
+		//---------------------------------------
+		//Set state parameters
+		void setState(const State::Parameters& new_state);
+		State::Parameters getState();
+
+		//Set and get an entire chain of nodes starting with this and recursing up parents
+		void setChainState(const int & chain_length, const State::Parameters & state);
+		State::Parameters getChainState(const int & chain_length);
+		//---------------------------------------
+
 		//Updates the state of this node (e.g. angle, quaternion, etc.)
 		void updateState(const State& new_state, const float& timestamp, const float& latency);
 		//Sets the model for the articulations associated with this node
@@ -116,6 +146,9 @@ namespace spooky {
 		void fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
 		void fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
 		
+
+		//Set and get local expectations and variances
+
 		//Get the jocobian of an entire pose chain mapping state |-> (w,p) axis-angle and position
 		Eigen::Matrix<float, 6, Eigen::Dynamic> getPoseChainJacobian(const int& chain_length);
 		

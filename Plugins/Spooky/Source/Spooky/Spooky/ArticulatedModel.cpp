@@ -76,9 +76,70 @@ namespace spooky {
 	int Node::getDimension() {
 		int dim = 0;
 		for (int i = 0; i < articulations.size(); i++) {
-			dim += local_state.articulation[i].expectation.size();
+			dim += local_state.articulation[i].size();
 		}
 		return dim;
+	}
+
+
+	//Set state parameters
+	void Node::setState(const State::Parameters& new_state){
+		int pos = 0;
+		for(int i = 0; i < articulations.size(); i++){
+			int dim = local_state.articulation[i].size();
+			local_state.articulation[i] = new_state.getSubstate(pos,dim);
+			pos += dim;
+		}
+	}
+
+	Node::State::Parameters Node::getState(){
+		//Construct new parameters set for combined articulations
+		State::Parameters p(getDimension());
+		int pos = 0;
+		for(int i = 0; i < articulations.size(); i++){
+			int dim = local_state.articulation[i].size();
+			p.insertSubstate(pos,local_state.articulation[i]);
+			pos += dim;
+		}
+		return p;
+	}
+
+	Node::State::Parameters Node::getChainState(const int& chain_length) {
+		//Precompute State size
+		int inputDimension = 0;
+		//TODO: dont use raw pointer
+		Node* node = this;
+		for (int i = 0; i < chain_length; i++) {
+			inputDimension += node->getDimension();
+			if (node->parent == NULL) break;
+			node = node->parent.get();
+		}
+		//Reset for actual calculation
+		node = this;
+		State::Parameters result(inputDimension);
+		int position = 0;
+		for (int i = 0; i < chain_length; i++) {
+			int dim = node->getDimension();
+			result.insertSubstate(position,node->getState());
+			position += dim;
+			if (node->parent == NULL) break;
+			node = node->parent.get();
+		}
+		return result;
+	}
+
+	void Node::setChainState(const int& chain_length, const State::Parameters& state_params) {
+		//Precompute Jacobian size
+		//TODO: dont use raw pointer
+		Node* node = this;
+		int last_block_end = 0;
+		for (int i = 0; i < chain_length; i++) {
+			int dim = node->getDimension();
+			node->setState(state_params.getSubstate(last_block_end,dim));
+			last_block_end += dim;
+			if (node->parent == NULL) break;
+			node = node->parent.get();
+		}
 	}
 
 
@@ -96,11 +157,12 @@ namespace spooky {
 		local_state.articulation.clear();
 		int max_n_rows = 1;
 		for(int i = 0; i < articulations.size(); i++){	
-			local_state.articulation.push_back(Node::State::Parameters());
-			local_state.articulation[i].expectation = Articulation::getInitialState(articulations[i].getType());
+			auto init = Articulation::getInitialState(articulations[i].getType());
+			local_state.articulation.push_back(Node::State::Parameters(init.size()));
+			local_state.articulation[i].expectation = init;
 			//TODO: generate covariance initial per aticulation
-			local_state.articulation[i].variance = initial_covariance * Eigen::MatrixXf::Identity(local_state.articulation[i].expectation.size(),
-																							      local_state.articulation[i].expectation.size());
+			local_state.articulation[i].variance = initial_covariance * Eigen::MatrixXf::Identity(local_state.articulation[i].size(),
+																							      local_state.articulation[i].size());
 		}
 	}
 

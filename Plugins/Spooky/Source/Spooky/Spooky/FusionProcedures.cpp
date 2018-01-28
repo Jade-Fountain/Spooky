@@ -91,6 +91,9 @@ namespace spooky{
 			int fusion_chain = getRequiredChainLength(m);
 			//fuse
 			Eigen::Matrix<float, 6, Eigen::Dynamic> measurementJacobian = getPoseChainJacobian(fusion_chain);
+			State::Parameters chainState = getChainState(fusion_chain);
+			//State::Parameters constraints = getPoseChainConstraints(fusion_chain);
+
         } else {
 			//TODO: Fuse locally with reg kalman filter
 			//insertMeasurement(m);
@@ -109,6 +112,7 @@ namespace spooky{
     void Node::fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace){
 
     }
+
 
 	Eigen::Matrix<float, 6, Eigen::Dynamic> Node::getPoseChainJacobian(const int& chain_length) {
 		//Precompute Jacobian size
@@ -143,6 +147,7 @@ namespace spooky{
 		}
 		return J;
 	}
+
 
 	Transform3Dcd Node::getLocalPoseComplexStep(int j, double h) {
 		Transform3Dcd pose = Transform3Dcd::Identity();
