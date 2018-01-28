@@ -46,7 +46,55 @@ namespace spooky{
 
 		//Get the transform associated with this articulation
 		template <typename Scalar>
-		Eigen::Transform<Scalar, 3, Eigen::Affine> getTransform(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& theta);
+		Eigen::Transform<Scalar, 3, Eigen::Affine> Articulation::getTransform(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& theta) {
+
+			//TODO: make these cases into methods
+			Eigen::Transform<Scalar, 3, Eigen::Affine> T = Eigen::Transform<Scalar, 3, Eigen::Affine>::Identity();
+			Eigen::Matrix<Scalar, 3, 3> R = Eigen::Matrix<Scalar, 3, 3>::Identity();
+			Sophus::Matrix<Scalar, 6, 1> vec;
+			Eigen::Matrix<Scalar, 3, 3> W = Eigen::Matrix<Scalar, 3, 3>::Identity();
+
+			switch (type) {
+			case(AXIAL):
+			{
+				R = Sophus::SO3<Scalar>::exp(theta(0) * w.cast<Scalar>()).matrix(); // = e^(theta * ^w)
+				T.translate(v.cast<Scalar>());
+				T.rotate(R);
+				break;
+			}
+			case(TWIST):
+			{
+				vec.block<3, 1>(0, 0) = v.cast<Scalar>();
+				vec.block<3, 1>(3, 0) = w.cast<Scalar>();
+				T.matrix() = Sophus::SE3<Scalar>::exp(theta(0) * vec).matrix();
+				break;
+			}
+			case(BONE):
+			{
+				//Theta is an axis-angle
+				Eigen::Matrix<Scalar, 3, 1> rw = theta;
+				T.translate(v.cast<Scalar>());
+				T.rotate(Sophus::SO3<Scalar>::exp(rw).matrix());
+				break;
+			}
+			case(POSE):
+			{
+				//Theta is an axis-angle
+				Eigen::Matrix<Scalar, 3, 1> rw = theta.tail(3);
+				Eigen::Matrix<Scalar, 3, 1> pos = theta.head(3);
+				T.translate(pos);
+				T.rotate(Sophus::SO3<Scalar>::exp(rw).matrix());
+				break;
+			}
+			case(SCALE):
+			{
+				//Theta is a scale vector in x,y and z
+				T.scale(Eigen::Matrix<Scalar, 3, 1>(theta.head(3)));
+				break;
+			}
+			}
+			return T;
+		}
 
 		//Constructor functions:
 		static Articulation createFromTransform(const Transform3D& T, const Type& type);
