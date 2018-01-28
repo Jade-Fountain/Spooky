@@ -5,6 +5,7 @@
 #include "../Source/Spooky/Spooky/Utilities/DataStructures.h"
 #include "../Source/Spooky/Spooky/Utilities/CommonMath.h"
 #include "../Spooky/Eigen/Core"
+#include "../Spooky/Spooky/Core.h"
 #include "../Spooky/sophus/so3.hpp"
 #include <Windows.h>
 
@@ -315,6 +316,45 @@ namespace FusionTesting
 			Assert::AreEqual(false, true, widestr2.c_str());
 		}
 
+		TEST_METHOD(ArticulatedModelFusionTest) {
+			//Set up spooky
+			spooky::Core core;
+			spooky::Transform3D bonePose = spooky::Transform3D::Identity();
+			bonePose.translate(Eigen::Vector3f(1, 0, 0));
+			core.addBoneNode(spooky::SystemDescriptor("bone1"), spooky::SystemDescriptor(""), bonePose);
+			core.addBoneNode(spooky::SystemDescriptor("bone2"), spooky::SystemDescriptor("bone1"), bonePose);
+			core.addBoneNode(spooky::SystemDescriptor("bone3"), spooky::SystemDescriptor("bone2"), bonePose);
+			core.setReferenceSystem(spooky::SystemDescriptor("sys1"));
+			core.finaliseSetup();
+
+			//Run simulation
+			float time_to_run = 3;
+			float fps = 30;
+			int iterations = fps * time_to_run;
+			float deltaT = 1 / fps;
+			for (int i = 0; i < iterations; i++) {
+				float t = deltaT * iterations;
+
+				//Simulate measurements
+				Eigen::Vector3f pos(std::sin(t) + 2, std::cos(t), 0);
+				Eigen::Quaternionf quat = Eigen::Quaternionf::Identity();
+				//Create measurement
+				spooky::Measurement::Ptr measurement = spooky::Measurement::createPoseMeasurement(pos, quat, Eigen::Matrix<float, 7, 7>::Identity() * 0.1);
+				//Get sensor and system info from spooky
+				core.setMeasurementSensorInfo(measurement, spooky::SystemDescriptor("sys1"), spooky::SensorID(0));
+				//Set metadata
+				bool measurementConsistent = measurement->setMetaData(t, 1);
+				if (!measurementConsistent) {
+					std::cout << "WARNING - Measurement not created correctly - " << __FILE__ << " : " << __LINE__ << std::endl;
+				}
+				else {
+					core.addMeasurement(measurement,spooky::NodeDescriptor("bone3"));
+				}
+				core.fuse(t);
+			}
+
+			//Check result
+		}
 
 	};
 }

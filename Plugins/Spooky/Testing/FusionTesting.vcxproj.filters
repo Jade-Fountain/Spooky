@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Spooky">
+      <UniqueIdentifier>{bb5e3138-1cfd-4a32-84c0-fcb021244843}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -21,13 +24,49 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Logging.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Spooky.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CalibrationTests.cpp">
+    <ClCompile Include="..\Source\Spooky\Spooky\SaveManager.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Spooky\Spooky\ArticulatedModel.cpp">
+      <Filter>Source Files\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Spooky\Spooky\Articulation.cpp">
+      <Filter>Source Files\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Spooky\Spooky\Calibration.cpp">
+      <Filter>Source Files\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Spooky\Spooky\CalibrationProcedures.cpp">
+      <Filter>Source Files\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="CalibrationTests.cpp">
+      <Filter>Source Files\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Spooky\Spooky\Core.cpp">
+      <Filter>Source Files\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Spooky\Spooky\CorrelationProcedures.cpp">
+      <Filter>Source Files\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Spooky\Spooky\Correlator.cpp">
+      <Filter>Source Files\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Spooky\Spooky\FusionProcedures.cpp">
+      <Filter>Source Files\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Spooky\Spooky\FusionTypes.cpp">
+      <Filter>Source Files\Spooky</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
