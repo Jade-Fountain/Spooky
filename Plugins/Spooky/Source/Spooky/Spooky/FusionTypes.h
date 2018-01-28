@@ -33,6 +33,7 @@ namespace spooky {
 
 	//Mapping between two affine spaces
 	typedef Eigen::Transform<float, 3, Eigen::Affine> Transform3D;
+	typedef Eigen::Transform<std::complex<double>, 3, Eigen::Affine> Transform3Dcd;
 	
 	//Define isometry for fast inverses when possible
 	class Isometry3D : Transform3D {
@@ -480,7 +481,7 @@ namespace spooky {
 				case(SCALE):
 					return 3;
 			}
-
+			return 0;
 		}
 		int getRequiredRDoF(){
 			switch(type){
@@ -495,6 +496,7 @@ namespace spooky {
 				case(SCALE):
 					return 0;
 			}
+			return 0;
 		}
 
 	};

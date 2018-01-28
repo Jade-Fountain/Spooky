@@ -16,8 +16,7 @@
 */
 #include "Spooky.h"
 #include "Articulation.h"
-#include "sophus/se3.hpp"
-#include "sophus/so3.hpp"
+#include "Utilities/CommonMath.h"
 
 namespace spooky{
     
@@ -25,51 +24,51 @@ namespace spooky{
 
     }
 
-
-    Transform3D Articulation::getTransform(const Eigen::VectorXf& theta){
+	template <typename Scalar>
+	Eigen::Transform<Scalar, 3, Eigen::Affine> Articulation::getTransform(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& theta){
 
 		//TODO: make these cases into methods
-		Transform3D T = Transform3D::Identity();
-		Eigen::Matrix3f R = Eigen::Matrix3f::Identity();
-		Sophus::Vector6f vec;
-		Eigen::Matrix3f W = Eigen::Matrix3f::Identity();
+		Eigen::Transform<Scalar, 3, Eigen::Affine> T = Eigen::Transform<Scalar, 3, Eigen::Affine>::Identity();
+		Eigen::Matrix<Scalar, 3,3> R = Eigen::Matrix<Scalar, 3, 3>::Identity();
+		Sophus::Matrix<Scalar, 6,1> vec;
+		Eigen::Matrix<Scalar, 3, 3> W = Eigen::Matrix<Scalar, 3, 3>::Identity();
 
 		switch(type){
 			case(AXIAL):
             {
-    			R = Sophus::SO3f::exp(theta(0) * w).matrix(); // = e^(theta * ^w)
-    			T.translate(v);
+    			R = Sophus::SO3<Scalar>::exp(theta(0) * w.cast<Scalar>()).matrix(); // = e^(theta * ^w)
+    			T.translate(v.cast<Scalar>());
     			T.rotate(R);
     			break;
             }
     		case(TWIST):
             {
-    			vec.block<3, 1>(0, 0) = v;
-    			vec.block<3, 1>(3, 0) = w;
-    			T.matrix() = Sophus::SE3f::exp(theta(0) * vec).matrix();
+    			vec.block<3, 1>(0, 0) = v.cast<Scalar>();
+    			vec.block<3, 1>(3, 0) = w.cast<Scalar>();
+    			T.matrix() = Sophus::SE3<Scalar>::exp(theta(0) * vec).matrix();
     			break;
             }
     		case(BONE):
             {
                 //Theta is an axis-angle
-				Eigen::Vector3f rw = theta;
-    			T.translate(v);
-    			T.rotate(Sophus::SO3f::exp(rw).matrix());
+				Eigen::Matrix<Scalar, 3, 1> rw = theta;
+    			T.translate(v.cast<Scalar>());
+    			T.rotate(Sophus::SO3<Scalar>::exp(rw).matrix());
     			break;
             }
 			case(POSE):
 			{
 				//Theta is an axis-angle
-				Eigen::Vector3f rw = theta.tail(3);
-				Eigen::Vector3f pos = theta.head(3);
+				Eigen::Matrix<Scalar, 3, 1> rw = theta.tail(3);
+				Eigen::Matrix<Scalar, 3, 1> pos = theta.head(3);
 				T.translate(pos);
-				T.rotate(Sophus::SO3f::exp(rw).matrix());
+				T.rotate(Sophus::SO3<Scalar>::exp(rw).matrix());
 				break;
 			}
 			case(SCALE):
 			{
 				//Theta is a scale vector in x,y and z
-				T.scale(Eigen::Vector3f(theta.head(3)));
+				T.scale(Eigen::Matrix<Scalar, 3, 1>(theta.head(3)));
 				break;
 			}
         }
@@ -194,51 +193,51 @@ namespace spooky{
 		}
 	}
 
-	Eigen::Matrix<float, 6, Eigen::Dynamic> Articulation::getPoseJacobian(const Eigen::VectorXf& expectation, const Eigen::MatrixXf& variance) {
-	switch (type) {
-		case(AXIAL):
-		{
-			//Single angle per articulation
+	//Eigen::Matrix<float, 6, 6> Articulation::getPoseVariance(const Eigen::VectorXf& expectation, const Eigen::MatrixXf& variance) {
+	//	Eigen::Matrix<float, 6, 6> result = Eigen::Matrix<float, 6, 6>::Identity();
+	//	Eigen::Matrix<float, 6, Eigen::Dynamic> jacobian = getPoseJacobian(expectation);
+	//	return jacobian * variance * jacobian.transpose();
 
-			break;
-		}
-		case(TWIST):
-		{
-			//Single angle per articulation
-			return Eigen::VectorXf::Zero(1);
-			break;
-		}
-		case(BONE):
-		{
-			//quaternion representation
-			return Eigen::Vector3f(0, 0, 0);
-			break;
-		}
-		case(POSE):
-		{
-			//pos_quat representation
-			Eigen::VectorXf vec = Eigen::Matrix<float, 6, 1>::Zero();
-			vec << 0, 0, 0, 0, 0, 0;
-			return vec;
-			break;
-		}
-		case(SCALE):
-		{
-			return Eigen::Vector3f(1, 1, 1);
-			break;
-		}
-		}
-		return Eigen::VectorXf::Zero(1);
-	}
-	}
 
-	Eigen::Matrix<float, 6, 6> Articulation::getPoseVariance(const Eigen::VectorXf& expectation, const Eigen::MatrixXf& variance) {
-		Eigen::Matrix<float, 6, 6> result = Eigen::Matrix<float, 6, 6>::Identity();
-		Eigen::Matrix<float, 6, Eigen::Dynamic> jacobian = getPoseJacobian(expectation);
-		return jacobian * variance * jacobian.transpose();
-		
+	//}
 
-	}
+	//Eigen::Matrix<float, 6, Eigen::Dynamic> Articulation::getPoseJacobian(const Eigen::VectorXf& expectation, const Eigen::MatrixXf& variance) {
+	//	switch (type) {
+	//		case(AXIAL):
+	//		{
+	//			//Single angle per articulation
+
+	//			break;
+	//		}
+	//		case(TWIST):
+	//		{
+	//			//Single angle per articulation
+	//			return Eigen::VectorXf::Zero(1);
+	//			break;
+	//		}
+	//		case(BONE):
+	//		{
+	//			//quaternion representation
+	//			return Eigen::Vector3f(0, 0, 0);
+	//			break;
+	//		}
+	//		case(POSE):
+	//		{
+	//			//pos_quat representation
+	//			Eigen::VectorXf vec = Eigen::Matrix<float, 6, 1>::Zero();
+	//			vec << 0, 0, 0, 0, 0, 0;
+	//			return vec;
+	//			break;
+	//		}
+	//		case(SCALE):
+	//		{
+	//			return Eigen::Vector3f(1, 1, 1);
+	//			break;
+	//		}
+	//		}
+	//		return Eigen::VectorXf::Zero(1);
+	//	}
+	//}
 
 
     Eigen::VectorXf Articulation::getInitialState(const Articulation::Type& type){

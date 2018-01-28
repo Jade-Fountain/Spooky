@@ -46,21 +46,21 @@ namespace spooky {
 	}
 	
 	Eigen::Matrix<float,6,6> Node::getLocalPoseVariance(){
-		Eigen::Matrix<float,6,6> var = Eigen::Matrix<float,6>::Zero();
+		Eigen::Matrix<float,6,6> var = Eigen::Matrix<float,6,6>::Zero();
 		for (int i = 0; i < articulations.size(); i++) {
 			//Assume decoupling of variances between articulations - only true for linear cases (position only)
 			//TODO: implement this method in articulation
 			assert(false);
-			var += articulations[i].getPoseVariance(local_state.articulation[i].expectation,local_state.articulation[i].variance);
+			//var += articulations[i].getPoseVariance(local_state.articulation[i].expectation,local_state.articulation[i].variance);
 		}	
 		return var;
 	}
 
 	
-	int Node::getPDoF(){
+	int Node::getPDoF(bool hasLeverChild){
 		int pdof = 0;
 		for (int i = 0; i < articulations.size(); i++) {
-			pdof += articulations[i].getPDoF();
+			pdof += articulations[i].getPDoF(hasLeverChild);
 		}
 		return pdof;
 	}
@@ -72,6 +72,15 @@ namespace spooky {
 		}
 		return rdof;
 	}
+
+	int Node::getDimension() {
+		int dim = 0;
+		for (int i = 0; i < articulations.size(); i++) {
+			dim += local_state.articulation[i].expectation.size();
+		}
+		return dim;
+	}
+
 
 
 	void Node::updateState(const State& new_state, const float& timestamp, const float& latency) {
@@ -117,31 +126,31 @@ namespace spooky {
 				toFusionSpace = calibResult.transform;
 			}
 
-			switch(m->getType()){
-				case(MeasurementType::POSITION):
+			switch(m->type){
+				case(Measurement::Type::POSITION):
 					fusePositionMeasurement(m,toFusionSpace);
 					break;
-				case(MeasurementType::ROTATION):
+				case(Measurement::Type::ROTATION):
 					fuseRotationMeasurement(m,toFusionSpace);
 					break;
-				case(MeasurementType::RIGID_BODY):
+				case(Measurement::Type::RIGID_BODY):
 					fuseRigidMeasurement(m,toFusionSpace);
 					break;
-				case(MeasurementType::SCALE):
-					fuseMeasurement(m,toFusionSpace);
+				case(Measurement::Type::SCALE):
+					fuseScaleMeasurement(m,toFusionSpace);
 					break;
 
 			}
-			Transform3D error = utilites::getError(m,parent_pose * getLocalPose());
+			//Transform3D error = utilites::getError(m,parent_pose * getLocalPose());
 
-			Node::State new_state = local_state;
-			new_state.valid = false;
-			for(int i = 0; i < articulations.size(); i++){
-				//Iteratively enters data into new_state
-				insertMeasurement(i,m,parent_pose,&new_state);
-				//If we can use the data, update the local state
-			}
-			if(new_state.valid) updateState(new_state, m->getTimestamp(), m->getLatency());
+			//Node::State new_state = local_state;
+			//new_state.valid = false;
+			//for(int i = 0; i < articulations.size(); i++){
+			//	//Iteratively enters data into new_state
+			//	insertMeasurement(i,m,parent_pose,&new_state);
+			//	//If we can use the data, update the local state
+			//}
+			//if(new_state.valid) updateState(new_state, m->getTimestamp(), m->getLatency());
 		}
 		//Dont use data twice
 		measurements.clear();

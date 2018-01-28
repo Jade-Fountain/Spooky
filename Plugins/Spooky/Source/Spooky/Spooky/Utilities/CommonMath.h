@@ -23,12 +23,13 @@
 #include<Eigen/Geometry>
 #include<Eigen/Eigenvalues>
 #include<Eigen/unsupported/KroneckerProduct>
+#include "ComplexMath.h"
 #include "sophus/so3.hpp"
+#include "sophus/se3.hpp"
 
 //#include "Logging.h"
 #pragma once
 
-#define M_PI 3.141592654
 
 namespace spooky{
 	namespace utility{
@@ -476,5 +477,12 @@ namespace spooky{
 			return J * sigmaW * J.transpose();
 		}
 
+		template <typename Scalar>
+		static inline Eigen::Matrix<Scalar, 6, 1> toAxisAnglePos(const Eigen::Transform<Scalar, 3, Eigen::Affine>& T) {
+			Eigen::Matrix<Scalar, 6, 1> result;
+			result.head(3) = Sophus::SO3<Scalar>::log(Sophus::SO3<Scalar>(T.rotation().matrix()));
+			result.tail(3) = T.translation();
+			return result;
+		}
 	}
 }

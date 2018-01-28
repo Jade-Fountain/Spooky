@@ -45,7 +45,7 @@ namespace spooky {
 				//				y
 				//				z
 				//	e.g. twists:(theta1	theta2 theta3)
-				Eigen::MatrixXf expectation;
+				Eigen::VectorXf expectation;
 				//Covariance associated with vec(expectation)
 				Eigen::MatrixXf variance;
 			};
@@ -94,8 +94,11 @@ namespace spooky {
 		Eigen::Matrix<float,6,6> getLocalPoseVariance();
 
 		//Get rotational and translational degrees of freedom
-		int getPDoF();
+		int getPDoF(bool hasLeverChild);
 		int getRDoF();
+
+		//Get the total number of variables describing this node
+		int getDimension();
 
 		//Updates the state of this node (e.g. angle, quaternion, etc.)
 		void updateState(const State& new_state, const float& timestamp, const float& latency);
@@ -105,13 +108,20 @@ namespace spooky {
 		void fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem);
 
 		//Get required parents for fusing measurement m
-	    std::vector<Node::Ptr> getRequiredParents(const Measurement::Ptr& m);
+	    int getRequiredChainLength(const Measurement::Ptr& m);
+
 		//Fusion of particular mesurement types (defined in FusionProcedures.cpp)
 		void fusePositionMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
 		void fuseRotationMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
 		void fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
 		void fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
-
+		
+		//Get the jocobian of an entire pose chain mapping state |-> (w,p) axis-angle and position
+		Eigen::Matrix<float, 6, Eigen::Dynamic> getPoseChainJacobian(const int& chain_length);
+		
+		//For use with complex step differentiation
+		// J = imag(f(x+ih)/h)
+		Transform3Dcd getLocalPoseComplexStep(int j, double h);
 	
 	private:
 		Transform3D getGlobalPose();

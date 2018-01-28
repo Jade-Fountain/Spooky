@@ -45,7 +45,8 @@ namespace spooky{
 		Articulation();
 
 		//Get the transform associated with this articulation
-		Transform3D getTransform(const Eigen::VectorXf& theta);
+		template <typename Scalar>
+		Eigen::Transform<Scalar, 3, Eigen::Affine> getTransform(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& theta);
 
 		//Constructor functions:
 		static Articulation createFromTransform(const Transform3D& T, const Type& type);
@@ -56,11 +57,14 @@ namespace spooky{
 		static Articulation createScale();
 
 		//Get rotational and translational degrees of freedom
-		int getPDoF();
+		int getPDoF(bool hasLeverChild);
 		int getRDoF();
 
 		//Get pose variance
-		Eigen::Matrix<float, 6, 6> getPoseVariance(const Eigen::VectorXf& expectation, const Eigen::MatrixXf& variance);
+		//Eigen::Matrix<float, 6, 6> getPoseVariance(const Eigen::VectorXf& expectation, const Eigen::MatrixXf& variance);
+
+		//TODO: Get the pose jacobian
+		//Eigen::Matrix<float, 6, Eigen::Dynamic> getPoseJacobian(const Eigen::VectorXf& expectation, const Eigen::MatrixXf& variance);
 
 		//Returns the initial state vector to operate this articulation
 		static Eigen::VectorXf getInitialState(const Articulation::Type & type);
