@@ -327,16 +327,18 @@ namespace FusionTesting
 			core.setReferenceSystem(spooky::SystemDescriptor("sys1"));
 			core.finaliseSetup();
 
+			std::stringstream ss2;
 			//Run simulation
 			float time_to_run = 3;
 			float fps = 30;
 			int iterations = fps * time_to_run;
 			float deltaT = 1 / fps;
+			Eigen::Vector3f pos;
 			for (int i = 0; i < iterations; i++) {
 				float t = deltaT * iterations;
 
 				//Simulate measurements
-				Eigen::Vector3f pos(std::sin(t) + 2, std::cos(t), 0);
+				pos = Eigen::Vector3f(std::sin(t) + 2, std::cos(t), 0);
 				Eigen::Quaternionf quat = Eigen::Quaternionf::Identity();
 				//Create measurement
 				spooky::Measurement::Ptr measurement = spooky::Measurement::createPoseMeasurement(pos, quat, Eigen::Matrix<float, 7, 7>::Identity() * 0.1);
@@ -351,8 +353,14 @@ namespace FusionTesting
 					core.addMeasurement(measurement,spooky::NodeDescriptor("bone3"));
 				}
 				core.fuse(t);
+				
 			}
 
+			spooky::Transform3D pose = core.getNodeGlobalPose(spooky::NodeDescriptor("bone3"));
+			ss2 << "Frame last " << " error = " << (pose.translation() - pos).norm() << " m, " << Eigen::AngleAxisf(pose.rotation()).angle() << " radians" << std::endl;
+			ss2 << pose.matrix() << std::endl;
+			std::wstring widestr2 = utf8_decode(ss2.str());
+			Assert::AreEqual(false, true, widestr2.c_str());
 			//Check result
 		}
 

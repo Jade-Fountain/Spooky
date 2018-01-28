@@ -35,9 +35,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Spooky\Spooky\SaveManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\Spooky\Spooky\ArticulatedModel.cpp">
       <Filter>Source Files\Spooky</Filter>
     </ClCompile>
@@ -48,9 +45,6 @@
       <Filter>Source Files\Spooky</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Spooky\Spooky\CalibrationProcedures.cpp">
-      <Filter>Source Files\Spooky</Filter>
-    </ClCompile>
-    <ClCompile Include="CalibrationTests.cpp">
       <Filter>Source Files\Spooky</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Spooky\Spooky\Core.cpp">
@@ -67,6 +61,12 @@
     </ClCompile>
     <ClCompile Include="..\Source\Spooky\Spooky\FusionTypes.cpp">
       <Filter>Source Files\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Spooky\Spooky\SaveManager.cpp">
+      <Filter>Source Files\Spooky</Filter>
+    </ClCompile>
+    <ClCompile Include="CalibrationTests.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
