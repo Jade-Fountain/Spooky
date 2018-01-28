@@ -92,8 +92,33 @@ namespace spooky{
 			//fuse
 			Eigen::Matrix<float, 6, Eigen::Dynamic> measurementJacobian = getPoseChainJacobian(fusion_chain);
 			State::Parameters chainState = getChainState(fusion_chain);
-			//State::Parameters constraints = getPoseChainConstraints(fusion_chain);
+			//TODO: constraints
+			State::Parameters constraints = getChainState(fusion_chain);
 
+			State::Parameters newChainState = chainState.size();
+
+			Eigen::AngleAxisf rot = Eigen::AngleAxisf(m->getRotation());
+			Eigen::Matrix<float, 6, 1> wp;
+			wp.head(3) = rot.angle() * rot.axis();
+			wp.tail(3) = m->getPosition();
+			Eigen::Matrix<float, 3, 4> quatToAxisJacobian = utility::getQuatToAxisJacobian(m->getRotation());
+
+			//TODO: Fix quat to be consistent: x,y,z,w is how eigen stores it internally, but its consrtuctor uses Quat(w,x,y,z)
+			Eigen::MatrixXf sigmaM_inv = (quatToAxisJacobian * m->getRotationVar() * quatToAxisJacobian.transpose()).inverse();
+			Eigen::MatrixXf sigmaP_inv = chainState.variance.inverse();
+			Eigen::MatrixXf sigmaC_inv = constraints.variance.inverse();
+			
+			float joint_stiffness = 0; //in [0,1]
+
+			newChainState.variance = (measurementJacobian.transpose() * sigmaM_inv * measurementJacobian +
+									  (1 / float(fusion_chain)) * (sigmaP_inv + joint_stiffness * sigmaC_inv)).inverse();
+			newChainState.expectation = newChainState.variance * (measurementJacobian.transpose() * sigmaM_inv * wp +
+																	(1 / float(fusion_chain)) *
+																	(sigmaP_inv * chainState.expectation 
+																		+ joint_stiffness * sigmaC_inv)
+																	);
+
+			setChainState(fusion_chain, newChainState);
         } else {
 			//TODO: Fuse locally with reg kalman filter
 			//insertMeasurement(m);

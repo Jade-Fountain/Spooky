@@ -484,5 +484,25 @@ namespace spooky{
 			result.tail(3) = T.translation();
 			return result;
 		}
+
+		static inline Eigen::Matrix<float, 3, 4> getQuatToAxisJacobian(Eigen::Quaternionf q) {
+			Eigen::Matrix<float, 3, 4> result = Eigen::Matrix<float, 3, 4>::Zero();
+			float d_sq = 1 - q.w()  * q.w();
+			if (d_sq == 0) {
+				result = Eigen::Matrix<float, 3, 4>::Identity() * 1e10;
+			} else {
+				float d = std::sqrt(d_sq);
+				float angle = 2 * std::acos(q.w());
+				float qwFactor = (2+q.w() * angle / d) / d_sq;
+				result(0,0) = q.x() * qwFactor;
+				result(1,0) = q.y() * qwFactor;
+				result(2,0) = q.z() * qwFactor;
+				result(0,1) = angle / d;
+				result(1,2) = angle / d;
+				result(2,3) = angle / d;
+			}
+			return result;
+			
+		}
 	}
 }
