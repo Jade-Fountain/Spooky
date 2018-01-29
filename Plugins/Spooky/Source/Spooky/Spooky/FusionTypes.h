@@ -76,7 +76,10 @@ namespace spooky {
 	};
 
 	//Node descriptor uses the same class as systemdescriptor
-	typedef SystemDescriptor NodeDescriptor;
+	class NodeDescriptor : public SystemDescriptor {
+	public:
+		NodeDescriptor(std::string n = "") :  SystemDescriptor(n){}
+	};
 
 	//Map key types
 	typedef std::pair<SystemDescriptor, SystemDescriptor> SystemPair;
@@ -322,15 +325,9 @@ namespace spooky {
 		//=========================
 
 		//Setup Methods
-		bool check_consistent() {
-			return (size == data.size() == uncertainty.rows() == uncertainty.cols());
-		}
+		bool check_consistent();
 
-		bool setMetaData(float timestamp_sec, float confidence_){
-			timestamp = timestamp_sec;
-			confidence = confidence_;
-			return check_consistent();
-		}
+		bool setMetaData(float timestamp_sec, float confidence_);
 
 		//=========================
 		//Static factory methods:

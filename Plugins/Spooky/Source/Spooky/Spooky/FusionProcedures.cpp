@@ -85,8 +85,16 @@ namespace spooky{
     }
 
     void Node::fusePositionMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace){
-        //Calculate error
-        if(m->globalSpace){
+
+    }
+
+    void Node::fuseRotationMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace){
+
+    }
+
+    void Node::fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace){
+		//Calculate error
+		if (m->globalSpace) {
 			//Fuse by modifying some parents if necessary
 			int fusion_chain = getRequiredChainLength(m);
 			//fuse
@@ -95,7 +103,7 @@ namespace spooky{
 			//TODO: constraints
 			State::Parameters constraints = getChainState(fusion_chain);
 
-			State::Parameters newChainState = chainState.size();
+			State::Parameters newChainState(chainState.size());
 
 			Eigen::AngleAxisf rot = Eigen::AngleAxisf(m->getRotation());
 			Eigen::Matrix<float, 6, 1> wp;
@@ -104,34 +112,30 @@ namespace spooky{
 			Eigen::Matrix<float, 3, 4> quatToAxisJacobian = utility::getQuatToAxisJacobian(m->getRotation());
 
 			//TODO: Fix quat to be consistent: x,y,z,w is how eigen stores it internally, but its consrtuctor uses Quat(w,x,y,z)
-			Eigen::MatrixXf sigmaM_inv = (quatToAxisJacobian * m->getRotationVar() * quatToAxisJacobian.transpose()).inverse();
+			Eigen::MatrixXf sigmaW = (quatToAxisJacobian * m->getRotationVar() * quatToAxisJacobian.transpose()).inverse();
+			Eigen::Matrix<float, 6, 6> sigmaM_inv = Eigen::Matrix<float, 6, 6>::Identity();
+			sigmaM_inv.topLeftCorner(3, 3) = sigmaW;
+			sigmaM_inv.bottomRightCorner(3, 3) = m->getPositionVar();
 			Eigen::MatrixXf sigmaP_inv = chainState.variance.inverse();
 			Eigen::MatrixXf sigmaC_inv = constraints.variance.inverse();
-			
+
 			float joint_stiffness = 0; //in [0,1]
 
 			newChainState.variance = (measurementJacobian.transpose() * sigmaM_inv * measurementJacobian +
-									  (1 / float(fusion_chain)) * (sigmaP_inv + joint_stiffness * sigmaC_inv)).inverse();
+				(1 / float(fusion_chain)) * (sigmaP_inv + joint_stiffness * sigmaC_inv)).inverse();
 			newChainState.expectation = newChainState.variance * (measurementJacobian.transpose() * sigmaM_inv * wp +
-																	(1 / float(fusion_chain)) *
-																	(sigmaP_inv * chainState.expectation 
-																		+ joint_stiffness * sigmaC_inv)
-																	);
+				(1 / float(fusion_chain)) *
+				(sigmaP_inv * chainState.expectation
+					+ joint_stiffness * sigmaC_inv * constraints.expectation)
+				);
 
 			setChainState(fusion_chain, newChainState);
-        } else {
+		}
+		else {
 			//TODO: Fuse locally with reg kalman filter
 			//insertMeasurement(m);
-        }
-        //TODO: fuse chain
-    }
-
-    void Node::fuseRotationMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace){
-
-    }
-
-    void Node::fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace){
-
+		}
+		//TODO: fuse chain
     }
 
     void Node::fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace){

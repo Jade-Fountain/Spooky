@@ -26,7 +26,16 @@ namespace spooky {
 
 	//Define config constants
 	const float Measurement::uncertainty_growth_max = 0.01f; //Fractional growth per second
+	
+	bool Measurement::check_consistent() {
+		return (size == data.size() == uncertainty.rows() == uncertainty.cols());
+	}
 
+	bool Measurement::setMetaData(float timestamp_sec, float confidence_) {
+		timestamp = timestamp_sec;
+		confidence = confidence_;
+		return check_consistent();
+	}
 	//=========================
 	//Static factory methods:
 	//=========================

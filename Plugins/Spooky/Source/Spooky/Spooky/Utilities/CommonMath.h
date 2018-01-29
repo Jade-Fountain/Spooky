@@ -489,7 +489,7 @@ namespace spooky{
 			Eigen::Matrix<float, 3, 4> result = Eigen::Matrix<float, 3, 4>::Zero();
 			float d_sq = 1 - q.w()  * q.w();
 			if (d_sq == 0) {
-				result = Eigen::Matrix<float, 3, 4>::Identity() * 1e10;
+				result.topRightCorner(3,3) = Eigen::Matrix3f::Identity();
 			} else {
 				float d = std::sqrt(d_sq);
 				float angle = 2 * std::acos(q.w());

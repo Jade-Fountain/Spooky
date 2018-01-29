@@ -66,7 +66,10 @@ namespace spooky {
 					return expectation.size();
 				}
 
-				Parameters(int size) : expectation(size), variance(size, size) {}
+				Parameters(int size) : expectation(size), variance(size, size) {
+					expectation.setZero();
+					variance.setIdentity();
+				}
 			};
 
 			//Paramters for each articulation
@@ -167,7 +170,7 @@ namespace spooky {
 
 		//Cached transforms
 		bool recacheRequired = true;
-		//TODO: optimise traversal and caching
+		//Optimise traversal and caching
 		Transform3D cachedPose;
 		size_t cachedPoseHash = 0;
 		size_t lastParentHash = 0;

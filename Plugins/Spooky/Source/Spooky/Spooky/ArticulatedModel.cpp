@@ -33,8 +33,7 @@ namespace spooky {
 	}
 
 	Transform3D Node::getFinalGlobalPose(){
-		Transform3D pose = getGlobalPose();
-		return pose * homePose;
+		return getGlobalPose() * homePose;
 	}
 
 	Transform3D Node::getLocalPose(){
@@ -90,6 +89,10 @@ namespace spooky {
 			local_state.articulation[i] = new_state.getSubstate(pos,dim);
 			pos += dim;
 		}
+		//Indicate that this node needs its local pose to be recomputed
+		recacheRequired = true;
+		//TODO:Add timestamp?
+		//local_state.last_update_time = t;
 	}
 
 	Node::State::Parameters Node::getState(){
@@ -167,7 +170,6 @@ namespace spooky {
 	}
 
 	void Node::fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem){
-		Transform3D toFusionSpace = Transform3D::Identity();
 		
 		//If this node has a parent, recursively fuse until we know its transform
 		if (parent != NULL) {
@@ -183,6 +185,7 @@ namespace spooky {
 
 			//Get mapping to correct reference frame
 			//TODO: Optimise this access somehow?
+			Transform3D toFusionSpace = Transform3D::Identity();
 			CalibrationResult calibResult = calib.getResultsFor(m->getSystem(),referenceSystem);
 			if (calibResult.calibrated()) {
 				toFusionSpace = calibResult.transform;
@@ -342,7 +345,6 @@ namespace spooky {
 
 	void ArticulatedModel::fuse(const Calibrator& calib) {
 		for(auto& node : nodes){
-			//TODO: support other fusion methods
 			node.second->fuse(calib, reference_system);
 		}
 		clearMeasurements();
@@ -352,7 +354,8 @@ namespace spooky {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createBone(boneTransform.translation()));
 		nodes[node]->setModel(art);
-		nodes[node]->local_state.articulation[0].expectation = Eigen::Quaternionf(boneTransform.rotation()).coeffs();
+		Eigen::AngleAxisf aa(boneTransform.rotation());
+		nodes[node]->local_state.articulation[0].expectation = aa.angle() * aa.axis();
 	}
 
 
