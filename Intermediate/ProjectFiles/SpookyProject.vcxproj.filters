@@ -3,7 +3,7 @@
   <ItemGroup>
     <None Include="..\..\SpookyProject.uproject" />
     <Filter Include="Source">
-      <UniqueIdentifier>{5ADC9316-7B21-41DB-B5ED-FFBFA004832D}</UniqueIdentifier>
+      <UniqueIdentifier>{DB7AC31D-8F7F-447C-A202-25402D99620C}</UniqueIdentifier>
     </Filter>
     <None Include="..\..\Source\SpookyProject.Target.cs">
       <Filter>Source</Filter>
@@ -12,7 +12,7 @@
       <Filter>Source</Filter>
     </None>
     <Filter Include="Config">
-      <UniqueIdentifier>{D6E07FE1-94CB-4DFD-9F7F-A6E3C3B944EC}</UniqueIdentifier>
+      <UniqueIdentifier>{49CBF1A4-9CFA-4746-9A9E-9107A15EBED4}</UniqueIdentifier>
     </Filter>
     <None Include="..\..\Config\DefaultEditor.ini">
       <Filter>Config</Filter>
@@ -33,22 +33,22 @@
       <Filter>Config</Filter>
     </None>
     <Filter Include="Plugins">
-      <UniqueIdentifier>{F207935F-46FF-4E0C-8DDC-A7094EA9FA31}</UniqueIdentifier>
+      <UniqueIdentifier>{2F70EAD2-C188-47F2-8784-5C2616B5C090}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Spooky">
-      <UniqueIdentifier>{19CA770C-9894-4BA4-9EC1-4F96CE7D1DCA}</UniqueIdentifier>
+      <UniqueIdentifier>{EA509A36-4EC7-4E07-8325-9772225D5D05}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Spooky\Source">
-      <UniqueIdentifier>{CD6AD2CE-D591-45C6-9C3D-1AED9F5B1FFE}</UniqueIdentifier>
+      <UniqueIdentifier>{FA3D4093-774E-4AF8-B6A3-A896CFEFB309}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Spooky\Source\Spooky">
-      <UniqueIdentifier>{E2CDF64B-F26C-4840-9D22-958E4EF6C54F}</UniqueIdentifier>
+      <UniqueIdentifier>{76736F62-88AA-4D0E-A260-0CA024CEF21A}</UniqueIdentifier>
     </Filter>
     <None Include="..\..\Plugins\Spooky\Source\Spooky\Spooky.Build.cs">
       <Filter>Plugins\Spooky\Source\Spooky</Filter>
     </None>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen">
-      <UniqueIdentifier>{433ED65F-0128-4463-8922-E8AA9366A121}</UniqueIdentifier>
+      <UniqueIdentifier>{6B2F021E-EF3F-47EA-A317-54A2070A7E47}</UniqueIdentifier>
     </Filter>
     <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\Cholesky">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen</Filter>
@@ -144,10 +144,10 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen</Filter>
     </None>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src">
-      <UniqueIdentifier>{2245D3E6-6DCE-44B7-9DB6-34C6E27DB902}</UniqueIdentifier>
+      <UniqueIdentifier>{63C10745-E3CB-4DCC-934D-1317F135293B}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Cholesky">
-      <UniqueIdentifier>{B306AD1C-1D9B-470D-B5F7-2B4C665183D8}</UniqueIdentifier>
+      <UniqueIdentifier>{F5DFEA03-11FB-4BC4-A299-EBEF3132B82E}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Cholesky\LDLT.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Cholesky</Filter>
@@ -159,13 +159,13 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Cholesky</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\CholmodSupport">
-      <UniqueIdentifier>{46816AE4-7558-4431-9208-4E5F47A521F2}</UniqueIdentifier>
+      <UniqueIdentifier>{82A054B6-379C-4BA2-8E0D-D26B478F0DA9}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\CholmodSupport\CholmodSupport.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\CholmodSupport</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Core">
-      <UniqueIdentifier>{4E4626C4-ADF4-4620-81C7-19062A39B5CB}</UniqueIdentifier>
+      <UniqueIdentifier>{9DEE9493-CABC-4E32-90D0-40BE074A579C}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Array.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core</Filter>
@@ -369,10 +369,10 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch">
-      <UniqueIdentifier>{C0359E3D-3F78-4506-A2F4-74651EF9F2FD}</UniqueIdentifier>
+      <UniqueIdentifier>{DDC209EA-579B-491D-BECB-399671BF2931}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AltiVec">
-      <UniqueIdentifier>{B9512CD8-A062-44BE-8B42-BD1701892B5A}</UniqueIdentifier>
+      <UniqueIdentifier>{3D7E08B2-715D-4823-84C1-89D2954E9B95}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AltiVec\Complex.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AltiVec</Filter>
@@ -384,7 +384,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AltiVec</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX">
-      <UniqueIdentifier>{B87C8D49-BE33-4E99-9B3D-398B41E1258C}</UniqueIdentifier>
+      <UniqueIdentifier>{1C866C9A-965E-4A90-A625-B0A244602ED1}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX\Complex.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX</Filter>
@@ -399,7 +399,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX512">
-      <UniqueIdentifier>{F7937718-A7FC-4C0D-B198-931E21F19454}</UniqueIdentifier>
+      <UniqueIdentifier>{DA29F793-EA27-47BE-A156-00E229149C05}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX512\MathFunctions.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX512</Filter>
@@ -408,7 +408,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX512</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\CUDA">
-      <UniqueIdentifier>{2DFBA8DD-74B6-4A07-A236-AA6DBF383C5E}</UniqueIdentifier>
+      <UniqueIdentifier>{4832A946-2D74-44F0-ACB1-C1FBCA6B8350}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\CUDA\Complex.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\CUDA</Filter>
@@ -429,13 +429,13 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\CUDA</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\Default">
-      <UniqueIdentifier>{24BB8AA5-C665-44E4-8E3F-493263B895A0}</UniqueIdentifier>
+      <UniqueIdentifier>{F835A33A-D519-4E27-82A7-E6B913F76003}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\Default\Settings.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\Default</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\NEON">
-      <UniqueIdentifier>{CC980507-7D51-4CC9-9F99-3B29D7CB2F2C}</UniqueIdentifier>
+      <UniqueIdentifier>{A03008A7-19FC-4E18-BFD0-4F0F99E2BA33}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\NEON\Complex.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\NEON</Filter>
@@ -447,7 +447,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\NEON</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\SSE">
-      <UniqueIdentifier>{7894C16C-A018-49EB-AC3A-57AF1447D915}</UniqueIdentifier>
+      <UniqueIdentifier>{C1B31F33-B116-4F69-9DA8-DA1FED5423FB}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\SSE\Complex.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\SSE</Filter>
@@ -462,7 +462,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\SSE</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\ZVector">
-      <UniqueIdentifier>{8FAD060E-41C0-485D-A370-ABD50475D75F}</UniqueIdentifier>
+      <UniqueIdentifier>{BACB5EB4-706D-4137-8155-E2DA07F76A87}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\ZVector\Complex.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\ZVector</Filter>
@@ -474,7 +474,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\ZVector</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Core\functors">
-      <UniqueIdentifier>{A3B8701F-F20F-4D25-B3F6-12FF15E263A9}</UniqueIdentifier>
+      <UniqueIdentifier>{07E09A79-D242-43D3-A4DE-0179E691D33E}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\functors\AssignmentFunctors.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\functors</Filter>
@@ -495,7 +495,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\functors</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Core\products">
-      <UniqueIdentifier>{97F0F662-8F9D-430D-A454-65E1A6A7C2A6}</UniqueIdentifier>
+      <UniqueIdentifier>{7E1F6873-C0E1-4351-9E33-EF2D4A60E890}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\GeneralBlockPanelKernel.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\products</Filter>
@@ -561,7 +561,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\products</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Core\util">
-      <UniqueIdentifier>{0C1E5EB1-5E42-4A65-B188-AE4489EE42D5}</UniqueIdentifier>
+      <UniqueIdentifier>{BEADD6CC-0006-47C5-AA44-0E30605337BB}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\util\BlasUtil.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\util</Filter>
@@ -600,7 +600,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Core\util</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues">
-      <UniqueIdentifier>{D0DD410F-1867-43B6-9855-BC0CEAE73B26}</UniqueIdentifier>
+      <UniqueIdentifier>{49141A26-9B0B-4893-AC09-F4496EE6783A}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\ComplexEigenSolver.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues</Filter>
@@ -645,7 +645,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Geometry">
-      <UniqueIdentifier>{C3004B82-D182-43FE-A36D-4711CDCBB478}</UniqueIdentifier>
+      <UniqueIdentifier>{472053EA-DFAE-4987-B890-FAC340CBF24F}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\AlignedBox.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Geometry</Filter>
@@ -690,13 +690,13 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Geometry</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\arch">
-      <UniqueIdentifier>{C4314DE3-33EC-42DC-A957-1207E89A5C4A}</UniqueIdentifier>
+      <UniqueIdentifier>{BE58507C-BFC9-440C-BA70-D959DDE82BE0}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\arch\Geometry_SSE.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\arch</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Householder">
-      <UniqueIdentifier>{EECBB975-F4F9-452D-B514-6D6BC9EF5BE9}</UniqueIdentifier>
+      <UniqueIdentifier>{3652CA4B-3BDA-4C0E-A3FF-F34AAAA119EF}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Householder\BlockHouseholder.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Householder</Filter>
@@ -708,7 +708,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Householder</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\IterativeLinearSolvers">
-      <UniqueIdentifier>{91F4F6DB-6C2B-4952-8A26-11B5CE3D6260}</UniqueIdentifier>
+      <UniqueIdentifier>{318C761F-FE5B-4805-B031-93EC4ED5E367}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\IterativeLinearSolvers\BasicPreconditioners.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\IterativeLinearSolvers</Filter>
@@ -735,13 +735,13 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\IterativeLinearSolvers</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\Jacobi">
-      <UniqueIdentifier>{41E56D1A-BF7A-4C25-A191-BEAD7D004A0E}</UniqueIdentifier>
+      <UniqueIdentifier>{0EDCB994-BEC9-41D2-941B-7CF446B4196F}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Jacobi\Jacobi.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\Jacobi</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\LU">
-      <UniqueIdentifier>{BA589A4C-9752-44F0-91F7-56FD0B0DA0E9}</UniqueIdentifier>
+      <UniqueIdentifier>{0BA06227-FEFE-4825-9F69-D232F3EB3421}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\LU\Determinant.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\LU</Filter>
@@ -759,19 +759,19 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\LU</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\LU\arch">
-      <UniqueIdentifier>{C775EAEC-54CF-4E0C-A640-ED4B995E5C18}</UniqueIdentifier>
+      <UniqueIdentifier>{C0165B81-9366-4B81-9CE5-3B43462A178D}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\LU\arch\Inverse_SSE.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\LU\arch</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\MetisSupport">
-      <UniqueIdentifier>{F3E42241-951A-423E-84ED-2CA56E878EA7}</UniqueIdentifier>
+      <UniqueIdentifier>{4E64B940-7E4E-472D-9738-00437938513C}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\MetisSupport\MetisSupport.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\MetisSupport</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\misc">
-      <UniqueIdentifier>{B0E53F49-4211-40E4-BC56-CFC4EE052B3E}</UniqueIdentifier>
+      <UniqueIdentifier>{C09A752A-4111-4B1B-99A6-B1AF85F27A53}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\misc\blas.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\misc</Filter>
@@ -795,7 +795,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\misc</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\OrderingMethods">
-      <UniqueIdentifier>{0DEA7450-15CC-4811-8E3A-3F68D5F6DBDE}</UniqueIdentifier>
+      <UniqueIdentifier>{EE5D852A-FB3A-4EEB-9781-E18DF830D85D}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\OrderingMethods\Amd.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\OrderingMethods</Filter>
@@ -807,19 +807,19 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\OrderingMethods</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\PardisoSupport">
-      <UniqueIdentifier>{CBD95531-FAE8-4E91-B7D7-B8820735512B}</UniqueIdentifier>
+      <UniqueIdentifier>{C895E58A-38C3-4DB7-BB91-25BC4E79AB9A}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\PardisoSupport\PardisoSupport.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\PardisoSupport</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\PaStiXSupport">
-      <UniqueIdentifier>{01A4546D-68E2-448D-9063-6E1267146B71}</UniqueIdentifier>
+      <UniqueIdentifier>{96B3C7A3-26B4-4C6A-AFBC-D7ECBD1E8DFB}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\PaStiXSupport\PaStiXSupport.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\PaStiXSupport</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\plugins">
-      <UniqueIdentifier>{AD23411D-E505-4824-B46E-96270FBE9C83}</UniqueIdentifier>
+      <UniqueIdentifier>{CA57AF57-4AEC-4E2C-9043-8E513A3C8E61}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\plugins\ArrayCwiseBinaryOps.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\plugins</Filter>
@@ -843,7 +843,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\plugins</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\QR">
-      <UniqueIdentifier>{17CE2FE8-621A-45B7-9E04-B5D642032641}</UniqueIdentifier>
+      <UniqueIdentifier>{D2F96386-A057-453C-867F-E5E460F0B72E}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\QR\ColPivHouseholderQR.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\QR</Filter>
@@ -864,7 +864,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\QR</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\SparseCholesky">
-      <UniqueIdentifier>{22DCECAB-960D-47E1-A9F1-DA1E52BE034A}</UniqueIdentifier>
+      <UniqueIdentifier>{AF0730BF-A8CB-477F-B567-159375B6DE88}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCholesky\SimplicialCholesky.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\SparseCholesky</Filter>
@@ -873,7 +873,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\SparseCholesky</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore">
-      <UniqueIdentifier>{C0BEB9FD-00CA-4742-8360-A339DCA2CCF1}</UniqueIdentifier>
+      <UniqueIdentifier>{FF76977E-957E-42C7-8F1A-DDD1A3D4A7E4}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\AmbiVector.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore</Filter>
@@ -966,7 +966,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU">
-      <UniqueIdentifier>{649BD940-E1E8-4766-A16F-BBBABCA9E3D1}</UniqueIdentifier>
+      <UniqueIdentifier>{4BB0A313-B757-43DD-9F37-77AE2FA7F35C}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU</Filter>
@@ -1020,19 +1020,19 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\SparseQR">
-      <UniqueIdentifier>{1EEDF65F-E5AB-4B03-85A4-3CD7A721AD64}</UniqueIdentifier>
+      <UniqueIdentifier>{93381879-6A77-4CDC-8B68-F2D05146CD37}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseQR\SparseQR.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\SparseQR</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\SPQRSupport">
-      <UniqueIdentifier>{BB3441F8-E30C-45CC-9055-A8C6C412CD10}</UniqueIdentifier>
+      <UniqueIdentifier>{B63FECE3-81AA-41A4-A09D-AD1BFB0A1465}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SPQRSupport\SuiteSparseQRSupport.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\SPQRSupport</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\StlSupport">
-      <UniqueIdentifier>{0593F9A4-9496-4EB1-A152-B1F65734B5BD}</UniqueIdentifier>
+      <UniqueIdentifier>{6CD2AEE9-08C2-4AF3-B4F6-CBC1CAAF5902}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\StlSupport\details.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\StlSupport</Filter>
@@ -1047,13 +1047,13 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\StlSupport</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\SuperLUSupport">
-      <UniqueIdentifier>{BEE943EE-8F5D-48A9-BAD2-D9EA0180CE87}</UniqueIdentifier>
+      <UniqueIdentifier>{96C2B3CA-0731-4FBC-8C36-2106D47B4ACB}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SuperLUSupport\SuperLUSupport.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\SuperLUSupport</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\SVD">
-      <UniqueIdentifier>{E09BC93D-DF7C-44AA-AFD8-5050CDA42015}</UniqueIdentifier>
+      <UniqueIdentifier>{3F9498DD-4C04-471E-83B0-758ECB18B2E5}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SVD\BDCSVD.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\SVD</Filter>
@@ -1071,13 +1071,13 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\SVD</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\src\UmfPackSupport">
-      <UniqueIdentifier>{D208AE60-B483-4BE9-9DDC-E5E35D4CECAB}</UniqueIdentifier>
+      <UniqueIdentifier>{B12FE93E-06F8-4F3B-8209-BEB47D025C01}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\UmfPackSupport\UmfPackSupport.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\src\UmfPackSupport</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported">
-      <UniqueIdentifier>{AC43CBCB-DFCC-4AC6-8A74-3FD2BB2A5476}</UniqueIdentifier>
+      <UniqueIdentifier>{27B20895-3DD8-4B4A-9273-0C680DF939DE}</UniqueIdentifier>
     </Filter>
     <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\AdolcForward">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported</Filter>
@@ -1146,7 +1146,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported</Filter>
     </None>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11">
-      <UniqueIdentifier>{8FDE33D9-E5DE-436B-A490-3F07D77BA04F}</UniqueIdentifier>
+      <UniqueIdentifier>{25A9FD7E-BCD9-4F8C-BD2B-4C451A402584}</UniqueIdentifier>
     </Filter>
     <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\CMakeLists.txt">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11</Filter>
@@ -1161,10 +1161,10 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11</Filter>
     </None>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src">
-      <UniqueIdentifier>{E88EF6C5-D722-41A7-A83A-BB6DDABCEC7F}</UniqueIdentifier>
+      <UniqueIdentifier>{4FA1E80E-6D29-4BEE-806A-507E98EEB354}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor">
-      <UniqueIdentifier>{FEC94F13-A3BA-4807-93DA-C8D930C991E2}</UniqueIdentifier>
+      <UniqueIdentifier>{D4670EC3-775E-43C9-B8BE-D053784D3F41}</UniqueIdentifier>
     </Filter>
     <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\README.md">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor</Filter>
@@ -1377,7 +1377,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\TensorSymmetry">
-      <UniqueIdentifier>{7A870497-EEF5-4DC2-A93F-CDB7E4FE5BF9}</UniqueIdentifier>
+      <UniqueIdentifier>{F0A19B9A-F779-41A8-828C-BE2BFDD605FB}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\TensorSymmetry\DynamicSymmetry.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\TensorSymmetry</Filter>
@@ -1389,13 +1389,13 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\TensorSymmetry</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\TensorSymmetry\util">
-      <UniqueIdentifier>{491AFBF3-C444-449D-B20B-78697CBE4CB1}</UniqueIdentifier>
+      <UniqueIdentifier>{17FF65D8-01C8-4F85-BB71-EF8C82E1042A}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\TensorSymmetry\util\TemplateGroupTheory.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\TensorSymmetry\util</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\ThreadPool">
-      <UniqueIdentifier>{3BDE7213-1B08-49C8-B6CD-8AD53C72ACDB}</UniqueIdentifier>
+      <UniqueIdentifier>{69F90727-DD2F-40F4-8741-943AF15A665A}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\ThreadPool\EventCount.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\ThreadPool</Filter>
@@ -1422,7 +1422,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\ThreadPool</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\util">
-      <UniqueIdentifier>{82CB0AC5-D7C9-45CE-BA95-CECE4AA08BC5}</UniqueIdentifier>
+      <UniqueIdentifier>{AE075369-4F19-4268-A8EE-EAE48266A21D}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\util\CXX11Meta.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\util</Filter>
@@ -1440,10 +1440,10 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\util</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src">
-      <UniqueIdentifier>{3671A90A-02D5-4F54-A830-2C8BA768EB92}</UniqueIdentifier>
+      <UniqueIdentifier>{EFCDE1F1-8340-4D28-9562-2C6BDC3A5C1C}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\AutoDiff">
-      <UniqueIdentifier>{A5F24F08-7FC7-406D-9349-014643340B29}</UniqueIdentifier>
+      <UniqueIdentifier>{55F4178E-4611-4405-B0ED-046FF7621918}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\AutoDiff\AutoDiffJacobian.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\AutoDiff</Filter>
@@ -1455,7 +1455,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\AutoDiff</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\BVH">
-      <UniqueIdentifier>{38664462-508E-430B-A0F5-F30249CBBA57}</UniqueIdentifier>
+      <UniqueIdentifier>{CDC24B11-384C-43A3-9104-13FAA37D6DAD}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\BVH\BVAlgorithms.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\BVH</Filter>
@@ -1464,13 +1464,13 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\BVH</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Eigenvalues">
-      <UniqueIdentifier>{FB1571BB-82B7-487F-9A33-58174380167E}</UniqueIdentifier>
+      <UniqueIdentifier>{8A8703D6-01A3-45B5-A040-69FFB4BBCAD7}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Eigenvalues\ArpackSelfAdjointEigenSolver.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Eigenvalues</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\EulerAngles">
-      <UniqueIdentifier>{2FB5279F-95C3-46BB-AFD9-FBC0A259CF40}</UniqueIdentifier>
+      <UniqueIdentifier>{AD9B316D-2FEA-4995-8089-58EF38AD56E5}</UniqueIdentifier>
     </Filter>
     <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\EulerAngles\CMakeLists.txt">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\EulerAngles</Filter>
@@ -1482,7 +1482,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\EulerAngles</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\FFT">
-      <UniqueIdentifier>{B788E326-2B2D-421E-83D1-06923E6B8297}</UniqueIdentifier>
+      <UniqueIdentifier>{54BB462D-316B-4EE1-BBDE-3B65B2E3F447}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\FFT\ei_fftw_impl.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\FFT</Filter>
@@ -1491,7 +1491,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\FFT</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\IterativeSolvers">
-      <UniqueIdentifier>{C44450F7-680A-4966-BD98-696BC4AD08CA}</UniqueIdentifier>
+      <UniqueIdentifier>{3800E74F-6153-441F-8D0C-AC5617CBCDAD}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\IterativeSolvers\ConstrainedConjGrad.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\IterativeSolvers</Filter>
@@ -1515,13 +1515,13 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\IterativeSolvers</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\KroneckerProduct">
-      <UniqueIdentifier>{585574E0-D47C-4789-92E1-B49777891FD8}</UniqueIdentifier>
+      <UniqueIdentifier>{41DD5E5E-5804-466E-B078-73165C548CED}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\KroneckerProduct\KroneckerTensorProduct.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\KroneckerProduct</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\LevenbergMarquardt">
-      <UniqueIdentifier>{B28E0AB1-453B-4673-A896-E734F0D60F07}</UniqueIdentifier>
+      <UniqueIdentifier>{24E05D6C-6331-4A76-BE6D-59CDDD78F87B}</UniqueIdentifier>
     </Filter>
     <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\LevenbergMarquardt\CopyrightMINPACK.txt">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\LevenbergMarquardt</Filter>
@@ -1542,7 +1542,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\LevenbergMarquardt</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MatrixFunctions">
-      <UniqueIdentifier>{1B065891-11AA-45DE-86B0-8D4ED5776354}</UniqueIdentifier>
+      <UniqueIdentifier>{ED4B66EE-819B-4DC4-8FC1-179974DF77A3}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MatrixFunctions\MatrixExponential.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MatrixFunctions</Filter>
@@ -1563,13 +1563,13 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MatrixFunctions</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MoreVectorization">
-      <UniqueIdentifier>{45BB4A03-34AB-4C1A-B08A-38EF91CCA832}</UniqueIdentifier>
+      <UniqueIdentifier>{D5D4F4C1-47BA-4514-BF92-94CD851263E0}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MoreVectorization\MathFunctions.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MoreVectorization</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization">
-      <UniqueIdentifier>{FA8E2EC2-AC6D-41DF-A010-F757E3B3F6AF}</UniqueIdentifier>
+      <UniqueIdentifier>{835EA67F-8360-49E6-9D58-31C64CCCA89C}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization\chkder.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization</Filter>
@@ -1605,13 +1605,13 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NumericalDiff">
-      <UniqueIdentifier>{80AD4BF8-C1D3-436C-A758-AF1A675FB845}</UniqueIdentifier>
+      <UniqueIdentifier>{96D15D00-D9C8-4678-94CC-C4E97000635F}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NumericalDiff\NumericalDiff.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NumericalDiff</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Polynomials">
-      <UniqueIdentifier>{78D2A770-5EBE-443F-92FF-509D61348E84}</UniqueIdentifier>
+      <UniqueIdentifier>{536663BF-AE5D-4B10-BD19-CB48D4FA06EB}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Polynomials\Companion.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Polynomials</Filter>
@@ -1623,7 +1623,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Polynomials</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Skyline">
-      <UniqueIdentifier>{D2ACFF44-9DBD-47E5-AB02-8E6914C47AF8}</UniqueIdentifier>
+      <UniqueIdentifier>{8F6BA64B-E98D-49DD-BD36-B40E2AB9E193}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Skyline\SkylineInplaceLU.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Skyline</Filter>
@@ -1644,7 +1644,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Skyline</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SparseExtra">
-      <UniqueIdentifier>{E3B99B0D-1816-4437-A00E-9586A223A17F}</UniqueIdentifier>
+      <UniqueIdentifier>{384614FF-30D9-47E4-939C-799FE2CBE763}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SparseExtra\BlockOfDynamicSparseMatrix.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SparseExtra</Filter>
@@ -1665,7 +1665,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SparseExtra</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions">
-      <UniqueIdentifier>{DA40B04C-60FF-4640-AAF8-5B5BE7D0E464}</UniqueIdentifier>
+      <UniqueIdentifier>{CBD666B5-E827-4674-A691-17D76482387E}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions\SpecialFunctionsArrayAPI.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions</Filter>
@@ -1683,16 +1683,16 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions\arch">
-      <UniqueIdentifier>{3AAB3B85-B493-40A3-8966-6C8C5A68CAE2}</UniqueIdentifier>
+      <UniqueIdentifier>{EFB62948-5D11-4BE8-A43B-B85FD70A2196}</UniqueIdentifier>
     </Filter>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions\arch\CUDA">
-      <UniqueIdentifier>{4B317469-CD2D-48FE-8EB2-156E5E1143F6}</UniqueIdentifier>
+      <UniqueIdentifier>{370045CB-9896-4364-81B4-FFDFCB771A9E}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions\arch\CUDA\CudaSpecialFunctions.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions\arch\CUDA</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Splines">
-      <UniqueIdentifier>{D06D77AF-F1FF-4053-B395-EB25CE013B4E}</UniqueIdentifier>
+      <UniqueIdentifier>{5851529A-39CB-4D9F-B31A-400BB3CC000A}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Splines\Spline.h">
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Splines</Filter>
@@ -1704,7 +1704,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Splines</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Private">
-      <UniqueIdentifier>{193A8846-0A3F-4A27-9DB0-A7DADF1F1358}</UniqueIdentifier>
+      <UniqueIdentifier>{BFCB5992-B49A-46BA-8C8F-3AE4EA4F2B89}</UniqueIdentifier>
     </Filter>
     <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Private\AnimGraphNode_GetSpookyResult.cpp">
       <Filter>Plugins\Spooky\Source\Spooky\Private</Filter>
@@ -1725,7 +1725,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Private</Filter>
     </ClCompile>
     <Filter Include="Plugins\Spooky\Source\Spooky\Public">
-      <UniqueIdentifier>{C7D2D352-DA84-4D97-A719-98A2EBD25FA6}</UniqueIdentifier>
+      <UniqueIdentifier>{78313A86-0043-43B6-B146-9CDE864A5BEF}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Public\AnimGraphNode_GetSpookyResult.h">
       <Filter>Plugins\Spooky\Source\Spooky\Public</Filter>
@@ -1746,7 +1746,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Public</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\sophus">
-      <UniqueIdentifier>{E5F0055B-9940-48A1-A048-76AB21FD0554}</UniqueIdentifier>
+      <UniqueIdentifier>{DB5C6B39-0862-410C-B08D-FF0CCFE04839}</UniqueIdentifier>
     </Filter>
     <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\average.hpp">
       <Filter>Plugins\Spooky\Source\Spooky\sophus</Filter>
@@ -1788,7 +1788,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\sophus</Filter>
     </None>
     <Filter Include="Plugins\Spooky\Source\Spooky\Spooky">
-      <UniqueIdentifier>{98DF3D0E-3B05-440D-9F26-A0DA1077BE39}</UniqueIdentifier>
+      <UniqueIdentifier>{FD6F0CEA-0729-45E5-BD80-FAD7B334F032}</UniqueIdentifier>
     </Filter>
     <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\ArticulatedModel.cpp">
       <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
@@ -1842,7 +1842,7 @@
       <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
     </ClInclude>
     <Filter Include="Plugins\Spooky\Source\Spooky\Spooky\Utilities">
-      <UniqueIdentifier>{C5F8938C-6D46-478F-A86F-E5F59032EB64}</UniqueIdentifier>
+      <UniqueIdentifier>{AB966CFA-DC4A-488A-80C3-9C1FD77CBE96}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\CalibrationUtilities.h">
       <Filter>Plugins\Spooky\Source\Spooky\Spooky\Utilities</Filter>
@@ -1866,13 +1866,13 @@
       <Filter>Plugins\Spooky</Filter>
     </None>
     <Filter Include="Plugins\Spooky\Resources">
-      <UniqueIdentifier>{C843D9BE-4225-486D-9F41-6A0E2AB702EB}</UniqueIdentifier>
+      <UniqueIdentifier>{2BB699A5-B4E1-48F7-B4ED-06B1E3D94CC7}</UniqueIdentifier>
     </Filter>
     <None Include="..\..\Plugins\Spooky\Resources\Icon128.png">
       <Filter>Plugins\Spooky\Resources</Filter>
     </None>
     <Filter Include="Source\SpookyProject">
-      <UniqueIdentifier>{56E83D09-D0A0-424A-9746-66E51D7CFE88}</UniqueIdentifier>
+      <UniqueIdentifier>{A8D034DE-3CD0-4F71-A40D-695026130682}</UniqueIdentifier>
     </Filter>
     <None Include="..\..\Source\SpookyProject\eigen.natvis">
       <Filter>Source\SpookyProject</Filter>
@@ -1891,5 +1891,10 @@
     <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\FusionProcedures.cpp">
       <Filter>Plugins\Spooky\Source\Spooky\Spooky</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\ComplexMath.h">
+      <Filter>Plugins\Spooky\Source\Spooky\Spooky\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -5,7 +5,10 @@
 			"path": "."
 		},
 		{
-			"path": "D:\\Epic Games\\UE_4.14\\Engine\\Source"
+			"path": "D:\\Epic Games\\UE_4.14\\Engine"
+		},
+		{
+			"path": "E:\\Program Files\\Epic Games\\4.14\\Engine\\Source"
 		}
 	]
 }
