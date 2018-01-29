@@ -42,6 +42,7 @@
 				FString bone_name = Output.GetAnimBlueprint()->TargetSkeleton->GetReferenceSkeleton().GetBoneName(index).GetPlainNameString();
 				Output.Pose[FCompactPoseBoneIndex(index)] = spookyFP->getBoneTransform(bone_name);
 				//Output.Pose[FCompactPoseBoneIndex(index)].SetRotation(FQuat(0, 0, 0, 1));
+				SPOOKY_FLOG(Output.Pose[FCompactPoseBoneIndex(index)].ToString());
 			}
 		}
 
