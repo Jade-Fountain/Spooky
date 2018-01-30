@@ -106,29 +106,43 @@ namespace spooky{
 			State::Parameters newChainState(chainState.size());
 
 			Eigen::AngleAxisf rot = Eigen::AngleAxisf(m->getRotation());
-			Eigen::Matrix<float, 6, 1> wp;
-			wp.head(3) = rot.angle() * rot.axis();
-			wp.tail(3) = m->getPosition();
+			Eigen::Matrix<float, 6, 1> wpm;
+			wpm.head(3) = rot.angle() * rot.axis();
+			wpm.tail(3) = m->getPosition();
 			Eigen::Matrix<float, 3, 4> quatToAxisJacobian = utility::getQuatToAxisJacobian(m->getRotation());
 
 			//TODO: Fix quat to be consistent: x,y,z,w is how eigen stores it internally, but its consrtuctor uses Quat(w,x,y,z)
-			Eigen::MatrixXf sigmaW = (quatToAxisJacobian * m->getRotationVar() * quatToAxisJacobian.transpose()).inverse();
-			Eigen::Matrix<float, 6, 6> sigmaM_inv = Eigen::Matrix<float, 6, 6>::Identity();
-			sigmaM_inv.topLeftCorner(3, 3) = sigmaW;
-			sigmaM_inv.bottomRightCorner(3, 3) = m->getPositionVar();
-			Eigen::MatrixXf sigmaP_inv = chainState.variance.inverse();
-			Eigen::MatrixXf sigmaC_inv = constraints.variance.inverse();
+            //Information matrices (inverse Covariance)
+			Eigen::MatrixXf sigmaW_info = (quatToAxisJacobian * m->getRotationVar() * quatToAxisJacobian.transpose()).inverse();
+			//Measurement information matrix
+			Eigen::Matrix<float, 6, 6> sigmaM_info = Eigen::Matrix<float, 6, 6>::Identity();
+			//Block diagonal inverse is inverse of blocks
+			sigmaM_info.topLeftCorner(3, 3) = sigmaW_info;
+			sigmaM_info.bottomRightCorner(3, 3) = m->getPositionVar().inverse();
+			//Prior information matrix
+			Eigen::MatrixXf sigmaP_info = chainState.variance.inverse();
+			//Constraint information matrix
+			Eigen::MatrixXf sigmaC_info = constraints.variance.inverse();
+            //Joint stiffness - 0 => no restriction; inf => next state will be the constraint centre
+			float joint_stiffness = 0; //in [0,inf]
 
-			float joint_stiffness = 0; //in [0,1]
+            //New states (extended kalman filter measurement update)
+			newChainState.variance = (measurementJacobian.transpose() * sigmaM_info * measurementJacobian +
+				(1 / float(fusion_chain)) * (sigmaP_info + joint_stiffness * sigmaC_info)).inverse();
 
-			newChainState.variance = (measurementJacobian.transpose() * sigmaM_inv * measurementJacobian +
-				(1 / float(fusion_chain)) * (sigmaP_inv + joint_stiffness * sigmaC_inv)).inverse();
-			newChainState.expectation = newChainState.variance * (measurementJacobian.transpose() * sigmaM_inv * wp +
+			Eigen::Matrix<float, 6, 1> wpstate = utility::toAxisAnglePos(getGlobalPose());
+			Eigen::Matrix<float, 6, 1> mVector = wpstate - measurementJacobian * chainState.expectation - wpm;
+			newChainState.expectation = newChainState.variance * (measurementJacobian.transpose() * sigmaM_info * mVector +
 				(1 / float(fusion_chain)) *
-				(sigmaP_inv * chainState.expectation
-					+ joint_stiffness * sigmaC_inv * constraints.expectation)
+				(sigmaP_info * chainState.expectation
+					+ joint_stiffness * sigmaC_info * constraints.expectation)
 				);
 
+            std::stringstream ss;
+			ss << std::endl << "measurementJacobian = " << std::endl << measurementJacobian << std::endl;
+			ss << std::endl << "new state = "  << std::endl << newChainState.expectation.transpose() << std::endl;
+            ss << "new state = " << std::endl << newChainState.variance;
+            SPOOKY_LOG(ss.str());
 			setChainState(fusion_chain, newChainState);
 		}
 		else {

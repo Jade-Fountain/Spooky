@@ -367,5 +367,9 @@ namespace FusionTesting
 			//Check result
 		}
 
+		TEST_METHOD(QuaternionToAxisJacobian) {
+			//Eigen::Quaternionf q =
+			//spooky::utility::getQuatToAxisJacobian(q);
+		}
 	};
 }
