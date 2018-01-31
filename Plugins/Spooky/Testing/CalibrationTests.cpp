@@ -368,8 +368,47 @@ namespace FusionTesting
 		}
 
 		TEST_METHOD(QuaternionToAxisJacobian) {
-			//Eigen::Quaternionf q =
-			//spooky::utility::getQuatToAxisJacobian(q);
+			Eigen::Quaternionf q0 = Eigen::Quaternionf::Identity();
+			Eigen::Quaternionf q1(Eigen::AngleAxisf(M_PI / 2, Eigen::Vector3f(1, 0, 0)));
+			Eigen::Quaternionf q2(Eigen::AngleAxisf(M_PI / 2, Eigen::Vector3f(0, 0, 1)));
+
+
+			Eigen::Matrix<float, 3, 4> result0 = spooky::utility::getQuatToAxisJacobian(q0);
+			Eigen::Matrix<float, 3, 4> result1 = spooky::utility::getQuatToAxisJacobian(q1);
+			Eigen::Matrix<float, 3, 4> result2 = spooky::utility::getQuatToAxisJacobian(q2);
+
+			Eigen::Matrix<float, 3, 4> expected_result0;
+			Eigen::Matrix<float, 3, 4> expected_result1;
+			Eigen::Matrix<float, 3, 4> expected_result2;
+			expected_result0 << 1,0,0,0,
+								0,1,0,0,
+								0,0,1,0;
+			expected_result1 <<
+				2.22144,       0,       0, 5.04987,
+				0, 2.22144,       0,       0,
+				0,       0, 2.22144,       0;
+			expected_result2 <<
+				2.22144,       0,       0,       0,
+				0, 2.22144,       0,       0,
+				0,       0, 2.22144, 5.04987;
+
+
+			//expected_result1 << 
+
+			float error = (result0-expected_result0).norm() + (result1-expected_result1).norm() + (result2-expected_result2).norm();
+			std::stringstream ss2;
+			ss2 << "error = " << error << std::endl;
+			ss2 << "error 0  = \n" << result0 - expected_result0 << std::endl;
+			ss2 << "error 1  = \n" << result1 - expected_result1 << std::endl;
+			ss2 << "error 2  = \n" << result2 - expected_result2 << std::endl;
+			ss2 << "q0 = " << q0.coeffs().transpose() << std::endl;
+			ss2 << "result0 = \n" << result0 << std::endl;
+			ss2 << "q1 = " << q1.coeffs().transpose() << std::endl;
+			ss2 << "result1 = \n" << result1 << std::endl;
+			ss2 << "q2 = " << q2.coeffs().transpose() << std::endl;
+			ss2 << "result2 = \n" << result2 << std::endl;
+			std::wstring widestr2 = utf8_decode(ss2.str());
+			Assert::AreEqual(error < 0.001, true, widestr2.c_str());
 		}
 	};
 }
