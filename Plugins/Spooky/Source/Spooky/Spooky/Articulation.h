@@ -74,7 +74,7 @@ namespace spooky{
 				//Theta is an axis-angle
 				Eigen::Matrix<Scalar, 3, 1> rw = theta;
 				T.translate(v.cast<Scalar>());
-				T.rotate(Sophus::SO3<Scalar>::exp(rw).matrix());
+				T.matrix().topLeftCorner(3, 3) = utility::rodriguezFormula(rw);
 				break;
 			}
 			case(POSE):

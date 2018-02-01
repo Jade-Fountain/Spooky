@@ -14,9 +14,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+
+//#include "Logging.h"
+#pragma once
+
 #include<iostream>
 #include<string>
 #include<numeric>
+#include<complex>
+#include<math.h>
 #include<algorithm>
 #include<Eigen/Core>
 #include<Eigen/SVD>
@@ -26,9 +32,6 @@
 #include "ComplexMath.h"
 #include "sophus/so3.hpp"
 #include "sophus/se3.hpp"
-
-//#include "Logging.h"
-#pragma once
 
 
 namespace spooky{
@@ -471,7 +474,24 @@ namespace spooky{
 			return result.cast<float>();
 		}
 
-
+		template <typename Scalar>
+		static inline Eigen::Matrix<Scalar, 3, 3> skewSymmetric(const Eigen::Matrix<Scalar, 3, 1>& t) {
+			Eigen::Matrix<Scalar, 3, 3> t_hat;
+			t_hat << 0, -t(2), t(1),
+				t(2), 0, -t(0),
+				-t(1), t(0), 0;
+			return t_hat;
+		}
+		
+		template <typename Scalar>
+		static inline Eigen::Matrix<Scalar,3,3> rodriguezFormula(const Eigen::Matrix<Scalar,3,1>& w) {
+			Eigen::Matrix<Scalar, 3, 3> w_hat = skewSymmetric(w.normalized());
+			//TODO: is this correct for complex numbers?
+			Scalar theta_sq = w.transpose() * w;
+			Scalar theta = std::pow(theta_sq,0.5);
+			return Eigen::Matrix<Scalar, 3, 3>::Identity() + w_hat * std::sin(theta) + w_hat * w_hat * (Scalar(1) - std::cos(theta));
+		}
+		//TODO: clean up unused functions
 		static inline Eigen::Matrix3f getPositionVarianceFromRotation(const Eigen::Vector3f& w, const Eigen::Vector3f& p, const Eigen::Matrix3f& sigmaW) {
 			Eigen::Matrix3f J = jacobianExp(w, p);
 			return J * sigmaW * J.transpose();
@@ -480,7 +500,8 @@ namespace spooky{
 		template <typename Scalar>
 		static inline Eigen::Matrix<Scalar, 6, 1> toAxisAnglePos(const Eigen::Transform<Scalar, 3, Eigen::Affine>& T) {
 			Eigen::Matrix<Scalar, 6, 1> result;
-			result.head(3) = Sophus::SO3<Scalar>::log(Sophus::SO3<Scalar>(T.rotation().matrix()));
+			//Warning - some functions squash imaginary component - e.g. transform.rotation()
+			result.head(3) = Sophus::SO3<Scalar>::log(Sophus::SO3<Scalar>(T.matrix().topLeftCorner(3,3)));
 			result.tail(3) = T.translation();
 			return result;
 		}

@@ -105,10 +105,7 @@ namespace spooky{
 
 			State::Parameters newChainState(chainState.size());
 
-			Eigen::AngleAxisf rot = Eigen::AngleAxisf(m->getRotation());
-			Eigen::Matrix<float, 6, 1> wpm;
-			wpm.head(3) = rot.angle() * rot.axis();
-			wpm.tail(3) = m->getPosition();
+			Eigen::Matrix<float, 6, 1> wpm = utility::toAxisAnglePos(m->getTransform());
 			Eigen::Matrix<float, 3, 4> quatToAxisJacobian = utility::getQuatToAxisJacobian(m->getRotation());
 
 			//TODO: Fix quat to be consistent: x,y,z,w is how eigen stores it internally, but its consrtuctor uses Quat(w,x,y,z)
@@ -131,14 +128,21 @@ namespace spooky{
 				(1 / float(fusion_chain)) * (sigmaP_info + joint_stiffness * sigmaC_info)).inverse();
 
 			Eigen::Matrix<float, 6, 1> wpstate = utility::toAxisAnglePos(getGlobalPose());
-			Eigen::Matrix<float, 6, 1> mVector = wpstate - measurementJacobian * chainState.expectation - wpm;
-			newChainState.expectation = newChainState.variance * (measurementJacobian.transpose() * sigmaM_info * mVector +
+			Eigen::Matrix<float, 6, 1> mVector = wpstate - wpm - measurementJacobian * chainState.expectation;
+			newChainState.expectation = newChainState.variance * (-measurementJacobian.transpose() * sigmaM_info * mVector +
 				(1 / float(fusion_chain)) *
 				(sigmaP_info * chainState.expectation
 					+ joint_stiffness * sigmaC_info * constraints.expectation)
 				);
 
             std::stringstream ss;
+            ss << std::endl << "sigmaW_info = " << std::endl << sigmaW_info << std::endl;
+            ss << std::endl << "sigmaM_info = " << std::endl << sigmaM_info << std::endl;
+            ss << std::endl << "sigmaC_info = " << std::endl << sigmaC_info << std::endl;
+			ss << std::endl << "wpstate = " << std::endl << wpstate << std::endl;
+			ss << std::endl << "wpm = " << std::endl << wpm << std::endl;
+            ss << std::endl << "mVector = " << std::endl << mVector << std::endl;
+            ss << std::endl << "measurementJacobian.transpose() * sigmaM_info * measurementJacobian = " << std::endl << measurementJacobian.transpose() * sigmaM_info * measurementJacobian << std::endl;
 			ss << std::endl << "measurementJacobian = " << std::endl << measurementJacobian << std::endl;
 			ss << std::endl << "new state = "  << std::endl << newChainState.expectation.transpose() << std::endl;
             ss << "new state = " << std::endl << newChainState.variance;
@@ -199,7 +203,7 @@ namespace spooky{
 			int thisDim = local_state.articulation[i].expectation.size();
 			int lastTotalDim = totalDim;
 			totalDim += thisDim;
-			Eigen::Matrix<std::complex<double>, Eigen::Dynamic,1> ih = Eigen::VectorXf::Zero(thisDim).cast<std::complex<double>>();
+			Eigen::Matrix<std::complex<double>, Eigen::Dynamic, 1> ih = Eigen::VectorXcd::Zero(thisDim);
 			if (j < totalDim && j >= lastTotalDim) {
 				ih[j - lastTotalDim] = std::complex<double>(0,h);
 			}
