@@ -350,6 +350,14 @@ namespace spooky {
 		clearMeasurements();
 	}
 
+	void ArticulatedModel::setFixedNode(const NodeDescriptor& node, const Transform3D& pose) {
+		std::vector<Articulation> art;
+		art.push_back(Articulation::createFixed(pose));
+		nodes[node]->setModel(art);
+		nodes[node]->local_state.articulation[0].expectation = Eigen::VectorXf(0);
+	}
+
+
 	void ArticulatedModel::setBoneForNode(const NodeDescriptor& node, const Transform3D& boneTransform) {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createBone(boneTransform.translation()));

@@ -75,6 +75,7 @@ namespace spooky {
 		////////////////////////////////////////////////////
 
 		//Adds a node to the fusion graph model
+		void addFixedNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& pose);
 		void addBoneNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& boneTransform);
 		void addPoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial);
 		void addScalePoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial, const Eigen::Vector3f& scaleInitial);

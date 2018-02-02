@@ -19,6 +19,12 @@
 #include <chrono>
 
 namespace spooky {
+	
+	void Core::addFixedNode(const NodeDescriptor & node, const NodeDescriptor & parent, const Transform3D& pose)
+	{
+		skeleton.addNode(node, parent);
+		skeleton.setFixedNode(node, pose);
+	}
 
 	void Core::addBoneNode(const NodeDescriptor & node, const NodeDescriptor & parent, const Transform3D& boneTransform)
 	{

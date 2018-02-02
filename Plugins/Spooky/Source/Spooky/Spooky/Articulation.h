@@ -24,11 +24,12 @@ namespace spooky{
 	public:
 		//Type of articulation
 		enum Type {
-			AXIAL = 0,
-			TWIST = 1,
-			BONE = 2,
-			POSE = 3,
-			SCALE = 4
+			FIXED = 0,
+			AXIAL = 1,
+			TWIST = 2,
+			BONE = 3,
+			POSE = 4,
+			SCALE = 5
 		};
 	private:
 
@@ -38,7 +39,8 @@ namespace spooky{
 		Eigen::Vector3f w;
 		//Vector: twist offest or displacement 
 		Eigen::Vector3f v;
-
+		//The constant matrix for fixed articulation
+		Transform3D fixedMatrix;
 
 	public:
 		//Default constructor
@@ -55,6 +57,11 @@ namespace spooky{
 			Eigen::Matrix<Scalar, 3, 3> W = Eigen::Matrix<Scalar, 3, 3>::Identity();
 
 			switch (type) {
+			case(FIXED):
+			{
+				T = fixedMatrix.cast<Scalar>();
+				break;
+			}			
 			case(AXIAL):
 			{
 				R = Sophus::SO3<Scalar>::exp(theta(0) * w.cast<Scalar>()).matrix(); // = e^(theta * ^w)
@@ -98,6 +105,7 @@ namespace spooky{
 
 		//Constructor functions:
 		static Articulation createFromTransform(const Transform3D& T, const Type& type);
+		static Articulation createFixed(const Transform3D & vec);
 		static Articulation createBone(const Eigen::Vector3f & vec);
 		static Articulation createTwist(const Eigen::Vector3f & axis, const Eigen::Vector3f & position);
 		static Articulation createCartesian(const Eigen::Vector3f & axis, const Eigen::Vector3f & position);

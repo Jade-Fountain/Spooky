@@ -21,7 +21,9 @@
 namespace spooky{
     
     Articulation::Articulation(){
-
+    	fixedMatrix = Transform3D::Identity();
+    	w = Eigen::Vector3f::Zero();
+    	v = Eigen::Vector3f::Zero();
     }
 
     Articulation Articulation::createFromTransform(const Transform3D& T, const Type& type){
@@ -29,6 +31,11 @@ namespace spooky{
 		result.type = type;
 
 		switch (type) {
+			case(FIXED):
+			{
+				result.fixedMatrix = T;
+				break;
+			}			
 			case(AXIAL):
 			{
 				result.v = T.matrix().col(3).head(3);
@@ -69,6 +76,13 @@ namespace spooky{
 		}
         return result;
     }
+
+	Articulation Articulation::createFixed(const Transform3D& T){
+		Articulation result;
+		result.type = FIXED;
+		result.fixedMatrix = T;
+		return result;
+	}
 
 	Articulation Articulation::createBone(const Eigen::Vector3f& vec){
 		Articulation result;
@@ -112,6 +126,8 @@ namespace spooky{
 
 	int Articulation::getPDoF(bool hasLeverChild){
 		  switch (type) {
+            case(FIXED):
+            	return 0;
             case(AXIAL):
             	return hasLeverChild ? 1 : 0;
             case(TWIST):
@@ -129,7 +145,7 @@ namespace spooky{
 		return 0;
 	}
 	int Articulation::getRDoF(){
-		if(type == SCALE){
+		if(type == SCALE || type == FIXED){
 			return 0;
 		}
 		else if (type == AXIAL || type == TWIST)
@@ -191,23 +207,25 @@ namespace spooky{
 
     Eigen::VectorXf Articulation::getInitialState(const Articulation::Type& type){
         switch (type) {
+        	case(FIXED):
+            {
+				//Zero articulations
+				return Eigen::VectorXf(0);
+            }
             case(AXIAL):
             {
 				//Single angle per articulation
 				return Eigen::VectorXf::Zero(1);
-                break;
             }
             case(TWIST):
             {
 				//Single angle per articulation
                 return Eigen::VectorXf::Zero(1);
-                break;
             }
             case(BONE):
             {
                 //quaternion representation
                 return Eigen::Vector3f(0,0,0);
-                break;
             }
 			case(POSE):
 			{
@@ -215,12 +233,10 @@ namespace spooky{
 				Eigen::VectorXf vec = Eigen::Matrix<float,6,1>::Zero();
 				vec << 0, 0, 0, 0, 0, 0;
 				return vec;
-				break;
 			}
 			case(SCALE):
 			{
 				return Eigen::Vector3f(1,1,1);
-				break;
 			}
         }
 		return Eigen::VectorXf::Zero(1);

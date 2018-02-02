@@ -97,15 +97,20 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh)
 		FTransform b = FTransform(skeletal_mesh->SkeletalMesh->GetRefPoseMatrix(i));
 		//Scale to spooky units
 		b.SetTranslation(b.GetTranslation() * spookyCore.config.units.input_m);
-		spooky::Transform3D bonePoseLocal = convert(b.ToMatrixNoScale());
+		spooky::Transform3D bonePoseLocal = convert(b.ToMatrixWithScale());
 		//Set parent
 		spooky::NodeDescriptor parent_desc = (bone.ParentIndex >= 0) ?
 			spooky::NodeDescriptor(TCHAR_TO_UTF8(*(boneInfo[bone.ParentIndex].Name.GetPlainNameString()))) :
 			spooky::NodeDescriptor();
 		//Set bone name		
 		spooky::NodeDescriptor bone_desc = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
-		//TODO: find better way to do this check for pose nodes
-		if (bone.Name.GetPlainNameString() == "pelvis") {
+		//TODO: add fixed nodes
+		if (i == 0) {
+			//Root node - doesnt move but has a scale component
+			spookyCore.addFixedNode(bone_desc, parent_desc, bonePoseLocal);
+		}
+		else if (bone.Name.GetPlainNameString() == "pelvis") {
+			//TODO: find better way to do this check for pose nodes
 			//The pelvis has 6DoF pose and 3DoF scale
 			spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones());
 		}
