@@ -487,8 +487,9 @@ namespace spooky{
 		static inline Eigen::Matrix<Scalar,3,3> rodriguezFormula(const Eigen::Matrix<Scalar,3,1>& w) {
 			Eigen::Matrix<Scalar, 3, 3> w_hat = skewSymmetric(w.normalized());
 			//TODO: is this correct for complex numbers?
-			Scalar theta_sq = w.transpose() * w;
-			Scalar theta = std::pow(theta_sq,0.5);
+			//Scalar theta_sq = w.transpose() * w;
+			//Scalar theta = std::pow(theta_sq,0.5);
+			Scalar theta = w.norm();
 			return Eigen::Matrix<Scalar, 3, 3>::Identity() + w_hat * std::sin(theta) + w_hat * w_hat * (Scalar(1) - std::cos(theta));
 		}
 		//TODO: clean up unused functions

@@ -96,11 +96,13 @@ namespace spooky{
 		//Calculate error
 		if (m->globalSpace) {
 			//Fuse by modifying some parents if necessary
-			int fusion_chain = getRequiredChainLength(m);
+			int fusion_chain = 1;// getRequiredChainLength(m);
 			//fuse
 			Eigen::Matrix<float, 6, Eigen::Dynamic> measurementJacobian = getPoseChainJacobian(fusion_chain);
 			State::Parameters chainState = getChainState(fusion_chain);
 			//TODO: constraints
+			//Joint stiffness - 0 => no restriction; inf => next state will be the constraint centre
+			float joint_stiffness = 0; //in [0,inf]
 			State::Parameters constraints = getChainState(fusion_chain);
 
 			State::Parameters newChainState(chainState.size());
@@ -120,8 +122,7 @@ namespace spooky{
 			Eigen::MatrixXf sigmaP_info = chainState.variance.inverse();
 			//Constraint information matrix
 			Eigen::MatrixXf sigmaC_info = constraints.variance.inverse();
-            //Joint stiffness - 0 => no restriction; inf => next state will be the constraint centre
-			float joint_stiffness = 0; //in [0,inf]
+
 
             //New states (extended kalman filter measurement update)
 			newChainState.variance = (measurementJacobian.transpose() * sigmaM_info * measurementJacobian +
@@ -129,23 +130,27 @@ namespace spooky{
 
 			Eigen::Matrix<float, 6, 1> wpstate = utility::toAxisAnglePos(getGlobalPose());
 			Eigen::Matrix<float, 6, 1> mVector = wpstate - wpm - measurementJacobian * chainState.expectation;
-			newChainState.expectation = newChainState.variance * (-measurementJacobian.transpose() * sigmaM_info * mVector +
-				(1 / float(fusion_chain)) *
-				(sigmaP_info * chainState.expectation
-					+ joint_stiffness * sigmaC_info * constraints.expectation)
-				);
+
+			Eigen::VectorXf measurementUpdate = measurementJacobian.transpose() * sigmaM_info * mVector;
+			Eigen::VectorXf priorUpdate = sigmaP_info * chainState.expectation;
+			Eigen::VectorXf constraintUpdate = sigmaC_info * constraints.expectation;
+
+			newChainState.expectation = newChainState.variance * ((1 / float(fusion_chain)) * (priorUpdate + joint_stiffness * constraintUpdate) - measurementUpdate);
 
             std::stringstream ss;
             ss << std::endl << "sigmaW_info = " << std::endl << sigmaW_info << std::endl;
             ss << std::endl << "sigmaM_info = " << std::endl << sigmaM_info << std::endl;
             ss << std::endl << "sigmaC_info = " << std::endl << sigmaC_info << std::endl;
-			ss << std::endl << "wpstate = " << std::endl << wpstate << std::endl;
-			ss << std::endl << "wpm = " << std::endl << wpm << std::endl;
-            ss << std::endl << "mVector = " << std::endl << mVector << std::endl;
-            ss << std::endl << "measurementJacobian.transpose() * sigmaM_info * measurementJacobian = " << std::endl << measurementJacobian.transpose() * sigmaM_info * measurementJacobian << std::endl;
+			ss << std::endl << "wpstate = " << std::endl << wpstate.transpose() << std::endl;
+			ss << std::endl << "wpm = " << std::endl << wpm.transpose() << std::endl;
+            ss << std::endl << "mVector = " << std::endl << mVector.transpose() << std::endl;
 			ss << std::endl << "measurementJacobian = " << std::endl << measurementJacobian << std::endl;
+			ss << std::endl << "measurementJacobian.transpose() * sigmaM_info * measurementJacobian = " << std::endl << measurementJacobian.transpose() * sigmaM_info * measurementJacobian << std::endl;
+			ss << std::endl << "measurementUpdate = " << std::endl << measurementUpdate.transpose() << std::endl;
+			ss << std::endl << "priorUpdate = " << std::endl << priorUpdate.transpose() << std::endl;
+			ss << std::endl << "constraintUpdate = " << std::endl << constraintUpdate.transpose() << std::endl;
 			ss << std::endl << "new state = "  << std::endl << newChainState.expectation.transpose() << std::endl;
-            ss << "new state = " << std::endl << newChainState.variance;
+            ss << std::endl << "new cov = " << std::endl << newChainState.variance;
             SPOOKY_LOG(ss.str());
 			setChainState(fusion_chain, newChainState);
 		}
@@ -175,7 +180,7 @@ namespace spooky{
 		node = this;
 		float h = 1e-20;
 		Transform3Dcd childPoses = Transform3Dcd::Identity();
-		Transform3Dcd parentPoses = (node->parent == NULL) ? parent->getGlobalPose().cast<std::complex<double>>() : Transform3Dcd::Identity();
+		Transform3Dcd parentPoses = (node->parent != NULL) ? parent->getGlobalPose().cast<std::complex<double>>() : Transform3Dcd::Identity();
 		Eigen::Matrix<float, 6, Eigen::Dynamic > J(6, inputDimension);
 		int column = 0;
 		for (int i = 0; i < chain_length; i++) {
@@ -190,7 +195,7 @@ namespace spooky{
 			if (node->parent == NULL) break;
 			childPoses = node->getLocalPose().cast<std::complex<double>>() * childPoses;
 			node = node->parent.get();
-			parentPoses = (node->parent == NULL) ? parent->getGlobalPose().cast<std::complex<double>>() : Transform3Dcd::Identity();
+			parentPoses = parent->getGlobalPose().cast<std::complex<double>>();
 		}
 		return J;
 	}
