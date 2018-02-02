@@ -39,13 +39,9 @@
 		if (spookyFP) {
 			//Copy new data in from the fusion plant
 			//The root node pose is fixed by externals
-			//Output.Pose[FCompactPoseBoneIndex(0)] = Output.Pose.GetRefPose(FCompactPoseBoneIndex(0));
-			SPOOKY_FLOG(Output.Pose.GetRefPose(FCompactPoseBoneIndex(0)).ToString());
 			for (int index = 0; index < Output.Pose.GetNumBones(); index++) {
 				FString bone_name = Output.GetAnimBlueprint()->TargetSkeleton->GetReferenceSkeleton().GetBoneName(index).GetPlainNameString();
 				Output.Pose[FCompactPoseBoneIndex(index)] = spookyFP->getBoneTransform(bone_name);
-
-
 			}
 		}
 
