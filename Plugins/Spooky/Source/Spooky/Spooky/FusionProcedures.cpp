@@ -179,23 +179,35 @@ namespace spooky{
 		//Reset for actual calculation
 		node = this;
 		float h = 1e-20;
-		Transform3Dcd childPoses = Transform3Dcd::Identity();
-		Transform3Dcd parentPoses = (node->parent != NULL) ? parent->getGlobalPose().cast<std::complex<double>>() : Transform3Dcd::Identity();
+		Transform3D childPoses = Transform3D::Identity();
+		Transform3D parentPoses = (node->parent != NULL) ? parent->getGlobalPose() : Transform3D::Identity();
 		Eigen::Matrix<float, 6, Eigen::Dynamic > J(6, inputDimension);
-		int column = 0;
+		
+		//Lambda to be differentiated
+		auto mapToGlobalPose = [childPoses, parentPoses, node](const Eigen::VectorXf& theta) {
+			return utility::toAxisAnglePos(parentPoses * node->getLocalPoseAt(theta) * childPoses);
+		};
+
+		int block = 0;
 		for (int i = 0; i < chain_length; i++) {
 			//Loop through all dof of this node and get the jacobian (w,p) entries for each dof
 			int dof = node->getDimension();
-			for (int j = 0; j < dof; j++) {
-				//Complex step approximation
-				J.col(column) = (utility::toAxisAnglePos((parentPoses * node->getLocalPoseComplexStep(j, h) * childPoses)) / std::complex<double>(h,0)).imag().cast<float>();
-				column++;
-			}
+
+			J.block(block, 0, dof, 6) = utility::numericalVectorDerivative<float>(mapToGlobalPose, node->getState().expectation, 0.01);
+			block += dof;
+
+			//Complex step approximation
+			//for (int j = 0; j < dof; j++) {
+			//	J.col(column) = (utility::toAxisAnglePos((parentPoses * node->getLocalPoseComplexStep(j, h) * childPoses)) / std::complex<double>(h,0)).imag().cast<float>();
+
+			//	column++;
+			//}
+
 			//Move to next parent
 			if (node->parent == NULL) break;
-			childPoses = node->getLocalPose().cast<std::complex<double>>() * childPoses;
+			childPoses = node->getLocalPose() * childPoses;
 			node = node->parent.get();
-			parentPoses = parent->getGlobalPose().cast<std::complex<double>>();
+			parentPoses = parent->getGlobalPose();
 		}
 		return J;
 	}

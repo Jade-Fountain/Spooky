@@ -112,6 +112,8 @@ namespace spooky {
 		Transform3D getFinalGlobalPose();
 		//Returns final local transform relative to parent transform
 		Transform3D getLocalPose();
+		//Allows for speculative evaluation of pose based on expectation vector
+		Transform3D getLocalPoseAt(const Eigen::VectorXf& theta);
 		//Returns variance associated with pose
 		Eigen::Matrix<float,6,6> getLocalPoseVariance();
 

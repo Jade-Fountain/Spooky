@@ -43,6 +43,19 @@ namespace spooky {
 		}	
 		return pose;
 	}
+
+	Transform3D Node::getLocalPoseAt(const Eigen::VectorXf & theta)
+	{
+		Transform3D pose = Transform3D::Identity();
+		assert(theta.size() == getDimension());
+		int block_start = 0;
+		for (int i = 0; i < articulations.size(); i++) {
+			int block_size = local_state.articulation[i].size();
+			pose = pose * articulations[i].getTransform<float>(theta.block(block_start,0,block_size,1));
+			block_start += block_size;
+		}
+		return pose;
+	}
 	
 	Eigen::Matrix<float,6,6> Node::getLocalPoseVariance(){
 		Eigen::Matrix<float,6,6> var = Eigen::Matrix<float,6,6>::Zero();
