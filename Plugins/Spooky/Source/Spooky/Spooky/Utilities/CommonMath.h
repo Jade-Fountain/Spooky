@@ -526,5 +526,52 @@ namespace spooky{
 			return result;
 			
 		}
+
+		//template <typename Scalar>
+		//static inline Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> numericalDerivative
+		//(const std::function<Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>(const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>&)> f,
+		// const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>& x, 
+		// double h = 1e-10) {
+		//	//Current state
+		//	Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> f_x = f(x);
+		//	int n = x.rows();
+		//	int m = x.cols();
+		//	int p = f_x.rows();
+		//	int q = f_x.cols();
+		//	//Atlas of derivatives
+		//	Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> df_dx = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>::Zero(n*p,m*q);
+		//	//Vary each independent variable and use change in f to estimate derivative
+		//	for (int i = 0; i < x.rows(); i++) {
+		//		for (int j = 0; j < x.cols(); j++) {
+		//			Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> xplush = x;
+		//			x(i, j) += Scalar(h);
+		//			Eigen::Matrix<Scalar, Eigen::Dynmic, Eigen::Dynamic> delf_delx = (f(xplush) - f_x) / h;
+		//			df_dx.block(i*p, j*q, p, q) = delf_delx;
+		//		}
+		//	}
+		//	return df_dx;
+		//}
+
+		template <typename Scalar>
+		static inline Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> numericalVectorDerivative
+		(const std::function<Eigen::Matrix<Scalar, Eigen::Dynamic, 1>(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>&)> f,
+			const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& x,
+			double h = 1e-10) {
+			//Current state
+			Eigen::Matrix<Scalar, Eigen::Dynamic, 1> f_x = f(x);
+			int n = x.size();
+			int m = f_x.size();
+			//Atlas of derivatives
+			Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> df_dx = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>::Zero(m,n);
+			//Vary each independent variable and use change in f to estimate derivative
+			for (int i = 0; i < n; i++) {
+				Eigen::Matrix<Scalar, Eigen::Dynamic, 1> xplush = x;
+				xplush(i) += Scalar(h);
+				Eigen::Matrix<Scalar, Eigen::Dynamic, 1> f2 = f(xplush);
+				Eigen::Matrix<Scalar, Eigen::Dynamic, 1> delf_delx = (f2 - f_x) / h;
+				df_dx.col(i) = delf_delx;
+			}
+			return df_dx;
+		}
 	}
 }

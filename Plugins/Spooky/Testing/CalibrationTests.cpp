@@ -410,5 +410,34 @@ namespace FusionTesting
 			std::wstring widestr2 = utf8_decode(ss2.str());
 			Assert::AreEqual(error < 0.001, true, widestr2.c_str());
 		}
+
+		TEST_METHOD(NumericalVectorDerivative) {
+			auto f = [](const Eigen::Vector3f& x) {
+				return Eigen::Vector3f(x[0] * cos(x[1]) * sin(x[2]), x[0] * sin(x[1])*sin(x[2]), x[0] * cos(x[2]));
+			};
+			Eigen::Matrix3f df_dx1 = spooky::utility::numericalVectorDerivative<float>(f, Eigen::Vector3f(1, 0, M_PI / 2),0.01);
+			Eigen::Matrix3f expected_result1;
+			expected_result1 << 1, 0, 0,
+							   0, 1, 0,
+							   0, 0, -1;
+			float error1 = (df_dx1 - expected_result1).norm();
+
+			Eigen::Matrix3f df_dx2 = spooky::utility::numericalVectorDerivative<float>(f, Eigen::Vector3f(1, M_PI / 4, M_PI / 4), 0.01);
+			Eigen::Matrix3f expected_result2;
+			expected_result2 << 0.5, -0.5, 0.5,
+								0.5,  0.5, 0.5,
+								1 / std::sqrt(2), 0, -1/std::sqrt(2);
+			float error2 = (df_dx2 - expected_result2).norm();
+
+			std::stringstream ss2;
+			ss2 << "df_dx1 = " << std::endl << df_dx1 << std::endl;
+			ss2 << "expected_result1 = " << std::endl << expected_result1 << std::endl;
+
+			ss2 << "df_dx2 = " << std::endl << df_dx2 << std::endl;
+			ss2 << "expected_result2 = " << std::endl << expected_result2 << std::endl;
+			std::wstring widestr2 = utf8_decode(ss2.str());
+			Assert::AreEqual(error1 <  0.01 && error2 < 0.01, true, widestr2.c_str());
+
+		}
 	};
 }
