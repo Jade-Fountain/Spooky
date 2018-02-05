@@ -97,20 +97,21 @@ namespace spooky{
 		if (m->globalSpace) {
 			//Fuse by modifying some parents if necessary
 			int fusion_chain = getRequiredChainLength(m);
-			//fuse
-			Eigen::Matrix<float, 6, Eigen::Dynamic> measurementJacobian = getPoseChainJacobian(fusion_chain);
+
 			State::Parameters chainState = getChainState(fusion_chain);
-			float  process_noise = 0.01;
-			//TODO: make process noise different for different variables
-			//TODO: make process noise scale with time elapsed
-			chainState.variance += Eigen::MatrixXf::Identity(chainState.variance.rows(), chainState.variance.cols()) * process_noise;
-			//TODO: constraints
+            //Process noise: max of ten seconds variance added
+			Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * std::fmin(10,m->getTimestamp() - local_state.last_update_time);
+			chainState.variance += process_noise;
+						
+			//Read quadratic constraints from joints in chain
+			State::Parameters constraints = getChainConstraints(fusion_chain);
 			//Joint stiffness - 0 => no restriction; inf => next state will be the constraint centre
 			float joint_stiffness = 0; //in [0,inf]
-			State::Parameters constraints = getChainState(fusion_chain);
 
+            //New state initialisation:
 			State::Parameters newChainState(chainState.size());
 
+            //Compute relation between measurement quaternion and twist representation w
 			Eigen::Matrix<float, 6, 1> wpm = utility::toAxisAnglePos(m->getTransform());
 			Eigen::Matrix<float, 3, 4> quatToAxisJacobian = utility::getQuatToAxisJacobian(m->getRotation());
 
@@ -127,8 +128,10 @@ namespace spooky{
 			//Constraint information matrix
 			Eigen::MatrixXf sigmaC_info = constraints.variance.inverse();
 
+            //Get Jacobian for the chain, mapping state to (w,v) global pose
+            Eigen::Matrix<float, 6, Eigen::Dynamic> measurementJacobian = getPoseChainJacobian(fusion_chain);
 
-            //New states (extended kalman filter measurement update)
+            //New variance (extended kalman filter measurement update)
 			newChainState.variance = (measurementJacobian.transpose() * sigmaM_info * measurementJacobian +
 				(1 / float(fusion_chain)) * (sigmaP_info + joint_stiffness * sigmaC_info)).inverse();
 
@@ -139,24 +142,28 @@ namespace spooky{
 			Eigen::VectorXf priorUpdate = sigmaP_info * chainState.expectation;
 			Eigen::VectorXf constraintUpdate = sigmaC_info * constraints.expectation;
 
+            //New state
 			newChainState.expectation = newChainState.variance * ((1 / float(fusion_chain)) * (priorUpdate + joint_stiffness * constraintUpdate) + measurementUpdate);
 
             std::stringstream ss;
-            ss << std::endl << "sigmaW_info = " << std::endl << sigmaW_info << std::endl;
-            ss << std::endl << "sigmaM_info = " << std::endl << sigmaM_info << std::endl;
-            ss << std::endl << "sigmaC_info = " << std::endl << sigmaC_info << std::endl;
-			ss << std::endl << "wpstate = " << std::endl << wpstate.transpose() << std::endl;
-			ss << std::endl << "wpm = " << std::endl << wpm.transpose() << std::endl;
-            ss << std::endl << "mVector = " << std::endl << mVector.transpose() << std::endl;
-			ss << std::endl << "measurementJacobian = " << std::endl << measurementJacobian << std::endl;
-			ss << std::endl << "measurementJacobian.transpose() * sigmaM_info * measurementJacobian = " << std::endl << measurementJacobian.transpose() * sigmaM_info * measurementJacobian << std::endl;
-			ss << std::endl << "measurementUpdate = " << std::endl << measurementUpdate.transpose() << std::endl;
-			ss << std::endl << "priorUpdate = " << std::endl << priorUpdate.transpose() << std::endl;
-			ss << std::endl << "constraintUpdate = " << std::endl << constraintUpdate.transpose() << std::endl;
+			// ss << std::endl << "process_noise = " << std::endl << process_noise << std::endl;
+			// ss << std::endl << "sigmaW_info = " << std::endl << sigmaW_info << std::endl;
+   //          ss << std::endl << "sigmaM_info = " << std::endl << sigmaM_info << std::endl;
+			// ss << std::endl << "sigmaP_info = " << std::endl << sigmaP_info << std::endl;
+			// ss << std::endl << "sigmaC_info * joint_stiffness = " << std::endl << sigmaC_info * joint_stiffness << std::endl;
+			// ss << std::endl << "wpstate = " << std::endl << wpstate.transpose() << std::endl;
+			// ss << std::endl << "wpm = " << std::endl << wpm.transpose() << std::endl;
+   //          ss << std::endl << "mVector = " << std::endl << mVector.transpose() << std::endl;
+			// ss << std::endl << "measurementJacobian = " << std::endl << measurementJacobian << std::endl;
+			// ss << std::endl << "measurementJacobian.transpose() * sigmaM_info * measurementJacobian = " << std::endl << measurementJacobian.transpose() * sigmaM_info * measurementJacobian << std::endl;
+			// ss << std::endl << "measurementUpdate = " << std::endl << measurementUpdate.transpose() << std::endl;
+			// ss << std::endl << "priorUpdate = " << std::endl << priorUpdate.transpose() << std::endl;
+			// ss << std::endl << "constraintUpdate = " << std::endl << constraintUpdate.transpose() << std::endl;
 			ss << std::endl << "new state = "  << std::endl << newChainState.expectation.transpose() << std::endl;
-            ss << std::endl << "new cov = " << std::endl << newChainState.variance;
+            ss << std::endl << "new cov diag = " << std::endl << newChainState.variance.diagonal().transpose() << std::endl;
             SPOOKY_LOG(ss.str());
 			setChainState(fusion_chain, newChainState);
+			local_state.last_update_time = m->getTimestamp();
 		}
 		else {
 			//TODO: Fuse locally with reg kalman filter

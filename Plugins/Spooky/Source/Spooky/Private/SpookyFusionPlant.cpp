@@ -88,7 +88,7 @@ UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::AddSk
 
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh)
+void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh, float default_constraint_flexibility, float default_process_noise)
 {
 	TArray<FMeshBoneInfo> boneInfo = skeletal_mesh->SkeletalMesh->RefSkeleton.GetRefBoneInfo();
 	for (int i = 0; i < boneInfo.Num(); i++) {
@@ -104,18 +104,22 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh)
 			spooky::NodeDescriptor();
 		//Set bone name		
 		spooky::NodeDescriptor bone_desc = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
-		//TODO: add fixed nodes
+		//Set different node types
 		if (i == 0) {
 			//Root node - doesnt move but has a scale component
 			spookyCore.addFixedNode(bone_desc, parent_desc, bonePoseLocal);
-		}
 		else if (bone.Name.GetPlainNameString() == "pelvis") {
 			//TODO: find better way to do this check for pose nodes
 			//The pelvis has 6DoF pose and 3DoF scale
-			spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones());
+			Eigen::MatrixXf constraint_variance = Eigen::Matrix3f::Identity(6,6) * default_constraint_flexibility;
+			Eigen::VectorXf constraint_centre = Eigen::VectorXf::Zero(6);
+			spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones(), constraint_centre, constraint_variance, default_process_noise);
 		}
 		else {
-			spookyCore.addBoneNode(bone_desc, parent_desc, bonePoseLocal);
+			//TODO: read constraint and process noise from USpookySkeletalMeshComponent
+			Eigen::Matrix3f constraint_variance = Eigen::Matrix3f::Identity() * default_constraint_flexibility;
+			Eigen::Vector3f constraint_centre = Eigen::Vector3f::Zero();
+			spookyCore.addBoneNode(bone_desc, parent_desc, bonePoseLocal, constraint_centre, constraint_variance, default_process_noise);
 		}
 		SPOOKY_LOG("Adding Bone: " + bone_desc.name + ", parent = " + parent_desc.name);
 	}

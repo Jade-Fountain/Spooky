@@ -20,28 +20,38 @@
 
 namespace spooky {
 	
-	void Core::addFixedNode(const NodeDescriptor & node, const NodeDescriptor & parent, const Transform3D& pose)
+	void Core::addFixedNode(const NodeDescriptor & node, const NodeDescriptor & parent,
+							 const Transform3D& pose)
 	{
 		skeleton.addNode(node, parent);
 		skeleton.setFixedNode(node, pose);
 	}
 
-	void Core::addBoneNode(const NodeDescriptor & node, const NodeDescriptor & parent, const Transform3D& boneTransform)
+	void Core::addBoneNode(const NodeDescriptor & node, const NodeDescriptor & parent,
+							 const Transform3D& boneTransform,
+							 const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
+							 const float& process_noise)
 	{
 		skeleton.addNode(node, parent);
-		skeleton.setBoneForNode(node, boneTransform);
+		skeleton.setBoneForNode(node, boneTransform, Node::State::Parameters(constraint_centre, constraint_variance), process_noise);
 	}
 
-	void Core::addPoseNode(const NodeDescriptor & node, const NodeDescriptor & parent, const Transform3D& poseInitial)
+	void Core::addPoseNode(const NodeDescriptor & node, const NodeDescriptor & parent,
+							 const Transform3D& poseInitial,
+							 const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
+							 const float& process_noise)
 	{
 		skeleton.addNode(node, parent);
-		skeleton.setPoseNode(node, poseInitial);
+		skeleton.setPoseNode(node, poseInitial, Node::State::Parameters(constraint_centre, constraint_variance), process_noise);
 	}
 
-	void Core::addScalePoseNode(const NodeDescriptor & node, const NodeDescriptor & parent, const Transform3D& poseInitial, const Eigen::Vector3f& scaleInitial)
+	void Core::addScalePoseNode(const NodeDescriptor & node, const NodeDescriptor & parent,
+							 const Transform3D& poseInitial, const Eigen::Vector3f& scaleInitial,
+							 const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
+							 const float& process_noise)
 	{
 		skeleton.addNode(node, parent);
-		skeleton.setScalePoseNode(node, poseInitial, scaleInitial);
+		skeleton.setScalePoseNode(node, poseInitial, scaleInitial, Node::State::Parameters(constraint_centre, constraint_variance),process_noise);
 	}
 
 

@@ -66,14 +66,23 @@ namespace spooky {
 					return expectation.size();
 				}
 
-				Parameters(int size) : expectation(size), variance(size, size) {
+				Parameters(int size) :
+					expectation(size), 
+					variance(size, size)
+				{
 					expectation.setZero();
 					variance.setIdentity();
+				}
+
+				Parameters(const Eigen::VectorXf& x, const Eigen::VectorXf& V) : expectation(x), variance(V){
+
 				}
 			};
 
 			//Paramters for each articulation
 			std::vector<Parameters> articulation;
+			std::vector<Parameters> constraints;
+			std::vector<Parameters> process_noise;
 
 			//Last update time
 			float last_update_time = 0;
@@ -92,7 +101,7 @@ namespace spooky {
 
 	
 		//////////////////////////////////////////////////////////////////
-		//External info
+		//Extrinsic info
 		//////////////////////////////////////////////////////////////////
 
 		//Own name
@@ -128,17 +137,34 @@ namespace spooky {
 		//---------------------------------------
 		//Set state parameters
 		void setState(const State::Parameters& new_state);
-		State::Parameters getState();
 
+		State::Parameters getState();
+		//Get combined articulation constraints
+		State::Parameters getConstraints();
+		//Get process noise for node
+		State::Parameters getProcessNoise();
+
+		//Generic grouped parameter methods
+		State::Parameters getChainParameters(std::function<Node::State::Parameters(Node&)> getParams, const int& chain_length);
 		//Set and get an entire chain of nodes starting with this and recursing up parents
 		void setChainState(const int & chain_length, const State::Parameters & state);
 		State::Parameters getChainState(const int & chain_length);
+		State::Parameters getChainConstraints(const int & chain_length);
+		State::Parameters getChainProcessNoise(const int & chain_length);
+
 		//---------------------------------------
 
 		//Updates the state of this node (e.g. angle, quaternion, etc.)
 		void updateState(const State& new_state, const float& timestamp, const float& latency);
 		//Sets the model for the articulations associated with this node
 		void setModel(std::vector<Articulation> art);
+
+		//Set fusion parameters
+		void setConstraintForArticulation(const int& i, const Node::State::Parameters& c);
+		void setConstraints(const Node::State::Parameters& c);
+		void setProcessNoiseForArticulation(const int& i, const Node::State::Parameters& p);
+		void setProcessNoises(const Node::State::Parameters& p);
+
 		//Local fusion of all buffered measurements
 		void fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem);
 
@@ -209,9 +235,9 @@ namespace spooky {
 
 			//Sets the structure parameters for the specified articulation as a bone according to the boneVec
 			void setFixedNode(const NodeDescriptor & node, const Transform3D& boneTransform);
-			void setBoneForNode(const NodeDescriptor & node, const Transform3D& boneTransform);
-			void setPoseNode(const NodeDescriptor & node, const Transform3D& poseTransform);
-			void setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial);
+			void setBoneForNode(const NodeDescriptor & node, const Transform3D& boneTransform, const Node::State::Parameters& constraints, const float& process_noise);
+			void setPoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Node::State::Parameters& constraints, const float& process_noise);
+			void setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial, const Node::State::Parameters& constraints, const float& process_noise);
 
 
 			////////////////////////////////////////////////////

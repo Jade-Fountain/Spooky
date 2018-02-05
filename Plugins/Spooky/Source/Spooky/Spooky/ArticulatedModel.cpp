@@ -120,7 +120,32 @@ namespace spooky {
 		return p;
 	}
 
-	Node::State::Parameters Node::getChainState(const int& chain_length) {
+	Node::State::Parameters Node::getConstraints(){
+		//Construct new parameters set for combined articulations
+		State::Parameters p(getDimension());
+		int pos = 0;
+		for(int i = 0; i < articulations.size(); i++){
+			int dim = local_state.constraints[i].size();
+			p.insertSubstate(pos,local_state.constraints[i]);
+			pos += dim;
+		}
+		return p;
+	}
+
+	Node::State::Parameters Node::getProcessNoise(){
+		//Construct new parameters set for combined articulations
+		State::Parameters p(getDimension());
+		int pos = 0;
+		for(int i = 0; i < articulations.size(); i++){
+			int dim = local_state.process_noise[i].size();
+			p.insertSubstate(pos,local_state.process_noise[i]);
+			pos += dim;
+		}
+		return p;
+	}
+
+
+	Node::State::Parameters Node::getChainParameters(std::function<Node::State::Parameters (Node&)> getParams, const int& chain_length) {
 		//Precompute State size
 		int inputDimension = 0;
 		//TODO: dont use raw pointer
@@ -136,12 +161,30 @@ namespace spooky {
 		int position = 0;
 		for (int i = 0; i < chain_length; i++) {
 			int dim = node->getDimension();
-			result.insertSubstate(position,node->getState());
+			result.insertSubstate(position,getParams(*node));
 			position += dim;
 			if (node->parent == NULL) break;
 			node = node->parent.get();
 		}
 		return result;
+	}
+
+	Node::State::Parameters Node::getChainState(const int& chain_length) {		
+		return getChainParameters(
+			std::function<Node::State::Parameters(Node&)>(&Node::getState)
+			, chain_length);
+	}
+
+	Node::State::Parameters Node::getChainConstraints(const int& chain_length) {		
+		return getChainParameters(
+			std::function<Node::State::Parameters(Node&)>(&Node::getConstraints)
+			, chain_length);
+	}
+
+	Node::State::Parameters Node::getChainProcessNoise(const int& chain_length) {		
+		return getChainParameters(
+			std::function<Node::State::Parameters(Node&)>(&Node::getProcessNoise)
+			, chain_length);
 	}
 
 	void Node::setChainState(const int& chain_length, const State::Parameters& state_params) {
@@ -156,10 +199,11 @@ namespace spooky {
 			if (node->parent == NULL) break;
 			node = node->parent.get();
 		}
+
 	}
 
 
-
+		//TODO: clean up old functions
 	void Node::updateState(const State& new_state, const float& timestamp, const float& latency) {
 		recacheRequired = true;
 		//TODO: add latency prediction
@@ -175,10 +219,38 @@ namespace spooky {
 		for(int i = 0; i < articulations.size(); i++){	
 			auto init = Articulation::getInitialState(articulations[i].getType());
 			local_state.articulation.push_back(Node::State::Parameters(init.size()));
+			local_state.constraints.push_back(Node::State::Parameters(init.size()));
+			local_state.process_noise.push_back(Node::State::Parameters(init.size()));
 			local_state.articulation[i].expectation = init;
 			//TODO: generate covariance initial per aticulation
 			local_state.articulation[i].variance = initial_covariance * Eigen::MatrixXf::Identity(local_state.articulation[i].size(),
 																							      local_state.articulation[i].size());
+		}
+	}
+
+	void Node::setConstraintForArticulation(const int& i, const Node::State::Parameters& c){
+		local_state.constraints[i] = c;
+	}
+
+	void Node::setConstraints(const Node::State::Parameters& c){
+		int pos = 0;
+		for(int i = 0; i < articulations.size(); i++){
+			int dim = local_state.articulation[i].size();
+			local_state.constraints[i] = c.getSubstate(pos,dim);
+			pos += dim;
+		}
+	}
+
+	void Node::setProcessNoiseForArticulation(const int& i, const Node::State::Parameters& p){
+		local_state.process_noise[i] = p;
+	}
+
+	void Node::setProcessNoises(const Node::State::Parameters& p){
+		int pos = 0;
+		for(int i = 0; i < articulations.size(); i++){
+			int dim = local_state.articulation[i].size();
+			local_state.process_noise[i] = p.getSubstate(pos,dim);
+			pos += dim;
 		}
 	}
 
@@ -371,23 +443,36 @@ namespace spooky {
 	}
 
 
-	void ArticulatedModel::setBoneForNode(const NodeDescriptor& node, const Transform3D& boneTransform) {
+	void ArticulatedModel::setBoneForNode(const NodeDescriptor& node, const Transform3D& boneTransform,
+										  const Node::State::Parameters& constraints, const float& process_noise) {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createBone(boneTransform.translation()));
 		nodes[node]->setModel(art);
 		Eigen::AngleAxisf aa(boneTransform.rotation());
 		nodes[node]->local_state.articulation[0].expectation = aa.angle() * aa.axis();
+		assert(constraints.size() == nodes[node]->getDimension());
+		nodes[node]->setConstraints(constraints);
+		Node::State::Parameters PN(nodes[node]->getDimension());
+		PN.variance = process_noise * Eigen::MatrixXf::Identity(nodes[node]->getDimension(),nodes[node]->getDimension());
+		nodes[node]->setProcessNoises(PN);
 	}
 
 
-	void ArticulatedModel::setPoseNode(const NodeDescriptor& node, const Transform3D& poseTransform) {
+	void ArticulatedModel::setPoseNode(const NodeDescriptor& node, const Transform3D& poseTransform,
+									   const Node::State::Parameters& constraints, const float& process_noise) {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createPose());
 		nodes[node]->setModel(art);
 		nodes[node]->local_state.articulation[0].expectation = Measurement::getPosQuatFromTransform(poseTransform);
+		assert(constraints.size() == nodes[node]->getDimension());
+		nodes[node]->setConstraints(constraints);
+		Node::State::Parameters PN(nodes[node]->getDimension());
+		PN.variance = process_noise * Eigen::MatrixXf::Identity(nodes[node]->getDimension(),nodes[node]->getDimension());
+		nodes[node]->setProcessNoises(PN);
 	}
 	
-	void ArticulatedModel::setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial) {
+	void ArticulatedModel::setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial,
+											const Node::State::Parameters& constraints, const float& process_noise) {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createPose());
 		//Scale in local space x'=T*S*x
@@ -395,6 +480,11 @@ namespace spooky {
 		nodes[node]->setModel(art);
 		nodes[node]->local_state.articulation[0].expectation = Measurement::getPosQuatFromTransform(poseTransform);
 		nodes[node]->local_state.articulation[1].expectation = scaleInitial;
+		assert(constraints.size() == nodes[node]->getDimension());
+		nodes[node]->setConstraints(constraints);
+		Node::State::Parameters PN(nodes[node]->getDimension());
+		PN.variance = process_noise * Eigen::MatrixXf::Identity(nodes[node]->getDimension(),nodes[node]->getDimension());
+		nodes[node]->setProcessNoises(PN);
 	}
 
 
