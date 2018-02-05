@@ -95,8 +95,11 @@ namespace spooky{
     void Node::fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace){
 		//Calculate error
 		if (m->globalSpace) {
+			Eigen::Matrix<float, 6, 1> wpstate = utility::toAxisAnglePos(getGlobalPose());
+			Eigen::Matrix<float, 6, 1> wpm = utility::toAxisAnglePos(m->getTransform());
+
 			//Fuse by modifying some parents if necessary
-			int fusion_chain = getRequiredChainLength(m);
+			int fusion_chain = 4;// getRequiredChainLength(m);
 
 			State::Parameters chainState = getChainState(fusion_chain);
             //Process noise: max of ten seconds variance added
@@ -111,7 +114,6 @@ namespace spooky{
 			State::Parameters newChainState(chainState.size());
 
             //Compute relation between measurement quaternion and twist representation w
-			Eigen::Matrix<float, 6, 1> wpm = utility::toAxisAnglePos(m->getTransform());
 			Eigen::Matrix<float, 3, 4> quatToAxisJacobian = utility::getQuatToAxisJacobian(m->getRotation());
 
 			//TODO: Fix quat to be consistent: x,y,z,w is how eigen stores it internally, but its consrtuctor uses Quat(w,x,y,z)
@@ -131,10 +133,8 @@ namespace spooky{
             Eigen::Matrix<float, 6, Eigen::Dynamic> measurementJacobian = getPoseChainJacobian(fusion_chain);
 
             //New variance (extended kalman filter measurement update)
-			newChainState.variance = (measurementJacobian.transpose() * sigmaM_info * measurementJacobian +
-				(1 / float(fusion_chain)) * (sigmaP_info + joint_stiffness * sigmaC_info)).inverse();
+			newChainState.variance = (measurementJacobian.transpose() * sigmaM_info * measurementJacobian + sigmaP_info + joint_stiffness * sigmaC_info).inverse();
 
-			Eigen::Matrix<float, 6, 1> wpstate = utility::toAxisAnglePos(getGlobalPose());
 			Eigen::Matrix<float, 6, 1> mVector = wpm - wpstate + measurementJacobian * chainState.expectation;
 
 			Eigen::VectorXf measurementUpdate = measurementJacobian.transpose() * sigmaM_info * mVector;
@@ -142,7 +142,7 @@ namespace spooky{
 			Eigen::VectorXf constraintUpdate = sigmaC_info * constraints.expectation;
 
             //New state
-			newChainState.expectation = newChainState.variance * ((1 / float(fusion_chain)) * (priorUpdate + joint_stiffness * constraintUpdate) + measurementUpdate);
+			newChainState.expectation = newChainState.variance * (priorUpdate + joint_stiffness * constraintUpdate + measurementUpdate);
 
             std::stringstream ss;
 			 ss << std::endl << "process_noise = " << std::endl << process_noise << std::endl;
