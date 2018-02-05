@@ -188,7 +188,7 @@ namespace spooky{
 		Eigen::Matrix<float, 6, Eigen::Dynamic > J(6, inputDimension);
 		
 		//Lambda to be differentiated
-		auto mapToGlobalPose = [childPoses, parentPoses, node](const Eigen::VectorXf& theta) {
+		auto mapToGlobalPose = [&childPoses, &parentPoses, &node](const Eigen::VectorXf& theta) {
 			return utility::toAxisAnglePos(parentPoses * node->getLocalPoseAt(theta) * childPoses);
 		};
 
