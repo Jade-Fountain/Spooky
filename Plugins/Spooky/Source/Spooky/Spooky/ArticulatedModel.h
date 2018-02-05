@@ -74,7 +74,7 @@ namespace spooky {
 					variance.setIdentity();
 				}
 
-				Parameters(const Eigen::VectorXf& x, const Eigen::VectorXf& V) : expectation(x), variance(V){
+				Parameters(const Eigen::VectorXf& x, const Eigen::MatrixXf& V) : expectation(x), variance(V){
 
 				}
 			};
