@@ -105,8 +105,7 @@ namespace spooky{
 						
 			//Read quadratic constraints from joints in chain
 			State::Parameters constraints = getChainConstraints(fusion_chain);
-			//Joint stiffness - 0 => no restriction; inf => next state will be the constraint centre
-			float joint_stiffness = 0; //in [0,inf]
+
 
             //New state initialisation:
 			State::Parameters newChainState(chainState.size());

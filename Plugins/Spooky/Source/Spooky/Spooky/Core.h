@@ -107,6 +107,9 @@ namespace spooky {
 		void setSensorLatency(const SystemDescriptor& system, const int& sensorID, const float& latency);
 		void setSystemLatency(const SystemDescriptor& system, const float& latency);
 
+		//Set fusion joint stiffness
+		void setJointStiffness(const float& stiffness);
+
 		////////////////////////////////////////////////////
 		//					Input at runtime
 		////////////////////////////////////////////////////

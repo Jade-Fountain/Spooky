@@ -487,6 +487,15 @@ namespace spooky {
 		nodes[node]->setProcessNoises(PN);
 	}
 
+	void ArticulatedModel::setJointStiffness(const NodeDescriptor & node, const float& stiffness) {
+		utility::safeAccess(nodes,node)->joint_stiffness = stiffness;
+	}
+
+	void ArticulatedModel::setAllJointStiffness(const float& stiffness) {
+		for (auto& node : nodes) {
+			node.second->joint_stiffness = stiffness;
+		}
+	}
 
 	void ArticulatedModel::addGenericNode(const NodeDescriptor & node) {
 		if (nodes.count(node) == 0) {

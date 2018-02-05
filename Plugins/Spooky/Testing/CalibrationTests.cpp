@@ -321,9 +321,11 @@ namespace FusionTesting
 			spooky::Core core;
 			spooky::Transform3D bonePose = spooky::Transform3D::Identity();
 			bonePose.translate(Eigen::Vector3f(1, 0, 0));
-			core.addBoneNode(spooky::NodeDescriptor("bone1"), spooky::NodeDescriptor(""), bonePose);
-			core.addBoneNode(spooky::NodeDescriptor("bone2"), spooky::NodeDescriptor("bone1"), bonePose);
-			core.addBoneNode(spooky::NodeDescriptor("bone3"), spooky::NodeDescriptor("bone2"), bonePose);
+			Eigen::Matrix3f c_var = Eigen::Matrix3f::Identity();
+			Eigen::Vector3f c_centre = Eigen::Vector3f::Zero();
+			core.addBoneNode(spooky::NodeDescriptor("bone1"), spooky::NodeDescriptor(""), bonePose, c_centre, c_var, 0.1);
+			core.addBoneNode(spooky::NodeDescriptor("bone2"), spooky::NodeDescriptor("bone1"), bonePose, c_centre, c_var, 0.1);
+			core.addBoneNode(spooky::NodeDescriptor("bone3"), spooky::NodeDescriptor("bone2"), bonePose, c_centre, c_var, 0.1);
 			core.setReferenceSystem(spooky::NodeDescriptor("sys1"));
 			core.finaliseSetup();
 

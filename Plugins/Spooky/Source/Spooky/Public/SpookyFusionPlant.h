@@ -76,13 +76,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void Configure(float input_units_m = 1, float output_units_m = 1);
 
+	UFUNCTION(BlueprintCallable, Category = "Spooky")
+	void SetJointStiffness(float stiffness);
+
 	//Add complete skeleton to list of fusion objects
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void AddSkeleton(USpookySkeletalMeshComponent* spooky_skeletal_mesh);
 
 	//Set the output target which will have the complete fused skeleton pose applied
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddOutputTarget(USkeletalMeshComponent* skeletal_mesh);
+	void AddOutputTarget(USkeletalMeshComponent* skeletal_mesh, float default_constraint_flexibility, float default_process_noise);
 	
 	//Perform some setup postprocessing
 	UFUNCTION(BlueprintCallable, Category = "Spooky")

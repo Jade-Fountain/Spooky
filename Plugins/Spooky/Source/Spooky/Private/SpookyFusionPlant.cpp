@@ -79,6 +79,10 @@ UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::Confi
 	spookyCore.config.calibrator.fault_distance_threshold = calibration_fault_distance_threshold;*/
 }
 
+UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::SetJointStiffness(float stiffness) {
+	spookyCore.setJointStiffness(stiffness);
+}
+
 UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::AddSkeleton(USpookySkeletalMeshComponent* spooky_skeletal_mesh)
 {
 	//Add skeleton reference
@@ -108,6 +112,7 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh,
 		if (i == 0) {
 			//Root node - doesnt move but has a scale component
 			spookyCore.addFixedNode(bone_desc, parent_desc, bonePoseLocal);
+		}
 		else if (bone.Name.GetPlainNameString() == "pelvis") {
 			//TODO: find better way to do this check for pose nodes
 			//The pelvis has 6DoF pose and 3DoF scale

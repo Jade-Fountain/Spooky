@@ -84,6 +84,8 @@ namespace spooky {
 			std::vector<Parameters> constraints;
 			std::vector<Parameters> process_noise;
 
+
+									   
 			//Last update time
 			float last_update_time = 0;
 			//State is valid - false if state poorly initialised, etc...
@@ -117,6 +119,9 @@ namespace spooky {
 
 
 	public:
+		//Joint stiffness - 0 => no restriction; inf => next state will be the constraint centre
+		float joint_stiffness = 1; //in [0,inf]
+
 		//Returns the final pose of this node in global space based on pose of all parents
 		Transform3D getFinalGlobalPose();
 		//Returns final local transform relative to parent transform
@@ -207,10 +212,12 @@ namespace spooky {
 	};
 
 	class ArticulatedModel{
+	public:
+
+
 		/*//////////////////////////////////////////////////////////////////
 		*				Public methods
 		*//////////////////////////////////////////////////////////////////
-		public:
 			//Sets reference system
 			void setReferenceSystem(const SystemDescriptor& s);
 			//Adds node to the skeleton
@@ -238,7 +245,10 @@ namespace spooky {
 			void setBoneForNode(const NodeDescriptor & node, const Transform3D& boneTransform, const Node::State::Parameters& constraints, const float& process_noise);
 			void setPoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Node::State::Parameters& constraints, const float& process_noise);
 			void setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial, const Node::State::Parameters& constraints, const float& process_noise);
-
+			
+			//Stiffness settings
+			void setJointStiffness(const NodeDescriptor & node, const float& stiffness);
+			void setAllJointStiffness(const float& stiffness);
 
 			////////////////////////////////////////////////////
 			//					Results

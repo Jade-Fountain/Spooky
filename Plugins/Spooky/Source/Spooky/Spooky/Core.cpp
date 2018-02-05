@@ -78,6 +78,11 @@ namespace spooky {
 	void Core::setSystemLatency(const SystemDescriptor& system, const float& latency){
 		sysLatencies[system] = latency;
 	}
+	
+	void Core::setJointStiffness(const float& stiffness) {
+		skeleton.setAllJointStiffness(stiffness);
+	}
+
 
 
 	// =================
