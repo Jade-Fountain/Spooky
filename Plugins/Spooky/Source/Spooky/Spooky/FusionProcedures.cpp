@@ -96,10 +96,14 @@ namespace spooky{
 		//Calculate error
 		if (m->globalSpace) {
 			//Fuse by modifying some parents if necessary
-			int fusion_chain = 1;// getRequiredChainLength(m);
+			int fusion_chain = getRequiredChainLength(m);
 			//fuse
 			Eigen::Matrix<float, 6, Eigen::Dynamic> measurementJacobian = getPoseChainJacobian(fusion_chain);
 			State::Parameters chainState = getChainState(fusion_chain);
+			float  process_noise = 0.01;
+			//TODO: make process noise different for different variables
+			//TODO: make process noise scale with time elapsed
+			chainState.variance += Eigen::MatrixXf::Identity(chainState.variance.rows(), chainState.variance.cols()) * process_noise;
 			//TODO: constraints
 			//Joint stiffness - 0 => no restriction; inf => next state will be the constraint centre
 			float joint_stiffness = 0; //in [0,inf]
@@ -129,13 +133,13 @@ namespace spooky{
 				(1 / float(fusion_chain)) * (sigmaP_info + joint_stiffness * sigmaC_info)).inverse();
 
 			Eigen::Matrix<float, 6, 1> wpstate = utility::toAxisAnglePos(getGlobalPose());
-			Eigen::Matrix<float, 6, 1> mVector = wpstate - wpm - measurementJacobian * chainState.expectation;
+			Eigen::Matrix<float, 6, 1> mVector = wpm - wpstate + measurementJacobian * chainState.expectation;
 
 			Eigen::VectorXf measurementUpdate = measurementJacobian.transpose() * sigmaM_info * mVector;
 			Eigen::VectorXf priorUpdate = sigmaP_info * chainState.expectation;
 			Eigen::VectorXf constraintUpdate = sigmaC_info * constraints.expectation;
 
-			newChainState.expectation = newChainState.variance * ((1 / float(fusion_chain)) * (priorUpdate + joint_stiffness * constraintUpdate) - measurementUpdate);
+			newChainState.expectation = newChainState.variance * ((1 / float(fusion_chain)) * (priorUpdate + joint_stiffness * constraintUpdate) + measurementUpdate);
 
             std::stringstream ss;
             ss << std::endl << "sigmaW_info = " << std::endl << sigmaW_info << std::endl;
@@ -193,7 +197,8 @@ namespace spooky{
 			//Loop through all dof of this node and get the jacobian (w,p) entries for each dof
 			int dof = node->getDimension();
 
-			J.block(block, 0, dof, 6) = utility::numericalVectorDerivative<float>(mapToGlobalPose, node->getState().expectation, 0.01);
+			//Watch out for block assignments - they cause horrible hard to trace memory errors if not sized properly
+			J.block(0,block, 6, dof) = utility::numericalVectorDerivative<float>(mapToGlobalPose, node->getState().expectation, 0.01);
 			block += dof;
 
 			//Complex step approximation

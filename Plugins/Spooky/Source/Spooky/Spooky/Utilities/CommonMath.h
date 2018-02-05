@@ -60,6 +60,13 @@ namespace spooky{
 			s = svd.singularValues();
 		}
 
+		static inline Eigen::Matrix3f normalize3D(const Eigen::Matrix3f& M) {
+			auto result = M;
+			for (int i = 0; i < M.cols(); i++) {
+				result.col(i) = M.col(i).normalized();
+			}
+			return result;
+		}
 
 		static inline Eigen::Matrix3f orthogonaliseBasic(const Eigen::Matrix3f& M) {
 			Eigen::Vector3f x = M.col(0);
@@ -502,7 +509,7 @@ namespace spooky{
 		static inline Eigen::Matrix<Scalar, 6, 1> toAxisAnglePos(const Eigen::Transform<Scalar, 3, Eigen::Affine>& T) {
 			Eigen::Matrix<Scalar, 6, 1> result;
 			//Warning - some functions squash imaginary component - e.g. transform.rotation()
-			result.head(3) = Sophus::SO3<Scalar>::log(Sophus::SO3<Scalar>(T.matrix().topLeftCorner(3,3)));
+			result.head(3) = Sophus::SO3<Scalar>::log(Sophus::SO3<Scalar>(normalize3D(T.matrix().topLeftCorner(3,3))));
 			result.tail(3) = T.translation();
 			return result;
 		}
