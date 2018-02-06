@@ -126,7 +126,7 @@ namespace spooky{
 
         std::stringstream ss;
         ss << std::endl << "process_noise = " << std::endl << process_noise << std::endl;
-        //ss << std::endl << "sigmaW_info = " << std::endl << sigmaW_info << std::endl;
+        ss << std::endl << "constraints = " << std::endl << constraints.variance << std::endl;
         //ss << std::endl << "sigmaM_info = " << std::endl << sigmaM_info << std::endl;
         //ss << std::endl << "sigmaP_info = " << std::endl << sigmaP_info << std::endl;
         //ss << std::endl << "sigmaC_info * joint_stiffness = " << std::endl << sigmaC_info * joint_stiffness << std::endl;
