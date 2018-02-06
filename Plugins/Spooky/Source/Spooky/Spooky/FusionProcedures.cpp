@@ -219,13 +219,6 @@ namespace spooky{
 			J.block(0,block, 6, dof) = utility::numericalVectorDerivative<float>(mapToGlobalPose, node->getState().expectation, 0.01);
 			block += dof;
 
-			//Complex step approximation
-			//for (int j = 0; j < dof; j++) {
-			//	J.col(column) = (utility::toAxisAnglePos((parentPoses * node->getLocalPoseComplexStep(j, h) * childPoses)) / std::complex<double>(h,0)).imag().cast<float>();
-
-			//	column++;
-			//}
-
 			//Move to next parent
 			if (node->parent == NULL) break;
 			childPoses = node->getLocalPose() * childPoses;
