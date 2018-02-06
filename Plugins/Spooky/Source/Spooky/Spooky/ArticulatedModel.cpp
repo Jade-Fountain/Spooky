@@ -291,16 +291,6 @@ namespace spooky {
 					break;
 
 			}
-			//Transform3D error = utilites::getError(m,parent_pose * getLocalPose());
-
-			//Node::State new_state = local_state;
-			//new_state.valid = false;
-			//for(int i = 0; i < articulations.size(); i++){
-			//	//Iteratively enters data into new_state
-			//	insertMeasurement(i,m,parent_pose,&new_state);
-			//	//If we can use the data, update the local state
-			//}
-			//if(new_state.valid) updateState(new_state, m->getTimestamp(), m->getLatency());
 		}
 		//Dont use data twice
 		measurements.clear();
