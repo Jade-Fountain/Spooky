@@ -563,7 +563,7 @@ namespace spooky{
 		static inline Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> numericalVectorDerivative
 		(const std::function<Eigen::Matrix<Scalar, Eigen::Dynamic, 1>(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>&)> f,
 			const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& x,
-			double h = 1e-10) {
+			double h = 0.01) {
 			//Current state
 			Eigen::Matrix<Scalar, Eigen::Dynamic, 1> f_x = f(x);
 			int n = x.size();

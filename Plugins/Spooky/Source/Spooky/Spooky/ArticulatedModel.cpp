@@ -534,7 +534,5 @@ namespace spooky {
 	}
 
 
-
-
 }
 

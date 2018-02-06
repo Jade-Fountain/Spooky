@@ -182,16 +182,15 @@ namespace spooky {
 		void fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
 		void fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
 		
-
-		//Set and get local expectations and variances
+		//Basic math for performing EKF with prior, constraints and measurement
+	    Node::State::Parameters 
+	    EKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,
+                            const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement);
+  
 
 		//Get the jocobian of an entire pose chain mapping state |-> (w,p) axis-angle and position
-		Eigen::Matrix<float, 6, Eigen::Dynamic> getPoseChainJacobian(const int& chain_length);
+		Eigen::Matrix<float, 6, Eigen::Dynamic> getPoseChainJacobian(const int& chain_length, const bool& globalSpace);
 		
-		//For use with complex step differentiation
-		// J = imag(f(x+ih)/h)
-		Transform3Dcd getLocalPoseComplexStep(int j, double h);
-	
 	private:
 		Transform3D getGlobalPose();
 
