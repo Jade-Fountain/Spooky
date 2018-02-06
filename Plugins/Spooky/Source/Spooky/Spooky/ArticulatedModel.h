@@ -62,7 +62,7 @@ namespace spooky {
 					variance.block(position, position, size, size) = p.variance;
 				}
 
-				size_t size(){
+				size_t size() const{
 					return expectation.size();
 				}
 
