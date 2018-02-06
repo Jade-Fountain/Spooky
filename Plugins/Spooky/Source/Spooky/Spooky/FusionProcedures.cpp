@@ -139,7 +139,7 @@ namespace spooky{
         State::Parameters newChainState = EKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, wpstate);
 
         std::stringstream ss;
-        ss << std::endl << "process_noise = " << std::endl << process_noise << std::endl;
+        //ss << std::endl << "process_noise = " << std::endl << process_noise << std::endl;
         //ss << std::endl << "sigmaW_info = " << std::endl << sigmaW_info << std::endl;
         //ss << std::endl << "sigmaM_info = " << std::endl << sigmaM_info << std::endl;
         //ss << std::endl << "sigmaP_info = " << std::endl << sigmaP_info << std::endl;
@@ -152,8 +152,8 @@ namespace spooky{
         //ss << std::endl << "measurementUpdate = " << std::endl << measurementUpdate.transpose() << std::endl;
         //ss << std::endl << "priorUpdate = " << std::endl << priorUpdate.transpose() << std::endl;
         //ss << std::endl << "constraintUpdate = " << std::endl << constraintUpdate.transpose() << std::endl;
-		ss << std::endl << "new state = "  << std::endl << newChainState.expectation.transpose() << std::endl;
-        ss << std::endl << "new cov diag = " << std::endl << newChainState.variance.diagonal().transpose() << std::endl;
+		ss << std::endl << "new state = " << newChainState.expectation.transpose() << std::endl;
+        //ss << std::endl << "new cov diag = " << std::endl << newChainState.variance.diagonal().transpose() << std::endl;
         SPOOKY_LOG(ss.str());
 		setChainState(fusion_chain, newChainState);
 		local_state.last_update_time = m->getTimestamp();
