@@ -441,5 +441,35 @@ namespace FusionTesting
 			Assert::AreEqual(error1 <  0.01 && error2 < 0.01, true, widestr2.c_str());
 
 		}
+
+		TEST_METHOD(ClosestTwist) {
+			{
+				Eigen::Vector3f w_m(-0.1, 0, 0);
+				Eigen::Vector3f w_t(3, 0, 0);
+				auto closest = spooky::utility::twistClosestRepresentation(w_m, w_t);
+
+				std::stringstream ss2;
+				ss2 << "w_m = " << std::endl << w_m << std::endl;
+				ss2 << "w_t = " << std::endl << w_t << std::endl;
+				ss2 << "closest = " << std::endl << closest << std::endl;
+				std::wstring widestr2 = utf8_decode(ss2.str());
+				Assert::AreEqual((w_m - closest).norm() < 0.001, true, widestr2.c_str());
+			}
+
+			{
+				Eigen::Vector3f w_m(-3.1, 0, 0);
+				Eigen::Vector3f w_t(3, 0, 0);
+				auto closest = spooky::utility::twistClosestRepresentation(w_m, w_t);
+
+				std::stringstream ss2;
+				ss2 << "w_m = " << std::endl << w_m << std::endl;
+				ss2 << "w_t = " << std::endl << w_t << std::endl;
+				ss2 << "closest = " << std::endl << closest << std::endl;
+				std::wstring widestr2 = utf8_decode(ss2.str());
+				Assert::AreEqual((closest - Eigen::Vector3f(M_PI + (M_PI - 3.1),0,0)).norm() < 0.001, true, widestr2.c_str());
+			}
+			
+
+		}
 	};
 }

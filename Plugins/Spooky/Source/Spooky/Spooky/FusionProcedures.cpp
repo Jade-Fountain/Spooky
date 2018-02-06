@@ -126,7 +126,7 @@ namespace spooky{
         //Measurement information matrix
         State::Parameters measurement(6);
 		//Block diagonal inverse is inverse of blocks
-        measurement.expectation = utility::toAxisAnglePos(m->getTransform());
+        measurement.expectation = utility::twistClosestRepresentation(utility::toAxisAnglePos(m->getTransform()),wpstate);
 		measurement.variance.topLeftCorner(3, 3) = sigmaW;
 		measurement.variance.bottomRightCorner(3, 3) = m->getPositionVar();
         

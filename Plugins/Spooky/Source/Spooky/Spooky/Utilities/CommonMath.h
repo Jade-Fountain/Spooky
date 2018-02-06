@@ -580,5 +580,21 @@ namespace spooky{
 			}
 			return df_dx;
 		}
+
+		//Returns the twist equivalent to w that is closest to target
+		// w = (2*pi*n - norm(w))*unit(w) for all n
+		static inline Eigen::VectorXf twistClosestRepresentation(const Eigen::VectorXf& wp, const Eigen::VectorXf& target_wp) {
+			Eigen::Vector3f w = wp.head(3);
+			float w_angle = w.norm();
+
+			Eigen::Vector3f target = target_wp.head(3);
+			float target_angle = target.norm();
+			int target_ring = std::floor(target_angle / (2 * M_PI));
+
+			//Two equivalent twists
+			Eigen::Vector3f w_1 = (w_angle + 2 * M_PI * target_ring) * w / w_angle;
+			Eigen::Vector3f w_2 = (w_angle + 2 * M_PI * (target_ring-1)) * w / w_angle;
+			return (w_1 - target).norm() < (w_2 - target).norm() ? w_1 : w_2;
+		}
 	}
 }
