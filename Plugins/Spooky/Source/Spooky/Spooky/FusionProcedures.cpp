@@ -226,6 +226,7 @@ namespace spooky{
     Node::State::Parameters Node::EKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,
                                                         const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement)
     {
+		//TODO: change to proper KF algorithm
         assert(prior.size() == measurementJacobian.cols() && measurement.size() == measurementJacobian.rows() == state_measurement.size() == measurement.size());
         //Prior information matrix
         Eigen::MatrixXf sigmaP_info = prior.variance.inverse();
