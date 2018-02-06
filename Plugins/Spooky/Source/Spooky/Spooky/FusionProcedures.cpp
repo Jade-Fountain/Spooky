@@ -125,8 +125,9 @@ namespace spooky{
 		Eigen::MatrixXf sigmaW = quatToAxisJacobian * m->getRotationVar() * quatToAxisJacobian.transpose();
         //Measurement information matrix
         State::Parameters measurement(6);
-		//Block diagonal inverse is inverse of blocks
-        measurement.expectation = utility::twistClosestRepresentation(utility::toAxisAnglePos(m->getTransform()),wpstate);
+		Eigen::Matrix<float, 6, 1> wpm = utility::toAxisAnglePos(m->getTransform());
+        measurement.expectation.head(3) = utility::twistClosestRepresentation(wpm.head(3),wpstate.head(3));
+		measurement.expectation.tail(3) = wpm.tail(3);
 		measurement.variance.topLeftCorner(3, 3) = sigmaW;
 		measurement.variance.bottomRightCorner(3, 3) = m->getPositionVar();
         

@@ -583,11 +583,9 @@ namespace spooky{
 
 		//Returns the twist equivalent to w that is closest to target
 		// w = (2*pi*n - norm(w))*unit(w) for all n
-		static inline Eigen::VectorXf twistClosestRepresentation(const Eigen::VectorXf& wp, const Eigen::VectorXf& target_wp) {
-			Eigen::Vector3f w = wp.head(3);
+		static inline Eigen::Vector3f twistClosestRepresentation(const Eigen::Vector3f& w, const Eigen::Vector3f& target) {
 			float w_angle = w.norm();
 
-			Eigen::Vector3f target = target_wp.head(3);
 			float target_angle = target.norm();
 			int target_ring = std::floor(target_angle / (2 * M_PI));
 
