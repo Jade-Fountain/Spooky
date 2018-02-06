@@ -228,22 +228,4 @@ namespace spooky{
 		return J;
 	}
 
-
-	Transform3Dcd Node::getLocalPoseComplexStep(int j, double h) {
-		Transform3Dcd pose = Transform3Dcd::Identity();
-		int totalDim = 0;
-		for (int i = 0; i < articulations.size(); i++) {
-			int thisDim = local_state.articulation[i].expectation.size();
-			int lastTotalDim = totalDim;
-			totalDim += thisDim;
-			Eigen::Matrix<std::complex<double>, Eigen::Dynamic, 1> ih = Eigen::VectorXcd::Zero(thisDim);
-			if (j < totalDim && j >= lastTotalDim) {
-				ih[j - lastTotalDim] = std::complex<double>(0,h);
-			}
-			pose = pose * articulations[i].getTransform<std::complex<double>>(local_state.articulation[i].expectation.cast<std::complex<double>>() + ih);
-		}
-		return pose;
-	}
-
-
 }
