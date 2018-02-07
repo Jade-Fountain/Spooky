@@ -476,7 +476,7 @@ namespace spooky {
 				case(ROTATION):
 					return 0;
 				case(SCALE):
-					return 3;
+					return 0;
 			}
 			return 0;
 		}
@@ -495,7 +495,14 @@ namespace spooky {
 			}
 			return 0;
 		}
-
+		int getRequiredSDoF(){
+			if(type == Type::SCALE)
+			{
+				return 3;
+			} else {
+  				return 0;
+			}
+		}
 	};
 
 	class MeasurementBuffer {

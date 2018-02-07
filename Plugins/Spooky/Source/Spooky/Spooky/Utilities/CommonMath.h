@@ -60,10 +60,12 @@ namespace spooky{
 			s = svd.singularValues();
 		}
 
-		static inline Eigen::Matrix3f normalize3D(const Eigen::Matrix3f& M) {
+		static inline Eigen::Matrix3f normalize3D(const Eigen::Matrix3f& M, Eigen::Vector3f* scale_out = NULL) {
 			auto result = M;
 			for (int i = 0; i < M.cols(); i++) {
-				result.col(i) = M.col(i).normalized();
+				float norm = M.col(i).norm();
+				if(scale_out) (*scale_out)[i] = norm;
+				result.col(i) = M.col(i) / norm;
 			}
 			return result;
 		}
@@ -511,6 +513,17 @@ namespace spooky{
 			//Warning - some functions squash imaginary component - e.g. transform.rotation()
 			result.head(3) = Sophus::SO3<Scalar>::log(Sophus::SO3<Scalar>(normalize3D(T.matrix().topLeftCorner(3,3))));
 			result.tail(3) = T.translation();
+			return result;
+		}
+
+		template <typename Scalar>
+		static inline Eigen::Matrix<Scalar, 9, 1> toAxisAnglePosScale(const Eigen::Transform<Scalar, 3, Eigen::Affine>& T) {
+			Eigen::Matrix<Scalar, 9, 1> result;
+			//Warning - some functions squash imaginary component - e.g. transform.rotation()
+			Eigen::Vector3f scale;
+			result.head(3) = Sophus::SO3<Scalar>::log(Sophus::SO3<Scalar>(normalize3D(T.matrix().topLeftCorner(3,3),&scale)));
+			result.segment<3>(3) = T.translation();
+			result.tail(3) = scale;
 			return result;
 		}
 

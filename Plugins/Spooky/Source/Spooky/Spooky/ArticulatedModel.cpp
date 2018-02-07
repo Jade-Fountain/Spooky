@@ -85,6 +85,14 @@ namespace spooky {
 		return rdof;
 	}
 
+	int Node::getSDoF(){
+		int sdof = 0;
+		for (int i = 0; i < articulations.size(); i++) {
+			sdof += articulations[i].getSDoF();
+		}
+		return sdof;
+	}
+
 	int Node::getDimension() {
 		int dim = 0;
 		for (int i = 0; i < articulations.size(); i++) {

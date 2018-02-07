@@ -134,6 +134,7 @@ namespace spooky {
 		//Get rotational and translational degrees of freedom
 		int getPDoF(bool hasLeverChild);
 		int getRDoF();
+		int getSDoF();
 
 		//Get the total number of variables describing this node
 		int getDimension();
@@ -189,7 +190,7 @@ namespace spooky {
   
 
 		//Get the jocobian of an entire pose chain mapping state |-> (w,p) axis-angle and position
-		Eigen::Matrix<float, 6, Eigen::Dynamic> getPoseChainJacobian(const int& chain_length, const bool& globalSpace);
+		Eigen::Matrix<float, 9, Eigen::Dynamic> getPoseChainJacobian(const int& chain_length, const bool& globalSpace);
 		
 	private:
 		Transform3D getGlobalPose();

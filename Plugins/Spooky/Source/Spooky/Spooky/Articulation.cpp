@@ -140,7 +140,7 @@ namespace spooky{
 			//Roll doesnt help with position
             	return hasLeverChild ? 5 : 2;
 			case(SCALE):
-				return 3;
+				return hasLeverChild ? 3 : 0;
 		}
 		return 0;
 	}
@@ -155,6 +155,13 @@ namespace spooky{
 		else
 		{
 			return 3;
+		}
+	}
+	int Articulation::getSDoF(){
+		if(type == SCALE){
+			return 3;
+		} else {
+			return 0;
 		}
 	}
 

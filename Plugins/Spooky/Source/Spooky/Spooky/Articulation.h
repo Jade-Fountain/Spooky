@@ -115,6 +115,7 @@ namespace spooky{
 		//Get rotational and translational degrees of freedom
 		int getPDoF(bool hasLeverChild);
 		int getRDoF();
+		int getSDoF();
 
 		//Get pose variance
 		//Eigen::Matrix<float, 6, 6> getPoseVariance(const Eigen::VectorXf& expectation, const Eigen::MatrixXf& variance);
