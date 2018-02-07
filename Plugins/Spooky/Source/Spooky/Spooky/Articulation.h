@@ -87,8 +87,8 @@ namespace spooky{
 			case(POSE):
 			{
 				//Theta is an axis-angle
-				Eigen::Matrix<Scalar, 3, 1> rw = theta.tail(3);
-				Eigen::Matrix<Scalar, 3, 1> pos = theta.head(3);
+				Eigen::Matrix<Scalar, 3, 1> rw = theta.head(3);
+				Eigen::Matrix<Scalar, 3, 1> pos = theta.tail(3);
 				T.translate(pos);
 				T.rotate(Sophus::SO3<Scalar>::exp(rw).matrix());
 				break;

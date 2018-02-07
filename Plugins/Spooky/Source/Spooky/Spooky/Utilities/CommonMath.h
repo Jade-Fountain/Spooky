@@ -600,12 +600,23 @@ namespace spooky{
 			float w_angle = w.norm();
 
 			float target_angle = target.norm();
-			int target_ring = std::floor(target_angle / (2 * M_PI));
 
-			//Two equivalent twists
-			Eigen::Vector3f w_1 = (w_angle + 2 * M_PI * target_ring) * w / w_angle;
-			Eigen::Vector3f w_2 = (w_angle + 2 * M_PI * (target_ring-1)) * w / w_angle;
-			return (w_1 - target).norm() < (w_2 - target).norm() ? w_1 : w_2;
+			//handle zero case
+			if (w_angle == 0) {
+				if (target_angle == 0) {
+					return Eigen::Vector3f::Zero();
+				}
+				//Round target to nearest multiple of 2pi
+				int target_ring = std::round(target_angle / (2 * M_PI));
+				return (2 * M_PI * target_ring) * target / target_angle;
+			}
+			else {
+				int target_ring = std::floor(target_angle / (2 * M_PI));
+				//Two equivalent twists
+				Eigen::Vector3f w_1 = (w_angle + 2 * M_PI * target_ring) * w / w_angle;
+				Eigen::Vector3f w_2 = (w_angle + 2 * M_PI * (target_ring - 1)) * w / w_angle;
+				return (w_1 - target).norm() < (w_2 - target).norm() ? w_1 : w_2;
+			}
 		}
 	}
 }

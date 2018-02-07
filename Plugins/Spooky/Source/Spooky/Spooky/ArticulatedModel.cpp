@@ -461,7 +461,7 @@ namespace spooky {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createPose());
 		nodes[node]->setModel(art);
-		nodes[node]->local_state.articulation[0].expectation = Measurement::getPosQuatFromTransform(poseTransform);
+		nodes[node]->local_state.articulation[0].expectation = utility::toAxisAnglePos(poseTransform);
 		assert(constraints.size() == nodes[node]->getDimension());
 		nodes[node]->setConstraints(constraints);
 		Node::State::Parameters PN(nodes[node]->getDimension());
@@ -476,7 +476,7 @@ namespace spooky {
 		//Scale in local space x'=T*S*x
 		art.push_back(Articulation::createScale());
 		nodes[node]->setModel(art);
-		nodes[node]->local_state.articulation[0].expectation = Measurement::getPosQuatFromTransform(poseTransform);
+		nodes[node]->local_state.articulation[0].expectation = utility::toAxisAnglePos(poseTransform);
 		nodes[node]->local_state.articulation[1].expectation = scaleInitial;
 		assert(constraints.size() == nodes[node]->getDimension());
 		nodes[node]->setConstraints(constraints);
