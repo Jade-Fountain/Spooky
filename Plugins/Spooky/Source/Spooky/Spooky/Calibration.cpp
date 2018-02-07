@@ -145,14 +145,12 @@ namespace spooky {
 		//Count
 		for (auto& m : measurementQueue) {
 			systemsPerNode[m->getNode()].insert(m->getSystem());
-			SPOOKY_LOG("filterLonelyData[" + m->getSystem().name + "] : " + m->getNode().name + " total count for this node = " + std::to_string(systemsPerNode[m->getNode()].size()));
 		}
 		//utility::profiler.endTimer("Calibration: Filter - Count");
 		//Push back relevant measurments
 		//utility::profiler.startTimer("Calibration: Filter - Pushback");
 		for (auto& m : measurementQueue) {
 			if (systemsPerNode[m->getNode()].size() > 1) {
-				SPOOKY_LOG("filterLonelyData[" + m->getSystem().name + "] : including node " + m->getNode().name);
 				result.push_back(m);
 			}
 		}
