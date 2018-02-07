@@ -101,7 +101,7 @@ namespace spooky{
         if (m->globalSpace) {
             pstate = getGlobalPose().translation();
             //Fuse by modifying some parents if necessary
-            fusion_chain = getRequiredChainLength(m);
+			fusion_chain = 2;//getRequiredChainLength(m);
         }
         else {
             pstate = getLocalPose().translation();
@@ -253,23 +253,23 @@ namespace spooky{
         //TODO optimise ekf by using information matrices and inverting covariance per node
         State::Parameters newChainState = EKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, wpstate);
 
-        std::stringstream ss;
-        ss << std::endl << "process_noise = " << std::endl << process_noise << std::endl;
-        //ss << std::endl << "sigmaW_info = " << std::endl << sigmaW_info << std::endl;
-        //ss << std::endl << "sigmaM_info = " << std::endl << sigmaM_info << std::endl;
-        //ss << std::endl << "sigmaP_info = " << std::endl << sigmaP_info << std::endl;
-        //ss << std::endl << "sigmaC_info * joint_stiffness = " << std::endl << sigmaC_info * joint_stiffness << std::endl;
-        ss << std::endl << "wpstate = " << std::endl << wpstate.transpose() << std::endl;
-        ss << std::endl << "wpm = " << std::endl << wpm.transpose() << std::endl;
-        //ss << std::endl << "mVector = " << std::endl << mVector.transpose() << std::endl;
-        ss << std::endl << "measurementJacobian = " << std::endl << measurementJacobian << std::endl;
-        //ss << std::endl << "measurementJacobian.transpose() * sigmaM_info * measurementJacobian = " << std::endl << measurementJacobian.transpose() * sigmaM_info * measurementJacobian << std::endl;
-        //ss << std::endl << "measurementUpdate = " << std::endl << measurementUpdate.transpose() << std::endl;
-        //ss << std::endl << "priorUpdate = " << std::endl << priorUpdate.transpose() << std::endl;
-        //ss << std::endl << "constraintUpdate = " << std::endl << constraintUpdate.transpose() << std::endl;
-		ss << std::endl << "new state = " << newChainState.expectation.transpose() << std::endl;
-        //ss << std::endl << "new cov diag = " << std::endl << newChainState.variance.diagonal().transpose() << std::endl;
-        SPOOKY_LOG(ss.str());
+  //      std::stringstream ss;
+  //      ss << std::endl << "process_noise = " << std::endl << process_noise << std::endl;
+  //      //ss << std::endl << "sigmaW_info = " << std::endl << sigmaW_info << std::endl;
+  //      //ss << std::endl << "sigmaM_info = " << std::endl << sigmaM_info << std::endl;
+  //      //ss << std::endl << "sigmaP_info = " << std::endl << sigmaP_info << std::endl;
+  //      //ss << std::endl << "sigmaC_info * joint_stiffness = " << std::endl << sigmaC_info * joint_stiffness << std::endl;
+  //      ss << std::endl << "wpstate = " << std::endl << wpstate.transpose() << std::endl;
+  //      ss << std::endl << "wpm = " << std::endl << wpm.transpose() << std::endl;
+  //      //ss << std::endl << "mVector = " << std::endl << mVector.transpose() << std::endl;
+  //      ss << std::endl << "measurementJacobian = " << std::endl << measurementJacobian << std::endl;
+  //      //ss << std::endl << "measurementJacobian.transpose() * sigmaM_info * measurementJacobian = " << std::endl << measurementJacobian.transpose() * sigmaM_info * measurementJacobian << std::endl;
+  //      //ss << std::endl << "measurementUpdate = " << std::endl << measurementUpdate.transpose() << std::endl;
+  //      //ss << std::endl << "priorUpdate = " << std::endl << priorUpdate.transpose() << std::endl;
+  //      //ss << std::endl << "constraintUpdate = " << std::endl << constraintUpdate.transpose() << std::endl;
+		//ss << std::endl << "new state = " << newChainState.expectation.transpose() << std::endl;
+  //      //ss << std::endl << "new cov diag = " << std::endl << newChainState.variance.diagonal().transpose() << std::endl;
+  //      SPOOKY_LOG(ss.str());
 		setChainState(fusion_chain, newChainState);
         //TODO: do this per node!
 		local_state.last_update_time = m->getTimestamp();
