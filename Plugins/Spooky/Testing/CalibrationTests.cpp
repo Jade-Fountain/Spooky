@@ -487,8 +487,8 @@ namespace FusionTesting
 						ss2 << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
 						ss2 << "w_new = " << std::endl << w_new.transpose() << std::endl;
 						ss2 << "w_new.norm = " << std::endl << w_new.norm() << std::endl;
-						ss2 << "w_t1 = " << std::endl << w_t1.transpose() << std::endl;
-						ss2 << "w_t1.norm = " << std::endl << w_t1.norm() << std::endl;
+						ss2 << "w_t2 = " << std::endl << w_t2.transpose() << std::endl;
+						ss2 << "w_t2.norm = " << std::endl << w_t2.norm() << std::endl;
 						ss2 << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
 					}
 					w_t1 = w_new;
