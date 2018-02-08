@@ -508,10 +508,15 @@ namespace spooky{
 		}
 
 		template <typename Scalar>
+		static inline Eigen::Matrix<Scalar, 3, 1> toAxisAngle(const Eigen::Matrix<Scalar, 3, 3>& R) {
+			return Sophus::SO3<Scalar>::log(Sophus::SO3<Scalar>(normalize3D(R)));
+		}
+
+		template <typename Scalar>
 		static inline Eigen::Matrix<Scalar, 6, 1> toAxisAnglePos(const Eigen::Transform<Scalar, 3, Eigen::Affine>& T) {
 			Eigen::Matrix<Scalar, 6, 1> result;
 			//Warning - some functions squash imaginary component - e.g. transform.rotation()
-			result.head(3) = Sophus::SO3<Scalar>::log(Sophus::SO3<Scalar>(normalize3D(T.matrix().topLeftCorner(3,3))));
+			result.head(3) = toAxisAngle<Scalar>(T.matrix().topLeftCorner(3,3));
 			result.tail(3) = T.translation();
 			return result;
 		}
@@ -521,7 +526,8 @@ namespace spooky{
 			Eigen::Matrix<Scalar, 9, 1> result;
 			//Warning - some functions squash imaginary component - e.g. transform.rotation()
 			Eigen::Vector3f scale;
-			result.head(3) = Sophus::SO3<Scalar>::log(Sophus::SO3<Scalar>(normalize3D(T.matrix().topLeftCorner(3,3),&scale)));
+			Eigen::Matrix3f rot = normalize3D(T.matrix().topLeftCorner(3, 3), &scale);
+			result.head(3) = toAxisAngle<Scalar>(rot);
 			result.segment<3>(3) = T.translation();
 			result.tail(3) = scale;
 			return result;
@@ -595,7 +601,7 @@ namespace spooky{
 		}
 
 		//Returns the twist equivalent to w that is closest to target
-		// w = (2*pi*n - norm(w))*unit(w) for all n
+		// w = (2*pi*n + norm(w))*unit(w) for all n integer
 		static inline Eigen::Vector3f twistClosestRepresentation(const Eigen::Vector3f& w, const Eigen::Vector3f& target) {
 			float w_angle = w.norm();
 
@@ -611,11 +617,12 @@ namespace spooky{
 				return (2 * M_PI * target_ring) * target / target_angle;
 			}
 			else {
-				int target_ring = std::floor(target_angle / (2 * M_PI));
+				//Project target onto line of w, then round to nearest whole 2pi offset magnitude from w
+				int k = std::round(((target).dot(w/w_angle)-w_angle)/(2 * M_PI));
+				int sign = target.dot(w) > 0 ? 1 : -1;
 				//Two equivalent twists
-				Eigen::Vector3f w_1 = (w_angle + 2 * M_PI * target_ring) * w / w_angle;
-				Eigen::Vector3f w_2 = (w_angle + 2 * M_PI * (target_ring - 1)) * w / w_angle;
-				return (w_1 - target).norm() < (w_2 - target).norm() ? w_1 : w_2;
+				
+				return  w * (w_angle + 2*M_PI*k)/w_angle;
 			}
 		}
 	}

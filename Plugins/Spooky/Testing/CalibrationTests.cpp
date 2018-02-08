@@ -468,6 +468,35 @@ namespace FusionTesting
 				std::wstring widestr2 = utf8_decode(ss2.str());
 				Assert::AreEqual((closest - Eigen::Vector3f(M_PI + (M_PI - 3.1),0,0)).norm() < 0.001, true, widestr2.c_str());
 			}
+
+			{
+				float T = 10;
+				float fps = 30;
+				int iterations = T * fps;
+				Eigen::Vector3f w_t1(2 * M_PI - 0.00001, 0, 0);
+				int failcount = 0;
+				std::stringstream ss2;
+
+				for (int i = 0; i < iterations; i++) {
+					float t = i / 30;
+					Eigen::Vector3f w_t2 = w_t1 + Eigen::Vector3f(0, 0.1*i,0);
+					Eigen::Vector3f w_t2_renormalized = spooky::utility::toAxisAngle(spooky::utility::rodriguezFormula(w_t2));
+					Eigen::Vector3f w_new = spooky::utility::twistClosestRepresentation(w_t2_renormalized, w_t1);
+					if ((w_new - w_t2).norm() > 0.1) {
+						failcount++;
+						ss2 << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
+						ss2 << "w_new = " << std::endl << w_new.transpose() << std::endl;
+						ss2 << "w_new.norm = " << std::endl << w_new.norm() << std::endl;
+						ss2 << "w_t1 = " << std::endl << w_t1.transpose() << std::endl;
+						ss2 << "w_t1.norm = " << std::endl << w_t1.norm() << std::endl;
+						ss2 << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
+					}
+					w_t1 = w_new;
+				}
+				std::wstring widestr2 = utf8_decode(ss2.str());
+				Assert::AreEqual(failcount==0,true, widestr2.c_str());
+
+			}
 			
 
 		}
