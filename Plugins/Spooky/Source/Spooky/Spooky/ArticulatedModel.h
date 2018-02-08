@@ -185,7 +185,11 @@ namespace spooky {
 		
 		//Basic math for performing EKF with prior, constraints and measurement
 	    Node::State::Parameters 
-	    EKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,
+	    customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,
+                            const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement);
+  		//Basic math for performing EKF with prior, constraints and measurement
+	    Node::State::Parameters 
+	    EKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& measurement,
                             const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement);
   
 
