@@ -101,7 +101,7 @@ namespace spooky{
         if (m->globalSpace) {
             pstate = getGlobalPose().translation();
             //Fuse by modifying some parents if necessary
-			fusion_chain = getRequiredChainLength(m);
+			fusion_chain = 2;// getRequiredChainLength(m);
         }
         else {
             pstate = getLocalPose().translation();
@@ -130,27 +130,33 @@ namespace spooky{
         Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace);
         Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(3,0,3, poseJac.cols());
 
-        //TODO optimise ekf by using information matrices and inverting covariance per node
         // State::Parameters newChainState = customEKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, pstate);
-        State::Parameters newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, pstate);
+        //State::Parameters newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, pstate);
 
-        // std::stringstream ss;
-        // ss << std::endl << "process_noise = " << std::endl << process_noise << std::endl;
+		State::Parameters newChainState = chainState;
+		float alpha = 1;
+		//newChainState.expectation += - alpha * measurementJacobian.transpose() * (pstate - measurement.expectation);
+		newChainState.expectation[4] += 0.01;
+
+        std::stringstream ss;
+		ss << std::endl << "pstate = " << std::endl << pstate.transpose() << std::endl;
+		ss << std::endl << "measurement.expectation = " << std::endl << measurement.expectation.transpose() << std::endl;
         // ss << std::endl << "constraints = " << std::endl << constraints.variance << std::endl;
         // //ss << std::endl << "sigmaM_info = " << std::endl << sigmaM_info << std::endl;
         // //ss << std::endl << "sigmaP_info = " << std::endl << sigmaP_info << std::endl;
         // //ss << std::endl << "sigmaC_info * joint_stiffness = " << std::endl << sigmaC_info * joint_stiffness << std::endl;
-        // ss << std::endl << "pstate = " << std::endl << pstate.transpose() << std::endl;
+        ss << std::endl << "chainState = " << std::endl << chainState.expectation.transpose() << std::endl;
         // ss << std::endl << "measurement.expectation = " << std::endl << measurement.expectation.transpose() << std::endl;
         // //ss << std::endl << "mVector = " << std::endl << mVector.transpose() << std::endl;
-        // ss << std::endl << "measurementJacobian = " << std::endl << measurementJacobian << std::endl;
-        // //ss << std::endl << "measurementJacobian.transpose() * sigmaM_info * measurementJacobian = " << std::endl << measurementJacobian.transpose() * sigmaM_info * measurementJacobian << std::endl;
+        ss << std::endl << "measurementJacobian.transpose() = " << std::endl << measurementJacobian.transpose() << std::endl;
+		ss << std::endl << " (pstate - measurement.expectation) = " << std::endl << (pstate - measurement.expectation).transpose() << std::endl;
+		ss << std::endl << " update = " << std::endl << (-alpha * measurementJacobian.transpose() * (pstate - measurement.expectation)).transpose() << std::endl;
         // //ss << std::endl << "measurementUpdate = " << std::endl << measurementUpdate.transpose() << std::endl;
         // //ss << std::endl << "priorUpdate = " << std::endl << priorUpdate.transpose() << std::endl;
         // //ss << std::endl << "constraintUpdate = " << std::endl << constraintUpdate.transpose() << std::endl;
-        // ss << std::endl << "new state = " << newChainState.expectation.transpose() << std::endl;
+        ss << std::endl << "new state = " << newChainState.expectation.transpose() << std::endl;
         // ss << std::endl << "new cov diag = " << std::endl << newChainState.variance.diagonal().transpose() << std::endl;
-        //SPOOKY_LOG(ss.str());
+        SPOOKY_LOG(ss.str());
         setChainState(fusion_chain, newChainState);
         //TODO: do this per node!
         local_state.last_update_time = m->getTimestamp();
@@ -329,6 +335,7 @@ namespace spooky{
     Node::State::Parameters Node::customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,
                                                         const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement)
     {
+		//TODO optimise custom ekf by using information matrices and inverting covariance per node
 		//TODO: change to proper KF algorithm
         assert(prior.size() == measurementJacobian.cols() && measurement.size() == measurementJacobian.rows() == state_measurement.size() == measurement.size());
         //Prior information matrix
@@ -437,9 +444,26 @@ namespace spooky{
 		for (int i = 0; i < chain_length; i++) {
 			//Loop through all dof of this node and get the jacobian (w,p) entries for each dof
 			int dof = node->getDimension();
-
+			//TODO: fix lambda function differentiation
 			//Watch out for block assignments - they cause horrible hard to trace memory errors if not sized properly
-			J.block(0, block, 9, dof) = utility::numericalVectorDerivative<float>(mapToGlobalPose, node->getState().expectation, h);
+			//J.block(0, block, 9, dof) = utility::numericalVectorDerivative<float>(mapToGlobalPose, node->getState().expectation, h);
+
+			Eigen::VectorXf f_x = utility::toAxisAnglePosScale(parentPoses * node->getLocalPose() * childPoses);
+			//Why is x infinite size?
+			Eigen::VectorXf x = node->getState().expectation;
+
+			Eigen::MatrixXf df_dx = Eigen::MatrixXf::Zero(x.size(), f_x.size());
+
+			for (int j = 0; j < dof; j++) {
+				Eigen::VectorXf xplush = x;
+				xplush(j) += h;
+				Eigen::VectorXf f2 = utility::toAxisAnglePosScale(parentPoses * node->getLocalPoseAt(xplush) * childPoses);
+				Eigen::VectorXf delf_delx = (f2 - f_x) / h;
+				df_dx.col(j) = delf_delx;
+			}
+
+			J.block(0, block, 9, dof) = df_dx;
+
 			block += dof;
 
 			//Move to next parent
