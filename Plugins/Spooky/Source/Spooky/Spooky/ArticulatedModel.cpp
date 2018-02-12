@@ -50,7 +50,7 @@ namespace spooky {
 		assert(theta.size() == getDimension());
 		int block_start = 0;
 		for (int i = 0; i < articulations.size(); i++) {
-			int block_size = local_state.articulation[i].size();
+			int block_size = local_state.articulation[i].expectation.size();
 			pose = pose * articulations[i].getTransform<float>(theta.block(block_start,0,block_size,1));
 			block_start += block_size;
 		}
@@ -96,7 +96,7 @@ namespace spooky {
 	int Node::getDimension() {
 		int dim = 0;
 		for (int i = 0; i < articulations.size(); i++) {
-			dim += local_state.articulation[i].size();
+			dim += local_state.articulation[i].expectation.size();
 		}
 		return dim;
 	}
@@ -106,7 +106,7 @@ namespace spooky {
 	void Node::setState(const State::Parameters& new_state){
 		int pos = 0;
 		for(int i = 0; i < articulations.size(); i++){
-			int dim = local_state.articulation[i].size();
+			int dim = local_state.articulation[i].expectation.size();
 			local_state.articulation[i] = new_state.getSubstate(pos,dim);
 			pos += dim;
 		}
@@ -121,7 +121,7 @@ namespace spooky {
 		State::Parameters p(getDimension());
 		int pos = 0;
 		for(int i = 0; i < articulations.size(); i++){
-			int dim = local_state.articulation[i].size();
+			int dim = local_state.articulation[i].expectation.size();
 			p.insertSubstate(pos,local_state.articulation[i]);
 			pos += dim;
 		}
@@ -133,7 +133,7 @@ namespace spooky {
 		State::Parameters p(getDimension());
 		int pos = 0;
 		for(int i = 0; i < articulations.size(); i++){
-			int dim = local_state.constraints[i].size();
+			int dim = local_state.constraints[i].expectation.size();
 			p.insertSubstate(pos,local_state.constraints[i]);
 			pos += dim;
 		}
@@ -145,7 +145,7 @@ namespace spooky {
 		State::Parameters p(getDimension());
 		int pos = 0;
 		for(int i = 0; i < articulations.size(); i++){
-			int dim = local_state.process_noise[i].size();
+			int dim = local_state.process_noise[i].expectation.size();
 			p.insertSubstate(pos,local_state.process_noise[i]);
 			pos += dim;
 		}
@@ -231,8 +231,8 @@ namespace spooky {
 			local_state.process_noise.push_back(Node::State::Parameters(init.size()));
 			local_state.articulation[i].expectation = init;
 			//TODO: generate covariance initial per aticulation
-			local_state.articulation[i].variance = initial_covariance * Eigen::MatrixXf::Identity(local_state.articulation[i].size(),
-																							      local_state.articulation[i].size());
+			local_state.articulation[i].variance = initial_covariance * Eigen::MatrixXf::Identity(local_state.articulation[i].expectation.size(),
+																							      local_state.articulation[i].expectation.size());
 		}
 	}
 
@@ -243,7 +243,7 @@ namespace spooky {
 	void Node::setConstraints(const Node::State::Parameters& c){
 		int pos = 0;
 		for(int i = 0; i < articulations.size(); i++){
-			int dim = local_state.articulation[i].size();
+			int dim = local_state.articulation[i].expectation.size();
 			local_state.constraints[i] = c.getSubstate(pos,dim);
 			pos += dim;
 		}
@@ -256,7 +256,7 @@ namespace spooky {
 	void Node::setProcessNoises(const Node::State::Parameters& p){
 		int pos = 0;
 		for(int i = 0; i < articulations.size(); i++){
-			int dim = local_state.articulation[i].size();
+			int dim = local_state.articulation[i].expectation.size();
 			local_state.process_noise[i] = p.getSubstate(pos,dim);
 			pos += dim;
 		}

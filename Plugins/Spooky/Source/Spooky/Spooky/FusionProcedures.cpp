@@ -344,7 +344,7 @@ namespace spooky{
         Eigen::MatrixXf sigmaC_info = constraints.variance.inverse();
 
         //New state initialisation:
-        State::Parameters posterior(prior.size());
+        State::Parameters posterior(prior.expectation.size());
 
         //New variance (extended kalman filter measurement update)
         Eigen::MatrixXf sigmaM_info = measurement.variance.inverse();
@@ -382,7 +382,7 @@ namespace spooky{
 		const auto& H = measurementJacobian;
 		const auto& SigmaBar = prior.variance;
 		const auto& Q = measurement.variance;
-		const int n = prior.size();
+		const int n = prior.expectation.size();
 		State::Parameters posterior(n);
 
 		Eigen::MatrixXf K = SigmaBar * H.transpose() * (H * SigmaBar * H.transpose() + Q).inverse();
@@ -450,9 +450,10 @@ namespace spooky{
 
 			Eigen::VectorXf f_x = utility::toAxisAnglePosScale(parentPoses * node->getLocalPose() * childPoses);
 			//Why is x infinite size?
-			Eigen::VectorXf x = node->getState().expectation;
+			State::Parameters state = node->getState();
+			Eigen::VectorXf x = state.expectation;
 
-			Eigen::MatrixXf df_dx = Eigen::MatrixXf::Zero(x.size(), f_x.size());
+			Eigen::MatrixXf df_dx = Eigen::MatrixXf::Zero(f_x.size(),x.size());
 
 			for (int j = 0; j < dof; j++) {
 				Eigen::VectorXf xplush = x;
@@ -470,7 +471,7 @@ namespace spooky{
 			if (node->parent == NULL) break;
 			childPoses = node->getLocalPose() * childPoses;
 			node = node->parent.get();
-			parentPoses = globalSpace ? parent->getGlobalPose() : Transform3D::Identity();
+			parentPoses = globalSpace && node->parent != NULL ? node->parent->getGlobalPose() : Transform3D::Identity();
 		}
 		return J;
 	}

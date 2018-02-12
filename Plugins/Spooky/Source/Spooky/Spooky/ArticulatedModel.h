@@ -33,8 +33,10 @@ namespace spooky {
 		//////////////////////////////////////////////////////////////////
 		//Internal Info
 		//////////////////////////////////////////////////////////////////
-		struct State{
-			struct Parameters {
+		class State{
+		public:
+			class Parameters {
+			public:
 				//Vectors of articulation states stored in columns
 				//		theta1	phi1 ...
 				//		theta2	phi2
@@ -49,26 +51,22 @@ namespace spooky {
 				//Covariance associated with vec(expectation)
 				Eigen::MatrixXf variance;
 
-				Parameters getSubstate(const int& position, const int& size) const {
-					Parameters substate(size);
-					substate.expectation = expectation.block(position, 0, size, 1);
-					substate.variance = variance.block(position, position, size, size);
+				Parameters getSubstate(const int& position, const int& dim) const {
+					Parameters substate(dim);
+					substate.expectation = expectation.block(position, 0, dim, 1);
+					substate.variance = variance.block(position, position, dim, dim);
 					return substate;
 				}
 
 				void insertSubstate(const int& position, const Parameters& p) {
-					int size = p.expectation.size();
-					expectation.block(position, 0, size, 1) = p.expectation;
-					variance.block(position, position, size, size) = p.variance;
+					int dim = p.expectation.size();
+					expectation.block(position, 0, dim, 1) = p.expectation;
+					variance.block(position, position, dim, dim) = p.variance;
 				}
 
-				size_t size() const{
-					return expectation.size();
-				}
-
-				Parameters(int size) :
-					expectation(size), 
-					variance(size, size)
+				Parameters(int dim) :
+					expectation(dim),
+					variance(dim, dim)
 				{
 					expectation.setZero();
 					variance.setIdentity();
