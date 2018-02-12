@@ -63,6 +63,7 @@ namespace spooky {
 		meas->size = scale.rows();
 		return std::move(meas);
 	}
+	//TODO: CONST REF THESE VARIABLES
 	Measurement::Ptr Measurement::createPoseMeasurement(Eigen::Vector3f position, Eigen::Quaternionf quaternion, Eigen::Matrix<float,7,7> sigma) {
 		Measurement::Ptr meas = std::make_shared<Measurement>();
 		meas->type = Type::RIGID_BODY;
@@ -186,6 +187,47 @@ namespace spooky {
 	float Measurement::compare(const Measurement::Ptr& other) {
 		return difference(other).norm();
 	}
+
+	Measurement Measurement::transform(const Transform3D& T) const{
+		Measurement result = *this;
+		if(!globalSpace) {
+			return result;
+		}
+		//Linear part of T
+		Eigen::Matrix3f T_linear = T.linear();
+		Eigen::Matrix3f T_rotation = T.rotation();
+		switch(result.type){
+			case(GENERIC):
+				break;
+			case(POSITION):
+			{
+				result.data = T.linear() * (data) + T.translation();
+				result.uncertainty = T_linear * uncertainty * T_linear.transpose();
+				break;
+			}
+			case(ROTATION):
+			{
+				Eigen::Quaternionf q(Eigen::Vector4f(data.tail(4)));
+				Eigen::Quaternionf quatFinal(T_rotation * q.matrix());
+				result.data = quatFinal.coeffs();
+				break;
+			}
+			case(RIGID_BODY):
+			{
+				Eigen::Quaternionf q(Eigen::Vector4f(data.tail(4)));
+				result.data.head(3) = T.linear() * (data.head(3)) + T.translation();
+				result.uncertainty.topLeftCorner(3, 3) = T_linear * uncertainty.topLeftCorner(3, 3) * T_linear.transpose();
+				Eigen::Quaternionf quatFinal(T_rotation * q.matrix());
+				result.data.tail(4) = quatFinal.coeffs();
+				break;
+			}
+			case(SCALE):
+				break;
+		}
+		return result;
+	}
+
+
 	//TODO: refactor using custom struct with two measurement streams
 	void Measurement::synchronise(
 		std::vector<Measurement::Ptr>& source, 

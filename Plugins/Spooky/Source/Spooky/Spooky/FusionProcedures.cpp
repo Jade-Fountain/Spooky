@@ -93,10 +93,14 @@ namespace spooky{
         return nodecount;
     }
 
-    void Node::fusePositionMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace){
+    void Node::fusePositionMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace){
 
         Eigen::VectorXf pstate;
         int fusion_chain = 1;
+
+        //Transform measurement to fusion space
+        //TODO: optimise: dont transform when possible
+        Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
 
         if (m->globalSpace) {
             pstate = getGlobalPose().translation();
@@ -139,12 +143,17 @@ namespace spooky{
         local_state.last_update_time = m->getTimestamp();
     }
 
-    void Node::fuseRotationMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace){
+    void Node::fuseRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace){
 
         //Calculate error
         Eigen::VectorXf wpstate;
         int fusion_chain = 1;
 
+        //Transform measurement to fusion space
+        //TODO: optimise: dont transform when possible
+        Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
+
+        
         if (m->globalSpace) {
             wpstate = utility::toAxisAnglePos(getGlobalPose()).head(3);
             //Fuse by modifying some parents if necessary
@@ -191,11 +200,16 @@ namespace spooky{
         local_state.last_update_time = m->getTimestamp();
     }
 
-    void Node::fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace){
+    void Node::fuseRigidMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace){
 		//Calculate error
         Eigen::VectorXf wpstate;
 		int fusion_chain = 1;
+        
+        //Transform measurement to fusion space
+        //TODO: optimise: dont transform when possible
+        Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
 
+        
 		if (m->globalSpace) {
             wpstate = utility::toAxisAnglePos(getGlobalPose());
 			//Fuse by modifying some parents if necessary
@@ -221,14 +235,14 @@ namespace spooky{
         //THIS MEASUREMENT
 		//WARNING: Quat to be consistent: x,y,z,w is how eigen stores it internally, but its consrtuctor uses Quat(w,x,y,z)
         //Information matrices (inverse Covariance)
-		Eigen::MatrixXf sigmaW = toFusionSpace.rotation() * quatToAxisJacobian * m->getRotationVar() * quatToAxisJacobian.transpose() * toFusionSpace.rotation().transpose();
+		Eigen::MatrixXf sigmaW = quatToAxisJacobian * m->getRotationVar() * quatToAxisJacobian.transpose();
         //Measurement information matrix
         State::Parameters measurement(6);
-		Eigen::Matrix<float, 6, 1> wpm = utility::toAxisAnglePos(toFusionSpace * m->getTransform());
-        measurement.expectation.head(3) = toFusionSpace.rotation() * utility::twistClosestRepresentation(wpm.head(3),wpstate.head(3));
+		Eigen::Matrix<float, 6, 1> wpm = utility::toAxisAnglePos(m->getTransform());
+        measurement.expectation.head(3) = utility::twistClosestRepresentation(wpm.head(3),wpstate.head(3));
 		measurement.expectation.tail(3) = wpm.tail(3);
 		measurement.variance.topLeftCorner(3, 3) = sigmaW;
-		measurement.variance.bottomRightCorner(3, 3) = toFusionSpace.rotation() * m->getPositionVar() * toFusionSpace.rotation().transpose();
+		measurement.variance.bottomRightCorner(3, 3) = m->getPositionVar();
         
         //JACOBIAN:state -> measurement
         //Get Jacobian for the chain, mapping state to (w,v) global pose
@@ -251,11 +265,16 @@ namespace spooky{
 
     }
 
-    void Node::fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace){
+    void Node::fuseScaleMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace){
 
         Eigen::VectorXf pstate;
         int fusion_chain = 1;
 
+        //Transform measurement to fusion space
+        //TODO: optimise: dont transform when possible
+        Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
+
+        
         if (m->globalSpace) {
 			//TODO: change to return class so I can use .scale(), .pos(), etc?
             pstate = utility::toAxisAnglePosScale(getGlobalPose()).tail(3);

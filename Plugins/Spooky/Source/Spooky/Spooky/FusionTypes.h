@@ -369,6 +369,9 @@ namespace spooky {
 		float compare(const Measurement::Ptr & other);
 
 
+		//Transform this measurement to a new space
+		Measurement transform(const Transform3D& T) const;
+
 		//Synchronises the source stream with the target stream
 		// It is assumed that the two  streams are chronologically sorted
 		static void synchronise(std::vector<Measurement::Ptr>& source,

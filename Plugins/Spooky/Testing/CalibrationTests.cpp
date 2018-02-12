@@ -500,5 +500,28 @@ namespace FusionTesting
 			
 
 		}
+
+		TEST_METHOD(MeasurementTransform) {
+			
+			spooky::Transform3D T = spooky::Transform3D::Identity();
+			T.translate(Eigen::Vector3f::Random());
+			T.rotate(Eigen::Quaternionf::UnitRandom());
+
+			Eigen::Vector3f mp = Eigen::Vector3f::Random();
+			Eigen::Quaternionf mq = Eigen::Quaternionf::UnitRandom();
+			Eigen::Matrix<float, 7, 7> var = Eigen::Matrix<float, 7, 7>::Identity() * 0.1;
+			spooky::Measurement::Ptr m = spooky::Measurement::createPoseMeasurement(mp,mq,var);
+			
+			spooky::Measurement::Ptr m_2 = std::make_unique<spooky::Measurement>(m->transform(T));
+			spooky::Measurement::Ptr m_3 = std::make_unique<spooky::Measurement>(m_2->transform(T.inverse()));
+
+			std::stringstream ss2;
+			ss2 << m->getData() << std::endl;
+			ss2 << m_2->getData() << std::endl;
+			ss2 << m_3->getData() << std::endl;
+			std::wstring widestr2 = utf8_decode(ss2.str());
+			Assert::AreEqual(m_3->compare(m) < 0.01, true, widestr2.c_str());
+
+		}
 	};
 }
