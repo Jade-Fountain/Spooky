@@ -134,24 +134,6 @@ namespace spooky{
         //State::Parameters newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, pstate);
 
 
-        std::stringstream ss;
-		ss << std::endl << "pstate = " << std::endl << pstate.transpose() << std::endl;
-		ss << std::endl << "measurement.expectation = " << std::endl << measurement.expectation.transpose() << std::endl;
-        // ss << std::endl << "constraints = " << std::endl << constraints.variance << std::endl;
-        // //ss << std::endl << "sigmaM_info = " << std::endl << sigmaM_info << std::endl;
-        // //ss << std::endl << "sigmaP_info = " << std::endl << sigmaP_info << std::endl;
-        // //ss << std::endl << "sigmaC_info * joint_stiffness = " << std::endl << sigmaC_info * joint_stiffness << std::endl;
-        ss << std::endl << "chainState = " << std::endl << chainState.expectation.transpose() << std::endl;
-        // ss << std::endl << "measurement.expectation = " << std::endl << measurement.expectation.transpose() << std::endl;
-        // //ss << std::endl << "mVector = " << std::endl << mVector.transpose() << std::endl;
-        ss << std::endl << "measurementJacobian.transpose() = " << std::endl << measurementJacobian.transpose() << std::endl;
-		ss << std::endl << " (pstate - measurement.expectation) = " << std::endl << (pstate - measurement.expectation).transpose() << std::endl;
-        // //ss << std::endl << "measurementUpdate = " << std::endl << measurementUpdate.transpose() << std::endl;
-        // //ss << std::endl << "priorUpdate = " << std::endl << priorUpdate.transpose() << std::endl;
-        // //ss << std::endl << "constraintUpdate = " << std::endl << constraintUpdate.transpose() << std::endl;
-        ss << std::endl << "new state = " << newChainState.expectation.transpose() << std::endl;
-        // ss << std::endl << "new cov diag = " << std::endl << newChainState.variance.diagonal().transpose() << std::endl;
-        SPOOKY_LOG(ss.str());
         setChainState(fusion_chain, newChainState);
         //TODO: do this per node!
         local_state.last_update_time = m->getTimestamp();
@@ -239,14 +221,14 @@ namespace spooky{
         //THIS MEASUREMENT
 		//WARNING: Quat to be consistent: x,y,z,w is how eigen stores it internally, but its consrtuctor uses Quat(w,x,y,z)
         //Information matrices (inverse Covariance)
-		Eigen::MatrixXf sigmaW = quatToAxisJacobian * m->getRotationVar() * quatToAxisJacobian.transpose();
+		Eigen::MatrixXf sigmaW = toFusionSpace.rotation() * quatToAxisJacobian * m->getRotationVar() * quatToAxisJacobian.transpose() * toFusionSpace.rotation().transpose();
         //Measurement information matrix
         State::Parameters measurement(6);
-		Eigen::Matrix<float, 6, 1> wpm = utility::toAxisAnglePos(m->getTransform());
-        measurement.expectation.head(3) = utility::twistClosestRepresentation(wpm.head(3),wpstate.head(3));
+		Eigen::Matrix<float, 6, 1> wpm = utility::toAxisAnglePos(toFusionSpace * m->getTransform());
+        measurement.expectation.head(3) = toFusionSpace.rotation() * utility::twistClosestRepresentation(wpm.head(3),wpstate.head(3));
 		measurement.expectation.tail(3) = wpm.tail(3);
 		measurement.variance.topLeftCorner(3, 3) = sigmaW;
-		measurement.variance.bottomRightCorner(3, 3) = m->getPositionVar();
+		measurement.variance.bottomRightCorner(3, 3) = toFusionSpace.rotation() * m->getPositionVar() * toFusionSpace.rotation().transpose();
         
         //JACOBIAN:state -> measurement
         //Get Jacobian for the chain, mapping state to (w,v) global pose
@@ -255,28 +237,17 @@ namespace spooky{
 
         //TODO optimise ekf by using information matrices and inverting covariance per node
         State::Parameters newChainState = customEKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, wpstate);
-        //State::Parameters newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, wpstate);
 
-  //      std::stringstream ss;
-  //      ss << std::endl << "process_noise = " << std::endl << process_noise << std::endl;
-  //      //ss << std::endl << "sigmaW_info = " << std::endl << sigmaW_info << std::endl;
-  //      //ss << std::endl << "sigmaM_info = " << std::endl << sigmaM_info << std::endl;
-  //      //ss << std::endl << "sigmaP_info = " << std::endl << sigmaP_info << std::endl;
-  //      //ss << std::endl << "sigmaC_info * joint_stiffness = " << std::endl << sigmaC_info * joint_stiffness << std::endl;
-  //      ss << std::endl << "wpstate = " << std::endl << wpstate.transpose() << std::endl;
-  //      ss << std::endl << "wpm = " << std::endl << wpm.transpose() << std::endl;
-  //      //ss << std::endl << "mVector = " << std::endl << mVector.transpose() << std::endl;
-  //      ss << std::endl << "measurementJacobian = " << std::endl << measurementJacobian << std::endl;
-  //      //ss << std::endl << "measurementJacobian.transpose() * sigmaM_info * measurementJacobian = " << std::endl << measurementJacobian.transpose() * sigmaM_info * measurementJacobian << std::endl;
-  //      //ss << std::endl << "measurementUpdate = " << std::endl << measurementUpdate.transpose() << std::endl;
-  //      //ss << std::endl << "priorUpdate = " << std::endl << priorUpdate.transpose() << std::endl;
-  //      //ss << std::endl << "constraintUpdate = " << std::endl << constraintUpdate.transpose() << std::endl;
-		//ss << std::endl << "new state = " << newChainState.expectation.transpose() << std::endl;
-  //      //ss << std::endl << "new cov diag = " << std::endl << newChainState.variance.diagonal().transpose() << std::endl;
-  //      SPOOKY_LOG(ss.str());
+        //State::Parameters newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, wpstate);
 		setChainState(fusion_chain, newChainState);
         //TODO: do this per node!
 		local_state.last_update_time = m->getTimestamp();
+
+        //DEBUG
+        std::stringstream ss;
+        ss << "wpstate = " << wpstate.transpose() << std::endl;
+        ss << "measurement = " << measurement.expectation.transpose() << std::endl;
+        SPOOKY_LOG(ss.str());
 
     }
 
@@ -353,17 +324,7 @@ namespace spooky{
 
         //New state
         posterior.expectation = posterior.variance * (priorUpdate + joint_stiffness * constraintUpdate + measurementUpdate);
-        //DEBUG
-            // std::stringstream ss;
-            // Eigen::IOFormat fmt(4, 0, ", ", "\n", "[", "]");
-            // ss << std::endl << "mVector = " << std::endl << mVector.transpose().format(fmt) << std::endl;
-            // ss << std::endl << "measurementUpdate = " << std::endl << measurementUpdate.transpose().format(fmt) << std::endl;
-            // ss << std::endl << "sigmaM_info = " << std::endl << sigmaM_info.format(fmt) << std::endl;
-            // ss << std::endl << "measurement.expecation. = " << std::endl << measurement.expectation.transpose().format(fmt) << std::endl;
-            // ss << std::endl << "measurementJacobian = " << std::endl << measurementJacobian.format(fmt) << std::endl;
-            // ss << std::endl << "new state = " << posterior.expectation.transpose().format(fmt) << std::endl;
-            // SPOOKY_LOG(ss.str());
-        //DEBUG END
+
         return posterior;
     };
 
@@ -386,27 +347,6 @@ namespace spooky{
         Eigen::VectorXf error = (measurement.expectation - state_measurement);
         Eigen::VectorXf delta = K * error;
 		posterior.expectation = prior.expectation + K * (measurement.expectation - state_measurement);
-
-		//DEBUG
-		// std::stringstream ss;
-		// Eigen::IOFormat fmt(4, 0, ", ", "\n", "[", "]");
-  //       ss << std::endl << "K = " << std::endl << K.format(fmt) << std::endl;
-  //       ss << std::endl << "H = " << std::endl << H.format(fmt) << std::endl;
-  //       Eigen::Vector3f x = H.col(3);
-  //       Eigen::Vector3f y = H.col(4);
-  //       Eigen::Vector3f z = H.col(5);
-  //       Eigen::MatrixXf xyzcross(3,3);
-		// xyzcross.col(0) = x.cross(y);
-		// xyzcross.col(1) = y.cross(z);
-		// xyzcross.col(2) = z.cross(x);
-  //       Eigen::Vector3f norms(x.norm(),y.norm(),z.norm());
-  //       ss << std::endl << "xyzcross = " << std::endl << xyzcross.format(fmt) << std::endl;
-  //       ss << std::endl << "norms.transpose() = " << std::endl << norms.transpose().format(fmt) << std::endl;
-		// ss << std::endl << "error = " << std::endl << error.transpose().format(fmt)  << std::endl;
-  //       ss << std::endl << "delta = " << std::endl << delta.transpose().format(fmt)<< std::endl;
-  //       ss << std::endl << "new state = " << posterior.expectation.transpose().format(fmt) << std::endl;
-		// SPOOKY_LOG(ss.str());
-		//DEBUG END
 		return posterior;
 	};
 
