@@ -110,7 +110,44 @@ Eigen::VectorXf USpookySkeletalMeshComponent::GetConstraintCentre(const FName& b
 			}
 			case(BONE):
 			{
-				return Eigen::Vector4f(info.quaternion_centre)
+				return Eigen::Vector4f(&(info.quaternion_centre[0]));
+			}
+			case(POSE):
+			{
+				Eigen::Quaternionf q(&(info.quaternion_centre[0]));
+				Eigen::Vector3f v(&(info.quaternion_centre[0]));
+				Eigen::VectorXf result;
+				result << spooky::utility::toAxisAngle(q.matrix()), v;
+				return result;
+			}
+			case(SCALE_POSE):
+			{
+				Eigen::Quaternionf q(&(info.quaternion_centre[0]));
+				Eigen::Vector3f v(&(info.quaternion_centre[0]));
+				Eigen::Vector3f s(&(info.scale_centre[0]));
+				Eigen::VectorXf result;
+				result << spooky::utility::toAxisAngle(q.matrix()), v, s;
+				return result;
+			}
+		}
+
+	}
+
+}
+
+Eigen::MatrixXf USpookySkeletalMeshComponent::GetConstraintVariance(const FName& bone){
+	if(fusionBones.count(bone) == 0){
+		throw std::runtime_exception("Bone " + bone.toString() + " doesn't exist! - tried to access fusion parameters!");
+	} else {
+		switch (fusionBones[bone].type) {
+			case(FIXED):
+			{
+				throw std::runtime_exception("Bone " + bone.toString() + " is fixed! - tried to access fusion parameters!");
+			}
+			case(BONE):
+			{
+				Eigen::Matrix3f V = Eigen::Matrix3f::Identity();
+				V.diagonal() = Eigen::Vector3f(info.quaternion_centre)
 			}
 			case(POSE):
 			{
@@ -123,39 +160,13 @@ Eigen::VectorXf USpookySkeletalMeshComponent::GetConstraintCentre(const FName& b
 		}
 
 	}
-
-}
-
-Eigen::MatrixXf USpookySkeletalMeshComponent::GetConstraintVariance(const FName& bone){
-	if(fusionBones.count(bone) == 0){
-		throw std::runtime_exception("Bone " + bone.toString() + " doesn't exist! - tried to access fusion parameters!");
-	} else {
-		switch(fusionBones[bone].type):
-			case(FIXED):
-			{
-				throw std::runtime_exception("Bone " + bone.toString() + " is fixed! - tried to access fusion parameters!");
-			}
-			case(BONE):
-			{
-				
-			}
-			case(POSE):
-			{
-
-			}
-			case(SCALE_POSE):
-			{
-
-			}
-
-	}
 }
 
 Eigen::MatrixXf USpookySkeletalMeshComponent::GetProcessNoise(const FName& bone){
 	if(fusionBones.count(bone) == 0){
-		throw std::runtime_exception("Bone " + bone.toString() + " doesn't exist! - tried to access fusion parameters!");
+		throw ("Bone " + bone.ToString() + " doesn't exist! - tried to access fusion parameters!");
 	} else {
-		switch(fusionBones[bone].type):
+		switch (fusionBones[bone].type) {
 			case(FIXED):
 			{
 				throw std::runtime_exception("Bone " + bone.toString() + " is fixed! - tried to access fusion parameters!");
@@ -172,7 +183,7 @@ Eigen::MatrixXf USpookySkeletalMeshComponent::GetProcessNoise(const FName& bone)
 			{
 
 			}
-
+		}
 	}
 }
 
