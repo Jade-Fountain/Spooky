@@ -32,6 +32,14 @@ enum class ESpookyMeasurementType : uint8 {
 	SCALE = 4
 };
 
+UENUM(BlueprintType)
+enum class ESpookyFusionType : uint8 {
+	FIXED = 0,
+	BONE = 1,
+	POSE = 2,
+	SCALE_POSE = 3
+};
+
 
 UENUM(BlueprintType)
 enum class ESpookyReturnStatus : uint8
@@ -98,7 +106,49 @@ struct FSpookySkeletonBoneInfo{
 	//.........................
 	//When the measurement was recorded, relative to start of program
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	float timestamp_sec; 	
+	float timestamp_sec;
+};
+
+//Fusion parameters describe how the skeleton behaves when targeted by spooky
+USTRUCT(BlueprintType)
+struct FSpookyBoneFusionParameters{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	ESpookyFusionType type;
+
+	//Quadratic constraints Energy = centre^T * var^-1 * centre
+	//Position constraints
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FVector position_centre;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FVector position_var;
+
+	//Rotation constraints
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FVector4 quaternion_centre;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FVector4 quaternion_var;
+
+	//Scale constraints
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FVector scale_centre;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FVector scale_var;
+
+	//Process noises:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FVector position_process_noise;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FVector4 quaternion_process_noise;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FVector scale_process_noise;
+	
 
 };
 
@@ -112,7 +162,12 @@ private:
 	//List of bones which carry measurements of  with associated meta info
 	std::map<FName,FSpookySkeletonBoneInfo> activeBones;
 
+	//List of bones which can be modified by measurements when this skeleton is in output mode
+	std::map<FName,FSpookyBoneFusionParameters> fusionBones;
+
+	//Default data for a new bone
 	std::unique_ptr<FSpookySkeletonBoneInfo> defaultBoneInfo;
+	std::unique_ptr<FSpookyBoneFusionParameters> defaultBoneFusionParams;
 
 public:
 
@@ -128,7 +183,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
 	void SetBoneInfo(const FSpookySkeletonBoneInfo& info, ESpookyReturnStatus& branch);
-
 
 	//--------------------------------
 	//		INPUT
@@ -148,6 +202,11 @@ public:
 	//		OUTPUT
 	//--------------------------------
 	
+	ESpookyFusionType GetBoneFusionType(const FName& bone);
+	Eigen::VectorXf GetConstraintCentre(const FName& bone);
+	Eigen::MatrixXf GetConstraintVariance(const FName& bone);
+	Eigen::MatrixXf GetProcessNoise(const FName& bone);
+
 	bool isBoneActive(const FName& name) {
 		return activeBones.count(name) > 0;
 	}
