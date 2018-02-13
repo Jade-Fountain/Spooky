@@ -92,7 +92,7 @@ UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::AddSk
 
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh, float default_constraint_flexibility, float default_process_noise)
+void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh, const TArray<FName>& fixedJoints, float default_constraint_flexibility, float default_process_noise)
 {
 	TArray<FMeshBoneInfo> boneInfo = skeletal_mesh->SkeletalMesh->RefSkeleton.GetRefBoneInfo();
 	for (int i = 0; i < boneInfo.Num(); i++) {
@@ -109,8 +109,9 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh,
 		//Set bone name		
 		spooky::NodeDescriptor bone_desc = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
 		//Set different node types
-		if (i == 0) {
-			//Root node - doesnt move but has a scale component
+		if (i == 0 || fixedJoints.Contains(bone.Name)) {
+			//Root node - doesnt move but has a typically has a constant scale component
+			//TODO: use this skeletal_mesh->GetComponentTransform();
 			spookyCore.addFixedNode(bone_desc, parent_desc, bonePoseLocal);
 		}
 		else if (bone.Name.GetPlainNameString() == "pelvis") {

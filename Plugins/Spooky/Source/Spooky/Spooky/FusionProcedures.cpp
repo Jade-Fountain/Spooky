@@ -259,7 +259,7 @@ namespace spooky{
 
         //DEBUG
         std::stringstream ss;
-        ss << "wpstate = " << wpstate.transpose() << std::endl;
+		ss << std::endl << "wpstate = " << wpstate.transpose() << std::endl;
         ss << "measurement = " << measurement.expectation.transpose() << std::endl;
         SPOOKY_LOG(ss.str());
 
