@@ -406,7 +406,7 @@ namespace spooky{
 		for (auto& node : node_chain) {
 			inputDimension += node->getDimension();
 		}
-		
+		TODO NEXT : FIX THIS STUFF - pivot point required!!!
         //Reset for actual calculation
 		float h = 0.0001;
 		Transform3D childPoses = Transform3D::Identity();
