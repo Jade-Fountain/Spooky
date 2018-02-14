@@ -47,9 +47,41 @@ namespace spooky{
     //         return parents;
     // }
 
-    int Node::getRequiredChainLength(const Measurement::Ptr& m){
+    //Following method is static for shared ptr reasons
+    std::vector<Node::Ptr> Node::getAllParents(const Node::Ptr& node){
+        std::vector<Node::Ptr> result;
+        Node::Ptr n = node;
+        while(true){
+            result.push_back(n);
+            if(n->parent == NULL){
+                break;
+            } else {
+                n = n->parent;
+            }
+        }
+        return result;
+    }
+
+    std::vector<Node::Ptr> getRequiredChain(const Node::Ptr& srcNode, const Node::Ptr& destNode, const Measurement::Ptr& m){
+        //Get all nodes from the sensor root to the global root node
+        std::vector<Node::Ptr> destParents = getAllParents(destNode);
+        std::vector<Node::Ptr> srcParents = getAllParents(srcNode);
+
+        int max_search_distance = std::min(destParents.size(),srcParents.size());
+        int diverge_point = 0;
+        for(int i = 0; i < max_search_distance; i++){
+            if(destParents[destParents.size()-i-1] != srcParents[srcParents.size()-i-1]){
+                //Tree has diverged at last node
+                diverge_point = i-1;
+            }
+        }
+        //Combine chains to make a chain from src to dest including both
+        std::vector<Node::Ptr> node_chain;
+        node_chain.insert(node_chain.end(),srcParents.begin(),srcParents.end()-diverge_point);
+        node_chain.insert(node_chain.end(),destParents.rbegin()+diverge_point+1,destParents.rend());
+
+
         //Iterate through parents until enough flex is found
-        int nodecount = 1;
         //Positional degrees of freedom
         int p_dof = 0;
         //rotational degrees of freedom
@@ -63,9 +95,10 @@ namespace spooky{
 
         const float flex_threshold = 0.9;
         bool hasLeverChild = false;
-		//TODO: do a better way?
-		Node* node = this;
-        while(true){
+		//Iterate down node chain and up dest chain until enough DOF found
+        std::vector<Node::Ptr> result;
+        for(auto& node : node_chain){
+            result.push_back(node);
             //Assume decoupling between nodes
             p_dof += node->getPDoF(hasLeverChild);
             r_dof += node->getRDoF();
@@ -79,24 +112,15 @@ namespace spooky{
             if(p_dof>=p_dof_req && r_dof >= r_dof_req && s_dof >= s_dof_req){
                 //We dont need anymore nodes to fuse data
                 break;
-            } else if(node->parent == NULL){
-                //We are out of nodes! the data cant be fused properly
-                //TODO: handle -1 case
-                //return -1;
-                return nodecount;
-            } else {
-                //We need more nodes
-				node = node->parent.get();
-				nodecount++;
             }
         }
-        return nodecount;
+        return result;
     }
 
     void Node::fusePositionMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 
         Eigen::VectorXf pstate;
-        int fusion_chain = 1;
+        std::vector<Node::Ptr> fusion_chain;
 
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
@@ -105,7 +129,7 @@ namespace spooky{
         if (m->globalSpace) {
             pstate = getGlobalPose().translation();
             //Fuse by modifying some parents if necessary
-			fusion_chain = getRequiredChainLength(m);
+			fusion_chain = getRequiredChainLength(m, rootNode);
         }
         else {
             pstate = getLocalPose().translation();
@@ -147,7 +171,7 @@ namespace spooky{
 
         //Calculate error
         Eigen::VectorXf wpstate;
-        int fusion_chain = 1;
+        std::vector<Node::Ptr> fusion_chain;
 
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
@@ -157,7 +181,7 @@ namespace spooky{
         if (m->globalSpace) {
             wpstate = utility::toAxisAnglePos(getGlobalPose()).head(3);
             //Fuse by modifying some parents if necessary
-            fusion_chain = getRequiredChainLength(m);
+            fusion_chain = getRequiredChainLength(m, rootNode);
         }
         else {
             wpstate = utility::toAxisAnglePos(getLocalPose()).head(3);
@@ -203,7 +227,7 @@ namespace spooky{
     void Node::fuseRigidMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 		//Calculate error
         Eigen::VectorXf wpstate;
-		int fusion_chain = 1;
+		std::vector<Node::Ptr> fusion_chain;
         
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
@@ -213,7 +237,7 @@ namespace spooky{
 		if (m->globalSpace) {
             wpstate = utility::toAxisAnglePos(getGlobalPose());
 			//Fuse by modifying some parents if necessary
-			fusion_chain = getRequiredChainLength(m);
+			fusion_chain = getRequiredChain(m,rootNode);
         }
         else {
             wpstate = utility::toAxisAnglePos(getLocalPose());
@@ -268,7 +292,7 @@ namespace spooky{
     void Node::fuseScaleMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 
         Eigen::VectorXf pstate;
-        int fusion_chain = 1;
+        std::vector<Node::Ptr> fusion_chain;
 
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
@@ -279,7 +303,7 @@ namespace spooky{
 			//TODO: change to return class so I can use .scale(), .pos(), etc?
             pstate = utility::toAxisAnglePosScale(getGlobalPose()).tail(3);
             //Fuse by modifying some parents if necessary
-            fusion_chain = getRequiredChainLength(m);
+            fusion_chain = getRequiredChain(m);
         }
         else {
             pstate = utility::toAxisAnglePosScale(getLocalPose()).tail(3);
