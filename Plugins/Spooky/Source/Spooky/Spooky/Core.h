@@ -112,7 +112,7 @@ namespace spooky {
 		void setJointStiffness(const float& stiffness);
 
 		//Sets the (possibly moving) node which the sensor system is attached
-		void setSystemRootNode(const SystemDescriptor& system, const NodeDescriptor& node, const FTransform& rootNodeOffset);
+		void setSystemRootNode(const SystemDescriptor& system, const NodeDescriptor& node);
 
 		////////////////////////////////////////////////////
 		//					Input at runtime

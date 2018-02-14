@@ -67,7 +67,7 @@ namespace spooky {
 			sensors[system][sensorID]->id = sensorID;
 			//If we have system latencies for this system, use those and override with individual sensor latencies
 			sensors[system][sensorID]->latency = sysLatencies.count(system) == 0 ? 0 : sysLatencies[system];
-			sensors[system][sensorID]->rootNode = rootNodes.count(system) == 0 ? "" : rootNodes[system];
+			sensors[system][sensorID]->rootNode = rootNodes.count(system) == 0 ? NodeDescriptor("") : rootNodes[system];
 
 		}
 	}

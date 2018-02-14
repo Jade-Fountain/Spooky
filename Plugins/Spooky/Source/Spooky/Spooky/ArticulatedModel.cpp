@@ -266,7 +266,7 @@ namespace spooky {
 		
 		//If this node has a parent, recursively fuse until we know its transform
 		if (parent != NULL) {
-			parent->fuse(calib, referenceSystem);
+			parent->fuse(calib, referenceSystem, nodes);
 		}
 
 		for(auto& m : measurements){
@@ -285,7 +285,7 @@ namespace spooky {
 			}
 			
 			NodeDescriptor rootName = m->getSensor()->getRootNode();
-			Node::Ptr rootNode = nodes.count(rootName) > 0 ? nodes[rootName] : NULL;
+			Node::Ptr rootNode = nodes.count(rootName) > 0 ? nodes.at(rootName) : NULL;
 
 			switch(m->type){
 				case(Measurement::Type::POSITION):
@@ -430,7 +430,7 @@ namespace spooky {
 
 	void ArticulatedModel::fuse(const Calibrator& calib) {
 		for(auto& node : nodes){
-			node.second->fuse(calib, reference_system);
+			node.second->fuse(calib, reference_system, nodes);
 		}
 		clearMeasurements();
 	}
