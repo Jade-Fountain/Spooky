@@ -1,0 +1,974 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugGame_Game|Win32">
+      <Configuration>DebugGame_Game</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugGame_Game|x64">
+      <Configuration>DebugGame_Game</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugGame_Editor|Win32">
+      <Configuration>DebugGame_Editor</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugGame_Editor|x64">
+      <Configuration>DebugGame_Editor</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="HTML5_DebugGame_Game|Win32">
+      <Configuration>HTML5_DebugGame_Game</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="HTML5_DebugGame_Game|x64">
+      <Configuration>HTML5_DebugGame_Game</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="HTML5_DebugGame_Editor|Win32">
+      <Configuration>HTML5_DebugGame_Editor</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="HTML5_DebugGame_Editor|x64">
+      <Configuration>HTML5_DebugGame_Editor</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Development_Game|Win32">
+      <Configuration>Development_Game</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Development_Game|x64">
+      <Configuration>Development_Game</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Development_Editor|Win32">
+      <Configuration>Development_Editor</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Development_Editor|x64">
+      <Configuration>Development_Editor</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="HTML5_Development_Game|Win32">
+      <Configuration>HTML5_Development_Game</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="HTML5_Development_Game|x64">
+      <Configuration>HTML5_Development_Game</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="HTML5_Development_Editor|Win32">
+      <Configuration>HTML5_Development_Editor</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="HTML5_Development_Editor|x64">
+      <Configuration>HTML5_Development_Editor</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Shipping_Game|Win32">
+      <Configuration>Shipping_Game</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Shipping_Game|x64">
+      <Configuration>Shipping_Game</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="HTML5_Shipping_Game|Win32">
+      <Configuration>HTML5_Shipping_Game</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="HTML5_Shipping_Game|x64">
+      <Configuration>HTML5_Shipping_Game</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{70033583-C069-4BA7-8073-D186763C0B85}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+    <RootNamespace>SpookyProject</RootNamespace>
+    <PlatformToolset>v140</PlatformToolset>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <TargetRuntime>Native</TargetRuntime>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Game|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Game|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Editor|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Editor|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_DebugGame_Game|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_DebugGame_Game|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_DebugGame_Editor|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_DebugGame_Editor|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development_Game|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development_Game|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development_Editor|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development_Editor|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_Development_Game|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_Development_Game|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_Development_Editor|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_Development_Editor|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping_Game|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping_Game|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_Shipping_Game|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_Shipping_Game|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <PropertyGroup Label="UserMacros" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Game|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Game|Win32'">
+    <IncludePath />
+    <ReferencePath />
+    <LibraryPath />
+    <LibraryWPath />
+    <SourcePath />
+    <ExcludePath />
+    <OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Build.bat" SpookyProject Win32 DebugGame "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Rebuild.bat" SpookyProject Win32 DebugGame "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Clean.bat" SpookyProject Win32 DebugGame "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeCleanCommandLine>
+    <NMakeOutput>..\..\Binaries\Win32\SpookyProject-Win32-DebugGame.exe</NMakeOutput>
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Editor|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Editor|Win32'">
+    <OutDir>E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Unused\</OutDir>
+    <IntDir>E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>@echo Win32 is not a supported platform for SpookyProjectEditor. Valid platforms are Win64, Mac, Linux.</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>@echo Win32 is not a supported platform for SpookyProjectEditor. Valid platforms are Win64, Mac, Linux.</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>@echo Win32 is not a supported platform for SpookyProjectEditor. Valid platforms are Win64, Mac, Linux.</NMakeCleanCommandLine>
+    <NMakeOutput />
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Game|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Game|x64'">
+    <IncludePath />
+    <ReferencePath />
+    <LibraryPath />
+    <LibraryWPath />
+    <SourcePath />
+    <ExcludePath />
+    <OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Build.bat" SpookyProject Win64 DebugGame "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Rebuild.bat" SpookyProject Win64 DebugGame "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Clean.bat" SpookyProject Win64 DebugGame "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeCleanCommandLine>
+    <NMakeOutput>..\..\Binaries\Win64\SpookyProject-Win64-DebugGame.exe</NMakeOutput>
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Editor|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Editor|x64'">
+    <IncludePath />
+    <ReferencePath />
+    <LibraryPath />
+    <LibraryWPath />
+    <SourcePath />
+    <ExcludePath />
+    <OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Build.bat" SpookyProjectEditor Win64 DebugGame "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Rebuild.bat" SpookyProjectEditor Win64 DebugGame "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Clean.bat" SpookyProjectEditor Win64 DebugGame "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeCleanCommandLine>
+    <NMakeOutput>E:\Program Files\Epic Games\4.14\Engine\Binaries\Win64\UE4Editor.exe</NMakeOutput>
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_DebugGame_Game|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_DebugGame_Game|Win32'">
+    <IncludePath />
+    <ReferencePath />
+    <LibraryPath />
+    <LibraryWPath />
+    <SourcePath />
+    <ExcludePath />
+    <OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Build.bat" SpookyProject HTML5 DebugGame "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Rebuild.bat" SpookyProject HTML5 DebugGame "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Clean.bat" SpookyProject HTML5 DebugGame "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeCleanCommandLine>
+    <NMakeOutput>..\..\Binaries\HTML5\SpookyProject-HTML5-DebugGame.exe</NMakeOutput>
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_DebugGame_Editor|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_DebugGame_Editor|Win32'">
+    <OutDir>E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Unused\</OutDir>
+    <IntDir>E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>@echo HTML5 is not a supported platform for SpookyProjectEditor. Valid platforms are Win64, Mac, Linux.</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>@echo HTML5 is not a supported platform for SpookyProjectEditor. Valid platforms are Win64, Mac, Linux.</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>@echo HTML5 is not a supported platform for SpookyProjectEditor. Valid platforms are Win64, Mac, Linux.</NMakeCleanCommandLine>
+    <NMakeOutput />
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Development_Game|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development_Game|Win32'">
+    <IncludePath />
+    <ReferencePath />
+    <LibraryPath />
+    <LibraryWPath />
+    <SourcePath />
+    <ExcludePath />
+    <OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Build.bat" SpookyProject Win32 Development "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Rebuild.bat" SpookyProject Win32 Development "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Clean.bat" SpookyProject Win32 Development "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeCleanCommandLine>
+    <NMakeOutput>..\..\Binaries\Win32\SpookyProject.exe</NMakeOutput>
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Development_Editor|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development_Editor|Win32'">
+    <OutDir>E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Unused\</OutDir>
+    <IntDir>E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>@echo Win32 is not a supported platform for SpookyProjectEditor. Valid platforms are Win64, Mac, Linux.</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>@echo Win32 is not a supported platform for SpookyProjectEditor. Valid platforms are Win64, Mac, Linux.</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>@echo Win32 is not a supported platform for SpookyProjectEditor. Valid platforms are Win64, Mac, Linux.</NMakeCleanCommandLine>
+    <NMakeOutput />
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Development_Game|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development_Game|x64'">
+    <IncludePath />
+    <ReferencePath />
+    <LibraryPath />
+    <LibraryWPath />
+    <SourcePath />
+    <ExcludePath />
+    <OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Build.bat" SpookyProject Win64 Development "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Rebuild.bat" SpookyProject Win64 Development "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Clean.bat" SpookyProject Win64 Development "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeCleanCommandLine>
+    <NMakeOutput>..\..\Binaries\Win64\SpookyProject.exe</NMakeOutput>
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Development_Editor|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development_Editor|x64'">
+    <IncludePath />
+    <ReferencePath />
+    <LibraryPath />
+    <LibraryWPath />
+    <SourcePath />
+    <ExcludePath />
+    <OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Build.bat" SpookyProjectEditor Win64 Development "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Rebuild.bat" SpookyProjectEditor Win64 Development "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Clean.bat" SpookyProjectEditor Win64 Development "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeCleanCommandLine>
+    <NMakeOutput>E:\Program Files\Epic Games\4.14\Engine\Binaries\Win64\UE4Editor.exe</NMakeOutput>
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_Development_Game|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_Development_Game|Win32'">
+    <IncludePath />
+    <ReferencePath />
+    <LibraryPath />
+    <LibraryWPath />
+    <SourcePath />
+    <ExcludePath />
+    <OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Build.bat" SpookyProject HTML5 Development "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Rebuild.bat" SpookyProject HTML5 Development "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Clean.bat" SpookyProject HTML5 Development "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeCleanCommandLine>
+    <NMakeOutput>..\..\Binaries\HTML5\SpookyProject.exe</NMakeOutput>
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_Development_Editor|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_Development_Editor|Win32'">
+    <OutDir>E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Unused\</OutDir>
+    <IntDir>E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>@echo HTML5 is not a supported platform for SpookyProjectEditor. Valid platforms are Win64, Mac, Linux.</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>@echo HTML5 is not a supported platform for SpookyProjectEditor. Valid platforms are Win64, Mac, Linux.</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>@echo HTML5 is not a supported platform for SpookyProjectEditor. Valid platforms are Win64, Mac, Linux.</NMakeCleanCommandLine>
+    <NMakeOutput />
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Shipping_Game|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping_Game|Win32'">
+    <IncludePath />
+    <ReferencePath />
+    <LibraryPath />
+    <LibraryWPath />
+    <SourcePath />
+    <ExcludePath />
+    <OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Build.bat" SpookyProject Win32 Shipping "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Rebuild.bat" SpookyProject Win32 Shipping "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Clean.bat" SpookyProject Win32 Shipping "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeCleanCommandLine>
+    <NMakeOutput>..\..\Binaries\Win32\SpookyProject-Win32-Shipping.exe</NMakeOutput>
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Shipping_Game|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping_Game|x64'">
+    <IncludePath />
+    <ReferencePath />
+    <LibraryPath />
+    <LibraryWPath />
+    <SourcePath />
+    <ExcludePath />
+    <OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Build.bat" SpookyProject Win64 Shipping "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Rebuild.bat" SpookyProject Win64 Shipping "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Clean.bat" SpookyProject Win64 Shipping "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeCleanCommandLine>
+    <NMakeOutput>..\..\Binaries\Win64\SpookyProject-Win64-Shipping.exe</NMakeOutput>
+  </PropertyGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_Shipping_Game|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='HTML5_Shipping_Game|Win32'">
+    <IncludePath />
+    <ReferencePath />
+    <LibraryPath />
+    <LibraryWPath />
+    <SourcePath />
+    <ExcludePath />
+    <OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+    <NMakeBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Build.bat" SpookyProject HTML5 Shipping "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Rebuild.bat" SpookyProject HTML5 Shipping "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"E:\Program Files\Epic Games\4.14\Engine\Build\BatchFiles\Clean.bat" SpookyProject HTML5 Shipping "$(SolutionDir)$(ProjectName).uproject" -waitmutex</NMakeCleanCommandLine>
+    <NMakeOutput>..\..\Binaries\HTML5\SpookyProject-HTML5-Shipping.exe</NMakeOutput>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\SpookyProject.uproject" />
+    <None Include="..\..\Source\SpookyProject.Target.cs" />
+    <None Include="..\..\Source\SpookyProjectEditor.Target.cs" />
+    <None Include="..\..\Config\DefaultEditor.ini" />
+    <None Include="..\..\Config\DefaultEditorPerProjectUserSettings.ini" />
+    <None Include="..\..\Config\DefaultEngine.ini" />
+    <None Include="..\..\Config\DefaultGame.ini" />
+    <None Include="..\..\Config\DefaultInput.ini" />
+    <None Include="..\..\Config\DefaultScalability.ini" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Spooky.Build.cs" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\Cholesky" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\CholmodSupport" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\CMakeLists.txt" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\Core" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\Dense" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\Eigen" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\eigen.natvis" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\Eigenvalues" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\Geometry" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\Householder" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\IterativeLinearSolvers" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\Jacobi" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\LU" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\MetisSupport" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\OrderingMethods" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\PardisoSupport" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\PaStiXSupport" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\QR" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\QtAlignedMalloc" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\Sparse" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\SparseCholesky" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\SparseCore" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\SparseLU" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\SparseQR" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\SPQRSupport" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\StdDeque" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\StdList" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\StdVector" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\SuperLUSupport" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\SVD" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\UmfPackSupport" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Cholesky\LDLT.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Cholesky\LLT.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Cholesky\LLT_LAPACKE.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\CholmodSupport\CholmodSupport.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Array.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\ArrayBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\ArrayWrapper.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Assign.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\AssignEvaluator.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Assign_MKL.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\BandMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Block.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\BooleanRedux.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\CommaInitializer.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\ConditionEstimator.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\CoreEvaluators.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\CoreIterators.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\CwiseBinaryOp.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\CwiseNullaryOp.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\CwiseTernaryOp.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\CwiseUnaryOp.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\CwiseUnaryView.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\DenseBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\DenseCoeffsBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\DenseStorage.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Diagonal.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\DiagonalMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\DiagonalProduct.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Dot.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\EigenBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\ForceAlignedAccess.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Fuzzy.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\GeneralProduct.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\GenericPacketMath.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\GlobalFunctions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Inverse.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\IO.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Map.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\MapBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\MathFunctions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\MathFunctionsImpl.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Matrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\MatrixBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\NestByValue.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\NoAlias.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\NumTraits.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\PermutationMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\PlainObjectBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Product.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\ProductEvaluators.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Random.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Redux.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Ref.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Replicate.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\ReturnByValue.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Reverse.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Select.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\SelfAdjointView.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\SelfCwiseBinaryOp.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Solve.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\SolverBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\SolveTriangular.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\StableNorm.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Stride.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Swap.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Transpose.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Transpositions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\TriangularMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\VectorBlock.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\VectorwiseOp.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\Visitor.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AltiVec\Complex.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AltiVec\MathFunctions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AltiVec\PacketMath.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX\Complex.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX\MathFunctions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX\PacketMath.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX\TypeCasting.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX512\MathFunctions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\AVX512\PacketMath.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\CUDA\Complex.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\CUDA\Half.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\CUDA\MathFunctions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\CUDA\PacketMath.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\CUDA\PacketMathHalf.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\CUDA\TypeCasting.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\Default\Settings.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\NEON\Complex.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\NEON\MathFunctions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\NEON\PacketMath.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\SSE\Complex.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\SSE\MathFunctions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\SSE\PacketMath.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\SSE\TypeCasting.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\ZVector\Complex.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\ZVector\MathFunctions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\arch\ZVector\PacketMath.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\functors\AssignmentFunctors.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\functors\BinaryFunctors.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\functors\NullaryFunctors.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\functors\StlFunctors.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\functors\TernaryFunctors.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\functors\UnaryFunctors.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\GeneralBlockPanelKernel.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\GeneralMatrixMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\GeneralMatrixMatrixTriangular.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\GeneralMatrixMatrixTriangular_BLAS.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\GeneralMatrixMatrix_BLAS.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\GeneralMatrixVector.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\GeneralMatrixVector_BLAS.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\Parallelizer.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\SelfadjointMatrixMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\SelfadjointMatrixMatrix_BLAS.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\SelfadjointMatrixVector.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\SelfadjointMatrixVector_BLAS.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\SelfadjointProduct.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\SelfadjointRank2Update.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\TriangularMatrixMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\TriangularMatrixMatrix_BLAS.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\TriangularMatrixVector.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\TriangularMatrixVector_BLAS.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\TriangularSolverMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\TriangularSolverMatrix_BLAS.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\products\TriangularSolverVector.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\util\BlasUtil.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\util\Constants.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\util\DisableStupidWarnings.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\util\ForwardDeclarations.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\util\Macros.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\util\Memory.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\util\Meta.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\util\MKL_support.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\util\NonMPL2.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\util\ReenableStupidWarnings.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\util\StaticAssert.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Core\util\XprHelper.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\ComplexEigenSolver.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\ComplexSchur.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\ComplexSchur_LAPACKE.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\EigenSolver.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\GeneralizedEigenSolver.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\GeneralizedSelfAdjointEigenSolver.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\HessenbergDecomposition.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\MatrixBaseEigenvalues.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\RealQZ.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\RealSchur.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\RealSchur_LAPACKE.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\SelfAdjointEigenSolver.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\SelfAdjointEigenSolver_LAPACKE.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Eigenvalues\Tridiagonalization.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\AlignedBox.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\AngleAxis.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\EulerAngles.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\Homogeneous.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\Hyperplane.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\OrthoMethods.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\ParametrizedLine.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\Quaternion.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\Rotation2D.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\RotationBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\Scaling.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\Transform.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\Translation.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\Umeyama.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Geometry\arch\Geometry_SSE.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Householder\BlockHouseholder.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Householder\Householder.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Householder\HouseholderSequence.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\IterativeLinearSolvers\BasicPreconditioners.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\IterativeLinearSolvers\BiCGSTAB.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\IterativeLinearSolvers\ConjugateGradient.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\IterativeLinearSolvers\IncompleteCholesky.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\IterativeLinearSolvers\IncompleteLUT.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\IterativeLinearSolvers\IterativeSolverBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\IterativeLinearSolvers\LeastSquareConjugateGradient.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\IterativeLinearSolvers\SolveWithGuess.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\Jacobi\Jacobi.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\LU\Determinant.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\LU\FullPivLU.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\LU\InverseImpl.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\LU\PartialPivLU.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\LU\PartialPivLU_LAPACKE.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\LU\arch\Inverse_SSE.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\MetisSupport\MetisSupport.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\misc\blas.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\misc\Image.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\misc\Kernel.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\misc\lapack.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\misc\lapacke.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\misc\lapacke_mangling.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\misc\RealSvd2x2.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\OrderingMethods\Amd.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\OrderingMethods\Eigen_Colamd.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\OrderingMethods\Ordering.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\PardisoSupport\PardisoSupport.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\PaStiXSupport\PaStiXSupport.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\plugins\ArrayCwiseBinaryOps.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\plugins\ArrayCwiseUnaryOps.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\plugins\BlockMethods.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\plugins\CommonCwiseBinaryOps.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\plugins\CommonCwiseUnaryOps.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\plugins\MatrixCwiseBinaryOps.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\plugins\MatrixCwiseUnaryOps.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\QR\ColPivHouseholderQR.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\QR\ColPivHouseholderQR_LAPACKE.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\QR\CompleteOrthogonalDecomposition.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\QR\FullPivHouseholderQR.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\QR\HouseholderQR.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\QR\HouseholderQR_LAPACKE.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCholesky\SimplicialCholesky.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCholesky\SimplicialCholesky_impl.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\AmbiVector.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\CompressedStorage.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\ConservativeSparseSparseProduct.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\MappedSparseMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseAssign.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseBlock.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseColEtree.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseCompressedBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseCwiseBinaryOp.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseCwiseUnaryOp.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseDenseProduct.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseDiagonalProduct.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseDot.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseFuzzy.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseMap.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseMatrixBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparsePermutation.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseProduct.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseRedux.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseRef.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseSelfAdjointView.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseSolverBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseSparseProductWithPruning.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseTranspose.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseTriangularView.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseUtil.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseVector.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\SparseView.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseCore\TriangularSolver.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLUImpl.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_column_bmod.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_column_dfs.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_copy_to_ucol.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_gemm_kernel.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_heap_relax_snode.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_kernel_bmod.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_Memory.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_panel_bmod.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_panel_dfs.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_pivotL.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_pruneL.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_relax_snode.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_Structs.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_SupernodalMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseLU\SparseLU_Utils.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SparseQR\SparseQR.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SPQRSupport\SuiteSparseQRSupport.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\StlSupport\details.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\StlSupport\StdDeque.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\StlSupport\StdList.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\StlSupport\StdVector.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SuperLUSupport\SuperLUSupport.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SVD\BDCSVD.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SVD\JacobiSVD.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SVD\JacobiSVD_LAPACKE.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SVD\SVDBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\SVD\UpperBidiagonalization.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\src\UmfPackSupport\UmfPackSupport.h" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\AdolcForward" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\AlignedVector3" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\ArpackSupport" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\AutoDiff" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\BVH" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CMakeLists.txt" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\EulerAngles" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\FFT" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\IterativeSolvers" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\KroneckerProduct" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\LevenbergMarquardt" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\MatrixFunctions" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\MoreVectorization" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\MPRealSupport" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\NonLinearOptimization" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\NumericalDiff" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\OpenGLSupport" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\Polynomials" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\Skyline" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\SparseExtra" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\SpecialFunctions" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\Splines" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\CMakeLists.txt" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\Tensor" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\TensorSymmetry" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\ThreadPool" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\README.md" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\Tensor.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorArgMax.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorAssign.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorBroadcasting.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorChipping.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorConcatenation.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorContraction.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorContractionBlocking.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorContractionCuda.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorContractionMapper.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorContractionThreadPool.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorConversion.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorConvolution.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorCostModel.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorCustomOp.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorDevice.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorDeviceCuda.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorDeviceDefault.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorDeviceSycl.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorDeviceThreadPool.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorDimensionList.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorDimensions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorEvalTo.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorEvaluator.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorExecutor.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorExpr.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorFFT.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorFixedSize.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorForcedEval.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorForwardDeclarations.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorFunctors.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorGenerator.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorGlobalFunctions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorImagePatch.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorIndexList.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorInflation.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorInitializer.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorIntDiv.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorIO.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorLayoutSwap.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorMacros.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorMap.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorMeta.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorMorphing.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorPadding.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorPatch.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorRandom.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorReduction.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorReductionCuda.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorReductionSycl.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorRef.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorReverse.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorScan.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorShuffling.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorStorage.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorStriding.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorSycl.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorSyclConvertToDeviceExpression.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorSyclExprConstructor.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorSyclExtractAccessor.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorSyclExtractFunctors.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorSyclLeafCount.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorSyclPlaceHolderExpr.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorSyclRun.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorSyclTuple.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorTraits.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorUInt128.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\Tensor\TensorVolumePatch.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\TensorSymmetry\DynamicSymmetry.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\TensorSymmetry\StaticSymmetry.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\TensorSymmetry\Symmetry.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\TensorSymmetry\util\TemplateGroupTheory.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\ThreadPool\EventCount.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\ThreadPool\NonBlockingThreadPool.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\ThreadPool\RunQueue.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\ThreadPool\SimpleThreadPool.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\ThreadPool\ThreadEnvironment.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\ThreadPool\ThreadLocal.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\ThreadPool\ThreadPoolInterface.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\ThreadPool\ThreadYield.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\util\CXX11Meta.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\util\CXX11Workarounds.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\util\EmulateArray.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\util\EmulateCXX11Meta.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\CXX11\src\util\MaxSizeVector.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\AutoDiff\AutoDiffJacobian.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\AutoDiff\AutoDiffScalar.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\AutoDiff\AutoDiffVector.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\BVH\BVAlgorithms.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\BVH\KdBVH.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Eigenvalues\ArpackSelfAdjointEigenSolver.h" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\EulerAngles\CMakeLists.txt" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\EulerAngles\EulerAngles.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\EulerAngles\EulerSystem.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\FFT\ei_fftw_impl.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\FFT\ei_kissfft_impl.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\IterativeSolvers\ConstrainedConjGrad.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\IterativeSolvers\DGMRES.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\IterativeSolvers\GMRES.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\IterativeSolvers\IncompleteLU.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\IterativeSolvers\IterationController.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\IterativeSolvers\MINRES.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\IterativeSolvers\Scaling.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\KroneckerProduct\KroneckerTensorProduct.h" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\LevenbergMarquardt\CopyrightMINPACK.txt" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\LevenbergMarquardt\LevenbergMarquardt.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\LevenbergMarquardt\LMcovar.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\LevenbergMarquardt\LMonestep.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\LevenbergMarquardt\LMpar.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\LevenbergMarquardt\LMqrsolv.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MatrixFunctions\MatrixExponential.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MatrixFunctions\MatrixFunction.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MatrixFunctions\MatrixLogarithm.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MatrixFunctions\MatrixPower.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MatrixFunctions\MatrixSquareRoot.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MatrixFunctions\StemFunction.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\MoreVectorization\MathFunctions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization\chkder.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization\covar.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization\dogleg.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization\fdjac1.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization\HybridNonLinearSolver.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization\LevenbergMarquardt.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization\lmpar.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization\qrsolv.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization\r1mpyq.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization\r1updt.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NonLinearOptimization\rwupdt.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\NumericalDiff\NumericalDiff.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Polynomials\Companion.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Polynomials\PolynomialSolver.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Polynomials\PolynomialUtils.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Skyline\SkylineInplaceLU.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Skyline\SkylineMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Skyline\SkylineMatrixBase.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Skyline\SkylineProduct.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Skyline\SkylineStorage.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Skyline\SkylineUtil.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SparseExtra\BlockOfDynamicSparseMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SparseExtra\BlockSparseMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SparseExtra\DynamicSparseMatrix.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SparseExtra\MarketIO.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SparseExtra\MatrixMarketIterator.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SparseExtra\RandomSetter.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions\SpecialFunctionsArrayAPI.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions\SpecialFunctionsFunctors.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions\SpecialFunctionsHalf.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions\SpecialFunctionsImpl.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions\SpecialFunctionsPacketMath.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\SpecialFunctions\arch\CUDA\CudaSpecialFunctions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Splines\Spline.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Splines\SplineFitting.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Eigen\unsupported\src\Splines\SplineFwd.h" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Private\AnimGraphNode_GetSpookyResult.cpp" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Private\AnimNode_GetSpookyResult.cpp" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Private\Spooky.cpp" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Private\SpookyFusionPlant.cpp" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Private\SpookyPrivatePCH.h" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Private\SpookySkeletalMeshComponent.cpp" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Public\AnimGraphNode_GetSpookyResult.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Public\AnimNode_GetSpookyResult.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Public\Logging.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Public\Spooky.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Public\SpookyFusionPlant.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Public\SpookySkeletalMeshComponent.h" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\average.hpp" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\common.hpp" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\interpolate.hpp" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\interpolate_details.hpp" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\LICENSE.txt" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\rxso3.hpp" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\se2.hpp" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\se3.hpp" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\sim3.hpp" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\so2.hpp" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\so3.hpp" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\test_macros.hpp" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\sophus\types.hpp" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\ArticulatedModel.cpp" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\ArticulatedModel.h" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Articulation.cpp" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Articulation.h" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Calibration.cpp" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Calibration.h" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\CalibrationProcedures.cpp" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Core.cpp" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Core.h" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\CorrelationProcedures.cpp" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Correlator.cpp" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Correlator.h" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\FusionProcedures.cpp" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\FusionTypes.cpp" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\FusionTypes.h" />
+    <None Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\LICENSE.txt" />
+    <ClCompile Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\SaveManager.cpp" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\SaveManager.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\CalibrationUtilities.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\CommonMath.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\ComplexMath.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\Conventions.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\CorrelationUtilities.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\DataStructures.h" />
+    <ClInclude Include="..\..\Plugins\Spooky\Source\Spooky\Spooky\Utilities\TimeProfiling.h" />
+    <None Include="..\..\Plugins\Spooky\Spooky.uplugin" />
+    <None Include="..\..\Plugins\Spooky\Resources\Icon128.png" />
+    <None Include="..\..\Source\SpookyProject\eigen.natvis" />
+    <None Include="..\..\Source\SpookyProject\SpookyProject.Build.cs" />
+    <ClCompile Include="..\..\Source\SpookyProject\SpookyProject.cpp" />
+    <ClInclude Include="..\..\Source\SpookyProject\SpookyProject.h" />
+  </ItemGroup>
+  <PropertyGroup>
+    <SourcePath>E:\Program Files\Epic Games\4.14\Engine\Source\Developer\TreeMap;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AITestSuite\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AITestSuite\Private\Actions;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AITestSuite\Private\BehaviorTree;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AITestSuite\Private\MockAI;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AITestSuite\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AllDesktopTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Android\AndroidDeviceDetection\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Android\AndroidPlatformEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Android\AndroidTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Android\Android_ASTCTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Android\Android_ATCTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Android\Android_DXTTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Android\Android_ETC1TargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Android\Android_ETC2TargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Android\Android_MultiTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Android\Android_PVRTCTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Apple\MetalShaderFormat\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AssetTools\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AssetTools\Private\AssetTypeActions;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AudioFormatADPCM\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AudioFormatOgg\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AudioFormatOpus\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AutomationController\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AutomationWindow\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\BlankModule\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\BlueprintCompilerCppBackend\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\BlueprintNativeCodeGen\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\BlueprintProfiler\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\CollectionManager\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\CollisionAnalyzer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\CrashDebugHelper\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\CrashDebugHelper\Private\Linux;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\CrashDebugHelper\Private\Mac;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\CrashDebugHelper\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\CrashTracker\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DerivedDataCache\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DesktopPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DesktopPlatform\Private\Linux;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DesktopPlatform\Private\Mac;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DesktopPlatform\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DesktopWidgets\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DesktopWidgets\Private\Widgets\Input;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DeviceManager\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DeviceManager\Private\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DeviceManager\Private\Widgets\Apps;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DeviceManager\Private\Widgets\Browser;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DeviceManager\Private\Widgets\Details;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DeviceManager\Private\Widgets\Processes;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DeviceManager\Private\Widgets\Toolbar;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DirectoryWatcher\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DirectoryWatcher\Private\Linux;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DirectoryWatcher\Private\Mac;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DirectoryWatcher\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DirectoryWatcher\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ExternalImagePicker\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\FunctionalTesting\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\FunctionalTesting\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\FunctionalTesting\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\GameplayDebugger\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\GameplayDebugger\Private\Editor;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\GammaUI\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\HierarchicalLODUtilities\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\HotReload\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\HTML5\HTML5PlatformEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\HTML5\HTML5TargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\InternationalizationSettings\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\iOS\IOSPlatformEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\iOS\IOSTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\iOS\IOSTargetPlatform\Private\Mac;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\iOS\IOSTargetPlatform\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\iOS\TVOSTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\LauncherServices\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\LauncherServices\Private\Launcher;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\LauncherServices\Private\Profiles;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Linux\LinuxClientTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Linux\LinuxNoEditorTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Linux\LinuxServerTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Linux\LinuxTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\LocalizationService\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\LogVisualizer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Mac\MacClientTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Mac\MacNoEditorTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Mac\MacServerTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Mac\MacTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\MaterialUtilities\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Merge\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\MeshBoneReduction\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\MeshSimplifier\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\MeshUtilities\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\MessageLog\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\MessageLog\Private\Model;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\MessageLog\Private\Presentation;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\MessageLog\Private\UserInterface;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ModuleUI\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\OutputLog\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\PackageDependencyInfo\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Profiler\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Profiler\Private\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProfilerClient\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProfilerMessages\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProfilerService\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProjectLauncher\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProjectLauncher\Private\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProjectLauncher\Private\Widgets\Archive;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProjectLauncher\Private\Widgets\Build;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProjectLauncher\Private\Widgets\Cook;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProjectLauncher\Private\Widgets\Deploy;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProjectLauncher\Private\Widgets\Launch;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProjectLauncher\Private\Widgets\Package;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProjectLauncher\Private\Widgets\Profile;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProjectLauncher\Private\Widgets\Project;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ProjectLauncher\Private\Widgets\Shared;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\RawMesh\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\RealtimeProfiler\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ScreenShotComparison\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ScreenShotComparison\Private\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ScreenShotComparisonTools\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SessionFrontend\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SessionFrontend\Private\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SessionFrontend\Private\Widgets\Browser;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SessionFrontend\Private\Widgets\Console;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Settings\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SettingsEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SettingsEditor\Private\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ShaderCompilerCommon\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ShaderFormatOpenGL\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\ShaderPreprocessor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SharedSettingsWidgets\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SimplygonMeshReduction\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SimplygonSwarm\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SlackIntegrations\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SlateFileDialogs\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SlateReflector\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SlateReflector\Private\Models;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SlateReflector\Private\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SourceCodeAccess\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SourceControl\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\StandaloneRenderer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\StandaloneRenderer\Private\ios;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\StandaloneRenderer\Private\OpenGL;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\StandaloneRenderer\Private\Linux\OpenGL;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\StandaloneRenderer\Private\Mac\OpenGL;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\StandaloneRenderer\Private\Windows\D3D;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\StandaloneRenderer\Private\Windows\OpenGL;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SuperSearch\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\TargetDeviceServices\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\TargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\TaskGraph\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\TextureCompressor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\TextureFormatAndroid\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\TextureFormatASTC\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\TextureFormatDXT\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\TextureFormatIntelISPCTexComp\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\TextureFormatPVR\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\TextureFormatUncompressed\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\UnrealCodeAnalyzerTests\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\VulkanShaderFormat\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Windows\ShaderFormatD3D\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Windows\WindowsClientTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Windows\WindowsNoEditorTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Windows\WindowsServerTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Windows\WindowsTargetPlatform\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\EditorLiveStreaming;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SizeMap;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UATHelper;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ViewportInteraction;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\VREditor;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ActorPickerMode\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\AddContentDialog\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\AddContentDialog\Private\ViewModels;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\AddContentDialog\Private\ContentSourceProviders\FeaturePack;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\AIGraph\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\AnimationBlueprintEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\AnimationEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\AnimGraph\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\AnimGraph\Private\EditModes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\BehaviorTreeEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\BehaviorTreeEditor\Private\DetailCustomizations;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\BlueprintGraph\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Blutility\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\BspMode\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Cascade\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Cascade\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ClassViewer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ComponentVisualizers\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ConfigEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ConfigEditor\Private\PropertyVisualization;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ContentBrowser\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\CurveAssetEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\CurveTableEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\DataTableEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\DestructibleMeshEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\DetailCustomizations\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\DeviceProfileEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\DeviceProfileEditor\Private\DetailsPanel;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\DeviceProfileServices\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\DistCurveEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Documentation\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\EditorSettingsViewer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\EditorStyle\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\EditorWidgets\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\EnvironmentQueryEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\EnvironmentQueryEditor\Private\DetailCustomizations;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\FoliageEdit\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\FontEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GameplayAbilitiesEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GameplayTagsEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GameplayTasksEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GameProjectGeneration\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GameProjectGeneration\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GeometryCacheEd\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GeometryMode\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GraphEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GraphEditor\Private\AnimationNodes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GraphEditor\Private\AnimationPins;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GraphEditor\Private\AnimationStateNodes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GraphEditor\Private\KismetNodes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GraphEditor\Private\KismetPins;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GraphEditor\Private\MaterialNodes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GraphEditor\Private\MaterialPins;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GraphEditor\Private\NiagaraPins;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\GraphEditor\Private\SoundNodes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\HardwareTargeting\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\HierarchicalLODOutliner\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\InputBindingEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\InputBindingEditor\Private\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\IntroTutorials\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Kismet\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Kismet\Private\Debugging;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Kismet\Private\Nodes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Kismet\Private\Profiler;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Kismet\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Kismet\Private\WorkflowOrientedApp;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\KismetCompiler\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\KismetWidgets\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\LandscapeEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\LandscapeEditor\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Layers\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\LevelEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Localization\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\LocalizationDashboard\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MainFrame\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MainFrame\Private\Frame;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MainFrame\Private\Menus;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MaterialEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MaterialEditor\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Matinee\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MergeActors\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MergeActors\Private\MeshMergingTool;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MergeActors\Private\MeshProxyTool;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MeshPaint\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MovieSceneCaptureDialog\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MovieSceneTools\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MovieSceneTools\Private\CurveKeyAreas;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MovieSceneTools\Private\CurveKeyEditors;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MovieSceneTools\Private\Sections;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MovieSceneTools\Private\TrackEditors;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MovieSceneTools\Private\TrackEditorThumbnail;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\MovieSceneTools\Private\TrackEditors\PropertyTrackEditors;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\NewLevelDialog\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\NiagaraEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\NiagaraEditor\Private\AssetTypeActions;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PackagesDialog\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Persona\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Persona\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Persona\Private\AnimationMode;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Persona\Private\BlueprintMode;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Persona\Private\Customization;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Persona\Private\EditModes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Persona\Private\MeshMode;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Persona\Private\PhysicsMode;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Persona\Private\Shared;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PhAT\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PixelInspector\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PlacementMode\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PListEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PluginWarden\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ProjectSettingsViewer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ProjectTargetPlatformEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ProjectTargetPlatformEditor\Private\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PropertyEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PropertyEditor\Private\Presentation\PropertyEditor;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PropertyEditor\Private\Presentation\PropertyTable;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PropertyEditor\Private\UserInterface\PropertyDetails;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PropertyEditor\Private\UserInterface\PropertyEditor;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PropertyEditor\Private\UserInterface\PropertyTable;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ReferenceViewer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SceneDepthPickerMode\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SceneOutliner\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Sequencer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Sequencer\Private\DisplayNodes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Sequencer\Private\Tools;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SequenceRecorder\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SequenceRecorder\Private\Sections;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SequenceRecorderSections\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SequencerWidgets\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SkeletalMeshEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SkeletonEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SoundClassEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SoundCueEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SourceControlWindows\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\StaticMeshEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\StatsViewer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\StatsViewer\Private\StatsEntries;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\StatsViewer\Private\StatsPages;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SwarmInterface\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\TextureAlignMode\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\TextureEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\TextureEditor\Private\Customizations;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\TextureEditor\Private\Models;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\TextureEditor\Private\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\TranslationEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\Animation;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\BlueprintModes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\Customizations;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\Designer;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\Details;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\DragDrop;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\Extensions;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\Hierarchy;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\Nodes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\Palette;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\Settings;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\TabFactory;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\Templates;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UMGEditor\Private\Utility;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UndoHistory\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UndoHistory\Private\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Analytics;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Animation;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\AutoReimport;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Commandlets;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Dialogs;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\DragAndDrop;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Editor;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Factories;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Fbx;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Features;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Kismet2;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Layers;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Lightmass;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Localization;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\MaterialEditor;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Settings;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\StaticLightingSystem;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\ThumbnailRendering;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Private\Toolkits;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEdMessages\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UserFeedback\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ViewportInteraction\Gizmo;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ViewportSnapping\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\VREditor\Gizmo;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\VREditor\Interactables;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\VREditor\Teleporter;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\VREditor\UI;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\WorkspaceMenuStructure\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\WorldBrowser\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\WorldBrowser\Private\StreamingLevels;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\WorldBrowser\Private\Tiles;E:\Program Files\Epic Games\4.14\Engine\Source\Programs\UnrealHeaderTool\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Programs\UnrealHeaderTool\Private\Specifiers;E:\Program Files\Epic Games\4.14\Engine\Source\Programs\UnrealHeaderTool\Private\UHTMakefile;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameLiveStreaming;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Advertising\Advertising\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Advertising\Android\AndroidAdvertising\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Advertising\IOS\IOSAdvertising\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\Actions;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\BehaviorTree;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\Blueprint;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\DataProviders;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\EnvironmentQuery;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\GameplayDebugger;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\HotSpots;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\Navigation;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\Perception;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\Tasks;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\BehaviorTree\Blackboard;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\BehaviorTree\Composites;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\BehaviorTree\Decorators;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\BehaviorTree\Services;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\BehaviorTree\Tasks;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\EnvironmentQuery\Contexts;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\EnvironmentQuery\Generators;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\EnvironmentQuery\Items;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Private\EnvironmentQuery\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\ALAudio\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Analytics\Analytics\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Analytics\AnalyticsET\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Analytics\AnalyticsSwrve\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Analytics\AnalyticsVisualEditing\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Analytics\QoSReporter\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Android\AndroidAudio\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Android\AndroidLocalNotification\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Android\AndroidRuntimeSettings\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AnimGraphRuntime\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AnimGraphRuntime\Private\AnimNodes;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AnimGraphRuntime\Private\BoneControllers;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AppFramework\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AppFramework\Private\Framework\Testing;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AppFramework\Private\Widgets\Colors;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AppFramework\Private\Widgets\Testing;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AppFramework\Private\Widgets\Workflow;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Apple\MetalRHI\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AssetRegistry\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AudioMixer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AudioMixer\Private\DSP;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AudioMixer\Private\Effects;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AutomationMessages\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AutomationWorker\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\BlueprintRuntime\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CEF3Utils\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CEF3Utils\Private\Mac;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CinematicCamera\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Android;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Apple;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Async;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Containers;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Delegates;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Features;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\GenericPlatform;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\HAL;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\HTML5;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Internationalization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\iOS;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Linux;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Logging;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Mac;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Math;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Misc;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Modules;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\ProfilingDebugging;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Serialization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Stats;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\UObject;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Containers\Algo;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\HAL\Allocators;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\ProfilingDebugging\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Serialization\Csv;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Tests\Async;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Tests\HAL;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Tests\Internationalization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Tests\Math;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Private\Tests\Misc;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject\Private\Blueprint;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject\Private\Internationalization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject\Private\Misc;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject\Private\Serialization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject\Private\Templates;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject\Private\UObject;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\D3D12RHI\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\D3D12RHI\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\DatabaseSupport\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\EmptyRHI\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\AI;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Animation;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Atmosphere;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Camera;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Collision;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Commandlets;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Components;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Curves;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Debug;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\DeviceProfiles;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\EdGraph;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\EditorFramework;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Engine;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\GameFramework;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Internationalization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Kismet;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Layers;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Materials;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\MeshVertexPainter;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\PacketHandlers;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Particles;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Performance;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\PhysicsEngine;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\PhysicsEngine2D;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Rendering;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\ShaderCompiler;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Slate;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Streaming;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\UserInterface;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Vehicles;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\VisualLogger;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\AI\Navigation;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\AI\Navigation\NavAreas;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\AI\Navigation\NavFilters;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Private\Tests\Internationalization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\EngineMessages\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\EngineSettings\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Foliage\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\FriendsAndChat\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameMenuBuilder\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayAbilities\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayAbilities\Private\Abilities;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayAbilities\Private\Abilities\Tasks;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayTags\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayTags\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayTasks\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayTasks\Private\Tasks;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GeometryCache\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\HardwareSurvey\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\HeadMountedDisplay\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\HTML5\HTML5JS\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\HTML5\MapPakDownloader\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\HTML5\Simulator\HTML5Win32\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\HTTPChunkInstaller\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\ImageCore\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\ImageWrapper\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\InputCore\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\InputDevice\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Internationalization\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Internationalization\Private\Serialization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\IOS\IOSAudio\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\IOS\IOSLocalNotification\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\IOS\IOSRuntimeSettings\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\IOS\LaunchDaemonMessages\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\IPC\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Json\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Json\Private\Dom;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Json\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\JsonUtilities\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Landscape\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Landscape\Private\Materials;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Launch\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Launch\Private\Android;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Launch\Private\HTML5;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Launch\Private\IOS;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Launch\Private\Linux;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Launch\Private\Mac;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Launch\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\LevelSequence\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Linux\LinuxCommonStartup\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Mac\CoreAudio\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Mac\UnrealAudioCoreAudio\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\MaterialShaderQualitySettings\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Media\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\MediaAssets\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\MediaAssets\Private\Assets;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\MediaAssets\Private\Misc;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\MediaUtils\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Messaging\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Messaging\Private\Bridge;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Messaging\Private\Bus;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\MessagingRpc\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\MoviePlayer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\MovieScene\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\MovieSceneCapture\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\MovieSceneTracks\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\MovieSceneTracks\Private\Sections;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\MovieSceneTracks\Private\TrackInstances;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\MovieSceneTracks\Private\Tracks;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Navmesh\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Navmesh\Private\DebugUtils;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Navmesh\Private\Detour;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Navmesh\Private\DetourCrowd;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Navmesh\Private\DetourTileCache;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Navmesh\Private\Recast;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\NetworkFile\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\NetworkFileSystem\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Networking\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Networking\Private\IPv4;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Networking\Private\Steam;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Networking\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\NetworkReplayStreaming\HttpNetworkReplayStreaming\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\NetworkReplayStreaming\InMemoryNetworkReplayStreaming\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\NetworkReplayStreaming\NetworkReplayStreaming\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\NetworkReplayStreaming\NullNetworkReplayStreaming\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Niagara\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\NullDrv\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\BuildPatchServices\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\BuildPatchServices\Private\Core;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\BuildPatchServices\Private\Generation;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\BuildPatchServices\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Private\Android;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Private\Apple;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Private\Curl;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Private\GenericPlatform;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Private\HTML5;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Private\Linux;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\ICMP\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\ICMP\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\ImageDownload\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\SSL\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\Stomp\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\Voice\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\Voice\Private\Linux;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\Voice\Private\Mac;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\Voice\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\WebSockets\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\WebSockets\Private\Lws;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\XMPP\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\XMPP\Private\XmppJingle;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\OpenGLDrv\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\OpenGLDrv\Private\Android;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\OpenGLDrv\Private\HTML5;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\OpenGLDrv\Private\IOS;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\OpenGLDrv\Private\Linux;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\OpenGLDrv\Private\Mac;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\OpenGLDrv\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\EncryptionComponents\AsymmetricEncryption\RSAEncryptionHandlerComponent\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\EncryptionComponents\EncryptionHandlerComponent\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\EncryptionComponents\SymmetricEncryption\BlockEncryption\AESBlockEncryptor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\EncryptionComponents\SymmetricEncryption\BlockEncryption\BlockEncryptionHandlerComponent\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\EncryptionComponents\SymmetricEncryption\BlockEncryption\BlowFishBlockEncryptor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\EncryptionComponents\SymmetricEncryption\BlockEncryption\TwoFishBlockEncryptor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\EncryptionComponents\SymmetricEncryption\BlockEncryption\XORBlockEncryptor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\EncryptionComponents\SymmetricEncryption\StreamEncryption\StreamEncryptionHandlerComponent\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\EncryptionComponents\SymmetricEncryption\StreamEncryption\XORStreamEncryptor\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\PacketHandler\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\ReliabilityHandlerComponent\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PakFile\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PerfCounters\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PhysXFormats\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Portal\LauncherCheck\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Portal\Messages\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Portal\Proxies\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Portal\Proxies\Private\Account;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Portal\Proxies\Private\Application;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Portal\Rpc\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Portal\Services\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Projects\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\RenderCore\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Renderer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Renderer\Private\CompositionLighting;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Renderer\Private\PostProcess;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\RHI\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\RHI\Private\Android;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\RHI\Private\Apple;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\RHI\Private\HTML5;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\RHI\Private\Linux;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\RHI\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\RuntimeAssetCache\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SandboxFile\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Serialization\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Serialization\Private\Backends;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Serialization\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SessionMessages\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SessionServices\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\ShaderCore\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Framework\Application;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Framework\Commands;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Framework\Docking;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Framework\Layout;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Framework\MultiBox;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Framework\Notifications;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Framework\Styling;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Framework\Text;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Framework\MultiBox\Mac;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Framework\Text\Android;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Framework\Text\IOS;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Widgets\Colors;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Widgets\Docking;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Widgets\Images;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Widgets\Input;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Widgets\LayerManager;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Widgets\Layout;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Widgets\Notifications;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Widgets\Text;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Private\Widgets\Views;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Animation;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Application;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Brushes;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Fonts;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Input;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Layout;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Logging;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Rendering;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Sound;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Stats;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Styling;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Textures;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Types;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Private\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateNullRenderer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateRHIRenderer\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Sockets\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Sockets\Private\Android;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Sockets\Private\BSDIPv6Sockets;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Sockets\Private\BSDSockets;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Sockets\Private\IOS;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Sockets\Private\Linux;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Sockets\Private\Mac;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Sockets\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Sockets\Private\HTML5\Device;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Sockets\Private\HTML5\Simulator;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\StreamingFile\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\StreamingPauseRendering\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SynthBenchmark\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Toolbox\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\UE4Game\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\UMG\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\UMG\Private\Animation;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\UMG\Private\Binding;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\UMG\Private\Blueprint;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\UMG\Private\Components;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\UMG\Private\Slate;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\UnrealAudio\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\UnrealAudio\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\UtilityShaders\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\VectorVM\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\VectorVM\Private\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\VulkanRHI\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\WebBrowser\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\WebBrowser\Private\Android;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\WebBrowser\Private\CEF;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\WebBrowser\Private\IOS;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\WidgetCarousel\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Windows\AudioMixerXAudio2\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Windows\D3D11RHI\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Windows\D3D11RHI\Private\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Windows\UnrealAudioWasapi\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Windows\UnrealAudioXAudio2\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Windows\XAudio2\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\XmlParser\Private;E:\Program Files\Epic Games\4.14\Engine\Source\ThirdParty\libJPG;</SourcePath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);UE_EDITOR=1;IS_PROGRAM=0;WITH_DEV_AUTOMATION_TESTS=1;WITH_PERF_AUTOMATION_TESTS=1;UNICODE;_UNICODE;__UNREAL__;IS_MONOLITHIC=0;WITH_ENGINE=1;WITH_UNREAL_DEVELOPER_TOOLS=1;WITH_COREUOBJECT=1;USE_STATS_WITHOUT_ENGINE=0;WITH_PLUGIN_SUPPORT=0;WITH_PERFCOUNTERS=1;USE_LOGGING_IN_SHIPPING=0;WITH_LOGGING_TO_MEMORY=0;USE_CHECKS_IN_SHIPPING=0;UE_BUILD_MINIMAL=0;WITH_EDITOR=1;WITH_SERVER_CODE=1;UBT_COMPILED_PLATFORM=Win64;UBT_COMPILED_TARGET=Editor;WIN32=1;_WIN32_WINNT=0x0601;WINVER=0x0601;PLATFORM_WINDOWS=1;NDEBUG=1;UE_BUILD_DEVELOPMENT=1;USE_NEW_ASYNC_IO=0;ORIGINAL_FILE_NAME="UE4Editor-Spooky.dll";DEPRECATED_FORGAME=DEPRECATED;SPOOKY_API=;UE_ENABLE_ICU=1;WITH_DIRECTXMATH=0;CORE_API=;ANIMGRAPH_API=;COREUOBJECT_API=;WITH_PHYSX=1;WITH_APEX=1;WITH_RUNTIME_PHYSICS_COOKING;WITH_BOX2D=1;WITH_RECAST=1;ENGINE_API=;JSON_API=;WITH_FREETYPE=1;SLATECORE_API=;INPUTCORE_API=;SLATE_API=;MESSAGING_API=;RENDERCORE_API=;RHI_API=;SHADERCORE_API=;ASSETREGISTRY_API=;ENGINEMESSAGES_API=;ENGINESETTINGS_API=;SYNTHBENCHMARK_API=;RENDERER_API=;WITH_GAMEPLAY_DEBUGGER=1;AIMODULE_API=;GAMEPLAYTAGS_API=;GAMEPLAYTASKS_API=;DATABASESUPPORT_API=;PACKETHANDLER_API=;RELIABILITYHANDLERCOMPONENT_API=;HARDWARESURVEY_API=;UNREALED_API=;BSPMODE_API=;DIRECTORYWATCHER_API=;DOCUMENTATION_API=;PROJECTS_API=;SANDBOXFILE_API=;EDITORSTYLE_API=;SOURCECONTROL_API=;UNREALEDMESSAGES_API=;ENABLE_OLD_GAMEPLAY_DEBUGGER=0;GAMEPLAYDEBUGGER_API=;BLUEPRINTGRAPH_API=;HTTP_PACKAGE=1;HTTP_API=;UNREALAUDIO_API=;FUNCTIONALTESTING_API=;AUTOMATIONCONTROLLER_API=;INTERNATIONALIZATION_API=;WITH_OGGVORBIS=1;XAUDIO2_API=;AUDIOMIXERXAUDIO2_API=;UNREALAUDIOXAUDIO2_API=;USERFEEDBACK_API=;COLLECTIONMANAGER_API=;ADDCONTENTDIALOG_API=;MESHUTILITIES_API=;KISMET_API=;ANIMGRAPHRUNTIME_API=;ASSETTOOLS_API=;PROPERTYEDITOR_API=;ACTORPICKERMODE_API=;SCENEDEPTHPICKERMODE_API=;INTROTUTORIALS_API=;DESKTOPWIDGETS_API=;DESKTOPPLATFORM_API=;SPOOKYPROJECT_API=</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(NMakeIncludeSearchPath);E:\Program Files\Epic Games\4.14\Engine\Source;..\..\Plugins\Spooky\Source\Spooky\Private;E:\Program Files\Epic Games\4.14\Engine\Source\Spooky\Public;..\..\Plugins\Spooky\Source;..\..\Plugins\Spooky\Source\Spooky\Public;..\..\Plugins\Spooky\Intermediate\Build\Win64\UE4Editor\Inc\Spooky;..\..\Plugins\Spooky\Source\Spooky;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Internationalization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Async;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Concurrency;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Containers;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Delegates;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\GenericPlatform;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\HAL;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Logging;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Math;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Misc;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Modules;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Modules\Boilerplate;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\ProfilingDebugging;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Serialization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Serialization\Csv;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Stats;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Templates;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\UObject;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core\Public\Windows;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Core;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\AnimGraph\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\AnimGraph\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AnimGraph;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\AnimGraph;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject\Public\Blueprint;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject\Public\Internationalization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject\Public\Misc;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject\Public\Serialization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject\Public\Templates;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject\Public\UObject;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\CoreUObject;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\CoreUObject;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Public\AI;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Public\AI\Navigation;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Public\Animation;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Public\EdGraph;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Public\Features;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Public\Internationalization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Public\Net;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Public\PacketHandlers;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Public\Performance;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Public\Slate;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Public\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine\Public\VisualLogger;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Engine;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Json\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Json\Public\Dom;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Json\Public\Policies;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Json\Public\Serialization;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Json;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Json;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Animation;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Application;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Brushes;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Fonts;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Input;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Layout;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Logging;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Rendering;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Sound;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Stats;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Styling;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Textures;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Types;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore\Public\Widgets;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\SlateCore;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SlateCore;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\InputCore\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\InputCore\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\InputCore;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\InputCore;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Framework;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Framework\Application;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Framework\Commands;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Framework\Docking;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Framework\Layout;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Framework\MultiBox;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Framework\Notifications;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Framework\Styling;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Framework\Text;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Framework\Text\Android;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Framework\Text\IOS;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Framework\Views;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Widgets\Colors;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Widgets\Docking;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Widgets\Images;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Widgets\Input;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Widgets\LayerManager;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Widgets\Layout;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Widgets\Navigation;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Widgets\Notifications;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Widgets\Text;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate\Public\Widgets\Views;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Slate;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Slate;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Messaging\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Messaging\Public\Deprecated;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Messaging\Public\Helpers;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Messaging;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Messaging;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\RenderCore\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\RenderCore;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\RenderCore;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\RHI\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\RHI;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\RHI;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\ShaderCore\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\ShaderCore;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\ShaderCore;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AssetRegistry\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AssetRegistry;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AssetRegistry;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\EngineMessages\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\EngineMessages\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\EngineMessages;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\EngineMessages;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\EngineSettings\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\EngineSettings\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\EngineSettings;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\EngineSettings;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SynthBenchmark\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\SynthBenchmark;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SynthBenchmark;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Renderer\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Renderer;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Renderer;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule\Classes;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AIModule;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayTags\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayTags\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\GameplayTags;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayTags;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayTasks\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayTasks\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\GameplayTasks;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayTasks;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\DatabaseSupport\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\DatabaseSupport;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\DatabaseSupport;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\PacketHandler\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\PacketHandler\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\PacketHandler;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\PacketHandler;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\ReliabilityHandlerComponent\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\ReliabilityHandlerComponent;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\PacketHandlers\ReliabilityHandlerComponent;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\HardwareSurvey\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\HardwareSurvey;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\HardwareSurvey;E:\Program Files\Epic Games\4.14\Engine\Source\Programs\UnrealLightmass\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Public\AutoReimport;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Public\Commandlets;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Public\Dialogs;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Public\DragAndDrop;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Public\Features;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Public\Kismet2;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Public\Layers;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Public\Localization;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Public\Settings;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Public\Tests;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd\Public\Toolkits;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\UnrealEd;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEd;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\BspMode\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\BspMode;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\BspMode;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DirectoryWatcher\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\DirectoryWatcher;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DirectoryWatcher;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Documentation\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Documentation;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Documentation;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Projects\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Projects\Public\Interfaces;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Projects;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Projects;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SandboxFile\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\SandboxFile;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\SandboxFile;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\EditorStyle\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\EditorStyle\Public\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\EditorStyle\Public\Interfaces;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\EditorStyle;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\EditorStyle;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SourceControl\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SourceControl\Public\Tests;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\SourceControl;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\SourceControl;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEdMessages\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEdMessages\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\UnrealEdMessages;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UnrealEdMessages;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\GameplayDebugger\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AIModule\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\Settings\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\GameplayAbilities\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\GameplayDebugger\Classes;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\GameplayDebugger;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\GameplayDebugger;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\BlueprintGraph\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\BlueprintGraph\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\BlueprintGraph;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\BlueprintGraph;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Public\Android;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Public\Apple;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Public\GenericPlatform;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Public\HTML5;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Public\Interfaces;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Public\Linux;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP\Public\Windows;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\HTTP;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Online\HTTP;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\UnrealAudio\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\UnrealAudio;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\UnrealAudio;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\FunctionalTesting\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\FunctionalTesting\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\FunctionalTesting;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\FunctionalTesting;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AutomationController\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AutomationController\Public\Interfaces;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AutomationController;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AutomationController;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Internationalization\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Internationalization\Public\Serialization;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Internationalization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Internationalization;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Windows\XAudio2\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\XAudio2;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Windows\XAudio2;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AudioMixer\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AudioMixerXAudio2;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Windows\AudioMixerXAudio2;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\UnrealAudioXAudio2;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\Windows\UnrealAudioXAudio2;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UserFeedback\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\UserFeedback;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\UserFeedback;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\CollectionManager\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\CollectionManager;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\CollectionManager;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\AddContentDialog\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AddContentDialog;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\AddContentDialog;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\MeshUtilities\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\MeshUtilities;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\MeshUtilities;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Kismet\Classes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Kismet\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Kismet\Public\Nodes;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Kismet\Public\Profiler;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Kismet\Public\WorkflowOrientedApp;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Kismet;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\Kismet;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AnimGraphRuntime\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AnimGraphRuntime\Public\AnimNodes;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AnimGraphRuntime\Public\BoneControllers;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AnimGraphRuntime;E:\Program Files\Epic Games\4.14\Engine\Source\Runtime\AnimGraphRuntime;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AssetTools\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AssetTools;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\AssetTools;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PropertyEditor\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\PropertyEditor;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\PropertyEditor;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ActorPickerMode\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\ActorPickerMode;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\ActorPickerMode;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SceneDepthPickerMode\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\SceneDepthPickerMode;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\SceneDepthPickerMode;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\IntroTutorials\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\IntroTutorials;E:\Program Files\Epic Games\4.14\Engine\Source\Editor\IntroTutorials;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DesktopWidgets\Public;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DesktopWidgets\Public\Widgets;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DesktopWidgets\Public\Widgets\Input;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\DesktopWidgets;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DesktopWidgets;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DesktopPlatform\Public;E:\Program Files\Epic Games\4.14\Engine\Intermediate\Build\Win64\UE4Editor\Inc\DesktopPlatform;E:\Program Files\Epic Games\4.14\Engine\Source\Developer\DesktopPlatform;..\..\Source;..\Build\Win64\UE4Editor\Inc\SpookyProject;..\..\Source\SpookyProject;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6\include\um;C:\Program Files (x86)\Windows Kits\8.1\include\shared;C:\Program Files (x86)\Windows Kits\8.1\include\um;C:\Program Files (x86)\Windows Kits\8.1\include\winrt;;</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes>$(NMakeForcedIncludes)</NMakeForcedIncludes>
+    <NMakeAssemblySearchPath>$(NMakeAssemblySearchPath)</NMakeAssemblySearchPath>
+    <NMakeForcedUsingAssemblies>$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

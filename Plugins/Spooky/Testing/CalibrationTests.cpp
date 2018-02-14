@@ -4,6 +4,9 @@
 #include "../Source/Spooky/Spooky/Utilities/CalibrationUtilities.h"
 #include "../Source/Spooky/Spooky/Utilities/DataStructures.h"
 #include "../Source/Spooky/Spooky/Utilities/CommonMath.h"
+#include "../Spooky/Eigen/Core"
+#include "../Spooky/Spooky/Core.h"
+#include "../Spooky/sophus/so3.hpp"
 #include <Windows.h>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -293,5 +296,232 @@ namespace FusionTesting
 
 		}
 
+		TEST_METHOD(RotationJacobian) {
+			Eigen::Vector3f w(M_PI / 2, 0, 0);
+			Eigen::Matrix3f sigmaw;
+			sigmaw << 0.1, 0, 0,
+				0, 0, 0,
+				0, 0, 0;
+			Eigen::Vector3f p(0, 1, 0);
+
+
+			std::stringstream ss2;
+			ss2 << "w " << w.transpose() << std::endl;
+			ss2 << "p = " << p.transpose() << std::endl;
+			ss2 << "rodriguesW * p = " << Sophus::SO3f::exp(w).matrix() * p << std::endl;
+			ss2 << "sigmaw = \n" << sigmaw << std::endl;
+			ss2 << "sigmap = \n" << spooky::utility::getPositionVarianceFromRotation(w, p, sigmaw) << std::endl;
+			std::wstring widestr2 = utf8_decode(ss2.str());
+
+			Assert::AreEqual(false, true, widestr2.c_str());
+		}
+
+		TEST_METHOD(ArticulatedModelFusionTest) {
+			//Set up spooky
+			spooky::Core core;
+			spooky::Transform3D bonePose = spooky::Transform3D::Identity();
+			bonePose.translate(Eigen::Vector3f(1, 0, 0));
+			Eigen::Matrix3f c_var = Eigen::Matrix3f::Identity();
+			Eigen::Vector3f c_centre = Eigen::Vector3f::Zero();
+			core.addBoneNode(spooky::NodeDescriptor("bone1"), spooky::NodeDescriptor(""), bonePose, c_centre, c_var, 0.1);
+			core.addBoneNode(spooky::NodeDescriptor("bone2"), spooky::NodeDescriptor("bone1"), bonePose, c_centre, c_var, 0.1);
+			core.addBoneNode(spooky::NodeDescriptor("bone3"), spooky::NodeDescriptor("bone2"), bonePose, c_centre, c_var, 0.1);
+			core.setReferenceSystem(spooky::NodeDescriptor("sys1"));
+			core.finaliseSetup();
+
+			std::stringstream ss2;
+			//Run simulation
+			float time_to_run = 1;
+			float fps = 10;
+			int iterations = fps * time_to_run;
+			float deltaT = 1 / fps;
+			Eigen::Vector3f pos;
+			for (int i = 0; i < iterations; i++) {
+				float t = deltaT * i;
+
+				//Simulate measurements
+				pos = Eigen::Vector3f(1,std::sqrt(2),0);//std::sin(t) + 2, std::cos(t), 0);
+				Eigen::Quaternionf quat = Eigen::Quaternionf::Identity();
+				//Create measurement
+				spooky::Measurement::Ptr measurement = spooky::Measurement::createPoseMeasurement(pos, quat, Eigen::Matrix<float, 7, 7>::Identity() * 0.1);
+				//Get sensor and system info from spooky
+				core.setMeasurementSensorInfo(measurement, spooky::SystemDescriptor("sys1"), spooky::SensorID(0));
+				//Set metadata and check returns true
+				bool valid = measurement->setMetaData(t, 1);
+				//TODO: For some reason measurement set metadata doesnt return true
+				if (false && !valid) {
+					std::cout << "WARNING - Measurement not created correctly - " << __FILE__ << " : " << __LINE__ << std::endl;
+				}
+				else {
+					core.addMeasurement(measurement,spooky::NodeDescriptor("bone3"));
+				}
+				core.fuse(t);
+
+			}
+
+			spooky::Transform3D pose = core.getNodeGlobalPose(spooky::NodeDescriptor("bone3"));
+			float error = (pose.translation() - pos).norm();
+			float errorAngle = Eigen::AngleAxisf(pose.rotation()).angle();
+			ss2 << "Frame last " << " error = " << error << " m, " <<  errorAngle << " radians" << std::endl;
+			ss2 << pose.matrix() << std::endl;
+			std::wstring widestr2 = utf8_decode(ss2.str());
+			Assert::AreEqual(error < 0.01 && errorAngle < 0.01, true, widestr2.c_str());
+			//Check result
+		}
+
+		TEST_METHOD(QuaternionToAxisJacobian) {
+			Eigen::Quaternionf q0 = Eigen::Quaternionf::Identity();
+			Eigen::Quaternionf q1(Eigen::AngleAxisf(M_PI / 2, Eigen::Vector3f(1, 0, 0)));
+			Eigen::Quaternionf q2(Eigen::AngleAxisf(M_PI / 2, Eigen::Vector3f(0, 0, 1)));
+
+
+			Eigen::Matrix<float, 3, 4> result0 = spooky::utility::getQuatToAxisJacobian(q0);
+			Eigen::Matrix<float, 3, 4> result1 = spooky::utility::getQuatToAxisJacobian(q1);
+			Eigen::Matrix<float, 3, 4> result2 = spooky::utility::getQuatToAxisJacobian(q2);
+
+			Eigen::Matrix<float, 3, 4> expected_result0;
+			Eigen::Matrix<float, 3, 4> expected_result1;
+			Eigen::Matrix<float, 3, 4> expected_result2;
+			expected_result0 << 1,0,0,0,
+								0,1,0,0,
+								0,0,1,0;
+			expected_result1 <<
+				2.22144,       0,       0, 5.04987,
+				0, 2.22144,       0,       0,
+				0,       0, 2.22144,       0;
+			expected_result2 <<
+				2.22144,       0,       0,       0,
+				0, 2.22144,       0,       0,
+				0,       0, 2.22144, 5.04987;
+
+
+			//expected_result1 << 
+
+			float error = (result0-expected_result0).norm() + (result1-expected_result1).norm() + (result2-expected_result2).norm();
+			std::stringstream ss2;
+			ss2 << "error = " << error << std::endl;
+			ss2 << "error 0  = \n" << result0 - expected_result0 << std::endl;
+			ss2 << "error 1  = \n" << result1 - expected_result1 << std::endl;
+			ss2 << "error 2  = \n" << result2 - expected_result2 << std::endl;
+			ss2 << "q0 = " << q0.coeffs().transpose() << std::endl;
+			ss2 << "result0 = \n" << result0 << std::endl;
+			ss2 << "q1 = " << q1.coeffs().transpose() << std::endl;
+			ss2 << "result1 = \n" << result1 << std::endl;
+			ss2 << "q2 = " << q2.coeffs().transpose() << std::endl;
+			ss2 << "result2 = \n" << result2 << std::endl;
+			std::wstring widestr2 = utf8_decode(ss2.str());
+			Assert::AreEqual(error < 0.001, true, widestr2.c_str());
+		}
+
+		TEST_METHOD(NumericalVectorDerivative) {
+			auto f = [](const Eigen::Vector3f& x) {
+				return Eigen::Vector3f(x[0] * cos(x[1]) * sin(x[2]), x[0] * sin(x[1])*sin(x[2]), x[0] * cos(x[2]));
+			};
+			Eigen::Matrix3f df_dx1 = spooky::utility::numericalVectorDerivative<float>(f, Eigen::Vector3f(1, 0, M_PI / 2),0.01);
+			Eigen::Matrix3f expected_result1;
+			expected_result1 << 1, 0, 0,
+							   0, 1, 0,
+							   0, 0, -1;
+			float error1 = (df_dx1 - expected_result1).norm();
+
+			Eigen::Matrix3f df_dx2 = spooky::utility::numericalVectorDerivative<float>(f, Eigen::Vector3f(1, M_PI / 4, M_PI / 4), 0.01);
+			Eigen::Matrix3f expected_result2;
+			expected_result2 << 0.5, -0.5, 0.5,
+								0.5,  0.5, 0.5,
+								1 / std::sqrt(2), 0, -1/std::sqrt(2);
+			float error2 = (df_dx2 - expected_result2).norm();
+
+			std::stringstream ss2;
+			ss2 << "df_dx1 = " << std::endl << df_dx1 << std::endl;
+			ss2 << "expected_result1 = " << std::endl << expected_result1 << std::endl;
+
+			ss2 << "df_dx2 = " << std::endl << df_dx2 << std::endl;
+			ss2 << "expected_result2 = " << std::endl << expected_result2 << std::endl;
+			std::wstring widestr2 = utf8_decode(ss2.str());
+			Assert::AreEqual(error1 <  0.01 && error2 < 0.01, true, widestr2.c_str());
+
+		}
+
+		TEST_METHOD(ClosestTwist) {
+			{
+				Eigen::Vector3f w_m(-0.1, 0, 0);
+				Eigen::Vector3f w_t(3, 0, 0);
+				auto closest = spooky::utility::twistClosestRepresentation(w_m, w_t);
+
+				std::stringstream ss2;
+				ss2 << "w_m = " << std::endl << w_m << std::endl;
+				ss2 << "w_t = " << std::endl << w_t << std::endl;
+				ss2 << "closest = " << std::endl << closest << std::endl;
+				std::wstring widestr2 = utf8_decode(ss2.str());
+				Assert::AreEqual((w_m - closest).norm() < 0.001, true, widestr2.c_str());
+			}
+
+			{
+				Eigen::Vector3f w_m(-3.1, 0, 0);
+				Eigen::Vector3f w_t(3, 0, 0);
+				auto closest = spooky::utility::twistClosestRepresentation(w_m, w_t);
+
+				std::stringstream ss2;
+				ss2 << "w_m = " << std::endl << w_m << std::endl;
+				ss2 << "w_t = " << std::endl << w_t << std::endl;
+				ss2 << "closest = " << std::endl << closest << std::endl;
+				std::wstring widestr2 = utf8_decode(ss2.str());
+				Assert::AreEqual((closest - Eigen::Vector3f(M_PI + (M_PI - 3.1),0,0)).norm() < 0.001, true, widestr2.c_str());
+			}
+
+			{
+				float T = 10;
+				float fps = 30;
+				int iterations = T * fps;
+				Eigen::Vector3f w_t1(2 * M_PI - 0.00001, 0, 0);
+				int failcount = 0;
+				std::stringstream ss2;
+
+				for (int i = 0; i < iterations; i++) {
+					float t = i / 30;
+					Eigen::Vector3f w_t2 = w_t1 + Eigen::Vector3f(0, 0.1*i,0);
+					Eigen::Vector3f w_t2_renormalized = spooky::utility::toAxisAngle(spooky::utility::rodriguezFormula(w_t2));
+					Eigen::Vector3f w_new = spooky::utility::twistClosestRepresentation(w_t2_renormalized, w_t1);
+					if ((w_new - w_t2).norm() > 0.1) {
+						failcount++;
+						ss2 << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
+						ss2 << "w_new = " << std::endl << w_new.transpose() << std::endl;
+						ss2 << "w_new.norm = " << std::endl << w_new.norm() << std::endl;
+						ss2 << "w_t2 = " << std::endl << w_t2.transpose() << std::endl;
+						ss2 << "w_t2.norm = " << std::endl << w_t2.norm() << std::endl;
+						ss2 << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
+					}
+					w_t1 = w_new;
+				}
+				std::wstring widestr2 = utf8_decode(ss2.str());
+				Assert::AreEqual(failcount==0,true, widestr2.c_str());
+
+			}
+			
+
+		}
+
+		TEST_METHOD(MeasurementTransform) {
+			
+			spooky::Transform3D T = spooky::Transform3D::Identity();
+			T.translate(Eigen::Vector3f::Random());
+			T.rotate(Eigen::Quaternionf::UnitRandom());
+
+			Eigen::Vector3f mp = Eigen::Vector3f::Random();
+			Eigen::Quaternionf mq = Eigen::Quaternionf::UnitRandom();
+			Eigen::Matrix<float, 7, 7> var = Eigen::Matrix<float, 7, 7>::Identity() * 0.1;
+			spooky::Measurement::Ptr m = spooky::Measurement::createPoseMeasurement(mp,mq,var);
+			
+			spooky::Measurement::Ptr m_2 = std::make_unique<spooky::Measurement>(m->transform(T));
+			spooky::Measurement::Ptr m_3 = std::make_unique<spooky::Measurement>(m_2->transform(T.inverse()));
+
+			std::stringstream ss2;
+			ss2 << m->getData() << std::endl;
+			ss2 << m_2->getData() << std::endl;
+			ss2 << m_3->getData() << std::endl;
+			std::wstring widestr2 = utf8_decode(ss2.str());
+			Assert::AreEqual(m_3->compare(m) < 0.01, true, widestr2.c_str());
+
+		}
 	};
 }

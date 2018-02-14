@@ -33,8 +33,10 @@ namespace spooky {
 		//////////////////////////////////////////////////////////////////
 		//Internal Info
 		//////////////////////////////////////////////////////////////////
-		struct State{
-			struct Parameters {
+		class State{
+		public:
+			class Parameters {
+			public:
 				//Vectors of articulation states stored in columns
 				//		theta1	phi1 ...
 				//		theta2	phi2
@@ -45,14 +47,43 @@ namespace spooky {
 				//				y
 				//				z
 				//	e.g. twists:(theta1	theta2 theta3)
-				Eigen::MatrixXf expectation;
+				Eigen::VectorXf expectation;
 				//Covariance associated with vec(expectation)
 				Eigen::MatrixXf variance;
+
+				Parameters getSubstate(const int& position, const int& dim) const {
+					Parameters substate(dim);
+					substate.expectation = expectation.block(position, 0, dim, 1);
+					substate.variance = variance.block(position, position, dim, dim);
+					return substate;
+				}
+
+				void insertSubstate(const int& position, const Parameters& p) {
+					int dim = p.expectation.size();
+					expectation.block(position, 0, dim, 1) = p.expectation;
+					variance.block(position, position, dim, dim) = p.variance;
+				}
+
+				Parameters(int dim) :
+					expectation(dim),
+					variance(dim, dim)
+				{
+					expectation.setZero();
+					variance.setIdentity();
+				}
+
+				Parameters(const Eigen::VectorXf& x, const Eigen::MatrixXf& V) : expectation(x), variance(V){
+
+				}
 			};
 
 			//Paramters for each articulation
 			std::vector<Parameters> articulation;
+			std::vector<Parameters> constraints;
+			std::vector<Parameters> process_noise;
 
+
+									   
 			//Last update time
 			float last_update_time = 0;
 			//State is valid - false if state poorly initialised, etc...
@@ -70,7 +101,7 @@ namespace spooky {
 
 	
 		//////////////////////////////////////////////////////////////////
-		//External info
+		//Extrinsic info
 		//////////////////////////////////////////////////////////////////
 
 		//Own name
@@ -86,18 +117,83 @@ namespace spooky {
 
 
 	public:
+		//Joint stiffness - 0 => no restriction; inf => next state will be the constraint centre
+		float joint_stiffness = 1; //in [0,inf]
+
 		//Returns the final pose of this node in global space based on pose of all parents
 		Transform3D getFinalGlobalPose();
 		//Returns final local transform relative to parent transform
 		Transform3D getLocalPose();
+		//Allows for speculative evaluation of pose based on expectation vector
+		Transform3D getLocalPoseAt(const Eigen::VectorXf& theta);
+		//Returns variance associated with pose
+		Eigen::Matrix<float,6,6> getLocalPoseVariance();
+
+		//Get rotational and translational degrees of freedom
+		int getPDoF(bool hasLeverChild);
+		int getRDoF();
+		int getSDoF();
+
+		//Get the total number of variables describing this node
+		int getDimension();
+
+		//Split and merging of state parameters:
+		//---------------------------------------
+		//Set state parameters
+		void setState(const State::Parameters& new_state);
+
+		State::Parameters getState();
+		//Get combined articulation constraints
+		State::Parameters getConstraints();
+		//Get process noise for node
+		State::Parameters getProcessNoise();
+
+		//Generic grouped parameter methods
+		State::Parameters getChainParameters(std::function<Node::State::Parameters(Node&)> getParams, const int& chain_length);
+		//Set and get an entire chain of nodes starting with this and recursing up parents
+		void setChainState(const int & chain_length, const State::Parameters & state);
+		State::Parameters getChainState(const int & chain_length);
+		State::Parameters getChainConstraints(const int & chain_length);
+		State::Parameters getChainProcessNoise(const int & chain_length);
+
+		//---------------------------------------
 
 		//Updates the state of this node (e.g. angle, quaternion, etc.)
 		void updateState(const State& new_state, const float& timestamp, const float& latency);
 		//Sets the model for the articulations associated with this node
 		void setModel(std::vector<Articulation> art);
-		//Local fusion of buffered measurements
+
+		//Set fusion parameters
+		void setConstraintForArticulation(const int& i, const Node::State::Parameters& c);
+		void setConstraints(const Node::State::Parameters& c);
+		void setProcessNoiseForArticulation(const int& i, const Node::State::Parameters& p);
+		void setProcessNoises(const Node::State::Parameters& p);
+
+		//Local fusion of all buffered measurements
 		void fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem);
-	
+
+		//Get required parents for fusing measurement m
+	    int getRequiredChainLength(const Measurement::Ptr& m);
+
+		//Fusion of particular mesurement types (defined in FusionProcedures.cpp)
+		void fusePositionMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
+		void fuseRotationMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
+		void fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
+		void fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
+		
+		//Basic math for performing EKF with prior, constraints and measurement
+	    Node::State::Parameters 
+	    customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,
+                            const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement);
+  		//Basic math for performing EKF with prior, constraints and measurement
+	    Node::State::Parameters 
+	    EKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& measurement,
+                            const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement);
+  
+
+		//Get the jocobian of an entire pose chain mapping state |-> (w,p) axis-angle and position
+		Eigen::Matrix<float, 9, Eigen::Dynamic> getPoseChainJacobian(const int& chain_length, const bool& globalSpace);
+		
 	private:
 		Transform3D getGlobalPose();
 
@@ -109,7 +205,7 @@ namespace spooky {
 
 		//Cached transforms
 		bool recacheRequired = true;
-		//TODO: optimise traversal and caching
+		//Optimise traversal and caching
 		Transform3D cachedPose;
 		size_t cachedPoseHash = 0;
 		size_t lastParentHash = 0;
@@ -118,10 +214,12 @@ namespace spooky {
 	};
 
 	class ArticulatedModel{
+	public:
+
+
 		/*//////////////////////////////////////////////////////////////////
 		*				Public methods
 		*//////////////////////////////////////////////////////////////////
-		public:
 			//Sets reference system
 			void setReferenceSystem(const SystemDescriptor& s);
 			//Adds node to the skeleton
@@ -145,10 +243,14 @@ namespace spooky {
 			void fuse(const Calibrator& calib);
 
 			//Sets the structure parameters for the specified articulation as a bone according to the boneVec
-			void setBoneForNode(const NodeDescriptor & node, const Transform3D& boneTransform);
-			void setPoseNode(const NodeDescriptor & node, const Transform3D& poseTransform);
-			void setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial);
-
+			void setFixedNode(const NodeDescriptor & node, const Transform3D& boneTransform);
+			void setBoneForNode(const NodeDescriptor & node, const Transform3D& boneTransform, const Node::State::Parameters& constraints, const float& process_noise);
+			void setPoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Node::State::Parameters& constraints, const float& process_noise);
+			void setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial, const Node::State::Parameters& constraints, const float& process_noise);
+			
+			//Stiffness settings
+			void setJointStiffness(const NodeDescriptor & node, const float& stiffness);
+			void setAllJointStiffness(const float& stiffness);
 
 			////////////////////////////////////////////////////
 			//					Results

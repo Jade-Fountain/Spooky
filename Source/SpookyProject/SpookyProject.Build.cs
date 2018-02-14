@@ -16,9 +16,9 @@
 */
 using UnrealBuildTool;
 
-public class UnrealFusion : ModuleRules
+public class SpookyProject : ModuleRules
 {
-	public UnrealFusion(TargetInfo Target)
+	public SpookyProject(TargetInfo Target)
 	{
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 

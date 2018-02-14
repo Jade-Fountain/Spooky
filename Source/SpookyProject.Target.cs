@@ -3,11 +3,11 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class UnrealFusionEditorTarget : TargetRules
+public class SpookyProjectTarget : TargetRules
 {
-	public UnrealFusionEditorTarget(TargetInfo Target)
+	public SpookyProjectTarget(TargetInfo Target)
 	{
-		Type = TargetType.Editor;
+		Type = TargetType.Game;
 	}
 
 	//
@@ -20,6 +20,6 @@ public class UnrealFusionEditorTarget : TargetRules
 		ref List<string> OutExtraModuleNames
 		)
 	{
-		OutExtraModuleNames.AddRange( new string[] { "UnrealFusion" } );
+		OutExtraModuleNames.AddRange( new string[] { "SpookyProject" } );
 	}
 }

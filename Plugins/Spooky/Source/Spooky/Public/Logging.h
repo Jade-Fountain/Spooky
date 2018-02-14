@@ -27,6 +27,10 @@ inline void SPOOKY_LOG(std::string s){
 	UE_LOG(LogTemp, Warning, TEXT("SPOOKY LOG : %s"),*str);
 }
 
+inline void SPOOKY_FLOG(FString s) {
+	UE_LOG(LogTemp, Warning, TEXT("SPOOKY LOG : %s"), *s);
+}
+
 inline void SPOOKY_SCREEN_MESSAGE(std::string s) {
 	FString str(s.c_str());
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("SPOOKY LOG : %s"), *str));

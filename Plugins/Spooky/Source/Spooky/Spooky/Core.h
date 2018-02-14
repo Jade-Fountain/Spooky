@@ -75,9 +75,16 @@ namespace spooky {
 		////////////////////////////////////////////////////
 
 		//Adds a node to the fusion graph model
-		void addBoneNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& boneTransform);
-		void addPoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial);
-		void addScalePoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial, const Eigen::Vector3f& scaleInitial);
+		void addFixedNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& pose);
+		void addBoneNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& boneTransform,
+							const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
+					 		const float& process_noise);
+		void addPoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial,
+							const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
+					 		const float& process_noise);
+		void addScalePoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial, const Eigen::Vector3f& scaleInitial,
+							const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
+					 		const float& process_noise);
 		
 		//Sets the reference system for the fused skeleton
 		//Joint values will be reported relative to this system
@@ -99,6 +106,9 @@ namespace spooky {
 		//Latency config
 		void setSensorLatency(const SystemDescriptor& system, const int& sensorID, const float& latency);
 		void setSystemLatency(const SystemDescriptor& system, const float& latency);
+
+		//Set fusion joint stiffness
+		void setJointStiffness(const float& stiffness);
 
 		////////////////////////////////////////////////////
 		//					Input at runtime

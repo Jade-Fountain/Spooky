@@ -14,19 +14,25 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+
+//#include "Logging.h"
+#pragma once
+
 #include<iostream>
 #include<string>
 #include<numeric>
+#include<complex>
+#include<math.h>
 #include<algorithm>
 #include<Eigen/Core>
 #include<Eigen/SVD>
 #include<Eigen/Geometry>
 #include<Eigen/Eigenvalues>
 #include<Eigen/unsupported/KroneckerProduct>
-//#include "Logging.h"
-#pragma once
+#include "ComplexMath.h"
+#include "sophus/so3.hpp"
+#include "sophus/se3.hpp"
 
-#define M_PI 3.141592654
 
 namespace spooky{
 	namespace utility{
@@ -54,6 +60,15 @@ namespace spooky{
 			s = svd.singularValues();
 		}
 
+		static inline Eigen::Matrix3f normalize3D(const Eigen::Matrix3f& M, Eigen::Vector3f* scale_out = NULL) {
+			auto result = M;
+			for (int i = 0; i < M.cols(); i++) {
+				float norm = M.col(i).norm();
+				if(scale_out) (*scale_out)[i] = norm;
+				result.col(i) = M.col(i) / norm;
+			}
+			return result;
+		}
 
 		static inline Eigen::Matrix3f orthogonaliseBasic(const Eigen::Matrix3f& M) {
 			Eigen::Vector3f x = M.col(0);
@@ -453,6 +468,162 @@ namespace spooky{
 			tnorm.distance = T.translation().norm();
 			return tnorm;
 		}
-	
+
+		static inline Eigen::Matrix3f jacobianExp(const Eigen::Vector3f& w, const Eigen::Vector3f& p){
+			double h = 1e-20;
+			Eigen::Matrix3d W_im = Eigen::Matrix3d::Identity() * h;
+			Eigen::Matrix3d result = Eigen::Matrix3d::Identity();
+			for(int i = 0; i < 3; i++){
+				Eigen::Vector3cd W;
+				W.real() = w.cast<double>();
+				W.imag() = W_im.col(i);
+				Eigen::Vector3cd exp = Sophus::SO3<std::complex<double>>::exp(W).matrix() * p.cast<std::complex<double>>() / h;
+				result.col(i) = exp.imag();
+			}
+			return result.cast<float>();
+		}
+
+		template <typename Scalar>
+		static inline Eigen::Matrix<Scalar, 3, 3> skewSymmetric(const Eigen::Matrix<Scalar, 3, 1>& t) {
+			Eigen::Matrix<Scalar, 3, 3> t_hat;
+			t_hat << 0, -t(2), t(1),
+				t(2), 0, -t(0),
+				-t(1), t(0), 0;
+			return t_hat;
+		}
+		
+		template <typename Scalar>
+		static inline Eigen::Matrix<Scalar,3,3> rodriguezFormula(const Eigen::Matrix<Scalar,3,1>& w) {
+			Eigen::Matrix<Scalar, 3, 3> w_hat = skewSymmetric(w.normalized());
+			//TODO: is this correct for complex numbers?
+			//Scalar theta_sq = w.transpose() * w;
+			//Scalar theta = std::pow(theta_sq,0.5);
+			Scalar theta = w.norm();
+			return Eigen::Matrix<Scalar, 3, 3>::Identity() + w_hat * std::sin(theta) + w_hat * w_hat * (Scalar(1) - std::cos(theta));
+		}
+		//TODO: clean up unused functions
+		static inline Eigen::Matrix3f getPositionVarianceFromRotation(const Eigen::Vector3f& w, const Eigen::Vector3f& p, const Eigen::Matrix3f& sigmaW) {
+			Eigen::Matrix3f J = jacobianExp(w, p);
+			return J * sigmaW * J.transpose();
+		}
+
+		template <typename Scalar>
+		static inline Eigen::Matrix<Scalar, 3, 1> toAxisAngle(const Eigen::Matrix<Scalar, 3, 3>& R) {
+			return Sophus::SO3<Scalar>::log(Sophus::SO3<Scalar>(normalize3D(R)));
+		}
+
+		template <typename Scalar>
+		static inline Eigen::Matrix<Scalar, 6, 1> toAxisAnglePos(const Eigen::Transform<Scalar, 3, Eigen::Affine>& T) {
+			Eigen::Matrix<Scalar, 6, 1> result;
+			//Warning - some functions squash imaginary component - e.g. transform.rotation()
+			result.head(3) = toAxisAngle<Scalar>(T.matrix().topLeftCorner(3,3));
+			result.tail(3) = T.translation();
+			return result;
+		}
+
+		template <typename Scalar>
+		static inline Eigen::Matrix<Scalar, 9, 1> toAxisAnglePosScale(const Eigen::Transform<Scalar, 3, Eigen::Affine>& T) {
+			Eigen::Matrix<Scalar, 9, 1> result;
+			//Warning - some functions squash imaginary component - e.g. transform.rotation()
+			Eigen::Vector3f scale;
+			Eigen::Matrix3f rot = normalize3D(T.matrix().topLeftCorner(3, 3), &scale);
+			result.head(3) = toAxisAngle<Scalar>(rot);
+			result.segment<3>(3) = T.translation();
+			result.tail(3) = scale;
+			return result;
+		}
+
+		static inline Eigen::Matrix<float, 3, 4> getQuatToAxisJacobian(Eigen::Quaternionf q) {
+			Eigen::Matrix<float, 3, 4> result = Eigen::Matrix<float, 3, 4>::Zero();
+			float d_sq = 1 - q.w()  * q.w();
+			if (d_sq == 0) {
+				result.topLeftCorner(3,3) = Eigen::Matrix3f::Identity();
+			} else {
+				float d = std::sqrt(d_sq);
+				float angle = 2 * std::acos(q.w());
+				float qwFactor = (2+q.w() * angle / d) / d_sq;
+				result(0,3) = q.x() * qwFactor;
+				result(1,3) = q.y() * qwFactor;
+				result(2,3) = q.z() * qwFactor;
+				result(0,0) = angle / d;
+				result(1,1) = angle / d;
+				result(2,2) = angle / d;
+			}
+			return result;
+			
+		}
+
+		//template <typename Scalar>
+		//static inline Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> numericalDerivative
+		//(const std::function<Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>(const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>&)> f,
+		// const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>& x, 
+		// double h = 1e-10) {
+		//	//Current state
+		//	Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> f_x = f(x);
+		//	int n = x.rows();
+		//	int m = x.cols();
+		//	int p = f_x.rows();
+		//	int q = f_x.cols();
+		//	//Atlas of derivatives
+		//	Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> df_dx = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>::Zero(n*p,m*q);
+		//	//Vary each independent variable and use change in f to estimate derivative
+		//	for (int i = 0; i < x.rows(); i++) {
+		//		for (int j = 0; j < x.cols(); j++) {
+		//			Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> xplush = x;
+		//			x(i, j) += Scalar(h);
+		//			Eigen::Matrix<Scalar, Eigen::Dynmic, Eigen::Dynamic> delf_delx = (f(xplush) - f_x) / h;
+		//			df_dx.block(i*p, j*q, p, q) = delf_delx;
+		//		}
+		//	}
+		//	return df_dx;
+		//}
+
+		template <typename Scalar>
+		static inline Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> numericalVectorDerivative
+		(const std::function<Eigen::Matrix<Scalar, Eigen::Dynamic, 1>(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>&)> f,
+			const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& x,
+			double h = 0.01) {
+			//Current state
+			Eigen::Matrix<Scalar, Eigen::Dynamic, 1> f_x = f(x);
+			int n = x.size();
+			int m = f_x.size();
+			//Atlas of derivatives
+			Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> df_dx = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>::Zero(m,n);
+			//Vary each independent variable and use change in f to estimate derivative
+			for (int i = 0; i < n; i++) {
+				Eigen::Matrix<Scalar, Eigen::Dynamic, 1> xplush = x;
+				xplush(i) += Scalar(h);
+				Eigen::Matrix<Scalar, Eigen::Dynamic, 1> f2 = f(xplush);
+				Eigen::Matrix<Scalar, Eigen::Dynamic, 1> delf_delx = (f2 - f_x) / h;
+				df_dx.col(i) = delf_delx;
+			}
+			return df_dx;
+		}
+
+		//Returns the twist equivalent to w that is closest to target
+		// w = (2*pi*n + norm(w))*unit(w) for all n integer
+		static inline Eigen::Vector3f twistClosestRepresentation(const Eigen::Vector3f& w, const Eigen::Vector3f& target) {
+			float w_angle = w.norm();
+
+			float target_angle = target.norm();
+
+			//handle zero case
+			if (w_angle == 0) {
+				if (target_angle == 0) {
+					return Eigen::Vector3f::Zero();
+				}
+				//Round target to nearest multiple of 2pi
+				int target_ring = std::round(target_angle / (2 * M_PI));
+				return (2 * M_PI * target_ring) * target / target_angle;
+			}
+			else {
+				//Project target onto line of w, then round to nearest whole 2pi offset magnitude from w
+				int k = std::round(((target).dot(w/w_angle)-w_angle)/(2 * M_PI));
+				int sign = target.dot(w) > 0 ? 1 : -1;
+				//Two equivalent twists
+				
+				return  w * (w_angle + 2*M_PI*k)/w_angle;
+			}
+		}
 	}
 }

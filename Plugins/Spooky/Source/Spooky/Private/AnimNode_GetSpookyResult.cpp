@@ -38,10 +38,10 @@
 	void FAnimNode_GetSpookyResult::Evaluate(FPoseContext& Output){
 		if (spookyFP) {
 			//Copy new data in from the fusion plant
+			//The root node pose is fixed by externals
 			for (int index = 0; index < Output.Pose.GetNumBones(); index++) {
 				FString bone_name = Output.GetAnimBlueprint()->TargetSkeleton->GetReferenceSkeleton().GetBoneName(index).GetPlainNameString();
 				Output.Pose[FCompactPoseBoneIndex(index)] = spookyFP->getBoneTransform(bone_name);
-				//Output.Pose[FCompactPoseBoneIndex(index)].SetRotation(FQuat(0, 0, 0, 1));
 			}
 		}
 

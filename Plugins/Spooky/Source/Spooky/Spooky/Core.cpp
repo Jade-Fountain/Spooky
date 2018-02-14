@@ -19,23 +19,39 @@
 #include <chrono>
 
 namespace spooky {
-
-	void Core::addBoneNode(const NodeDescriptor & node, const NodeDescriptor & parent, const Transform3D& boneTransform)
+	
+	void Core::addFixedNode(const NodeDescriptor & node, const NodeDescriptor & parent,
+							 const Transform3D& pose)
 	{
 		skeleton.addNode(node, parent);
-		skeleton.setBoneForNode(node, boneTransform);
+		skeleton.setFixedNode(node, pose);
 	}
 
-	void Core::addPoseNode(const NodeDescriptor & node, const NodeDescriptor & parent, const Transform3D& poseInitial)
+	void Core::addBoneNode(const NodeDescriptor & node, const NodeDescriptor & parent,
+							 const Transform3D& boneTransform,
+							 const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
+							 const float& process_noise)
 	{
 		skeleton.addNode(node, parent);
-		skeleton.setPoseNode(node, poseInitial);
+		skeleton.setBoneForNode(node, boneTransform, Node::State::Parameters(constraint_centre, constraint_variance), process_noise);
 	}
 
-	void Core::addScalePoseNode(const NodeDescriptor & node, const NodeDescriptor & parent, const Transform3D& poseInitial, const Eigen::Vector3f& scaleInitial)
+	void Core::addPoseNode(const NodeDescriptor & node, const NodeDescriptor & parent,
+							 const Transform3D& poseInitial,
+							 const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
+							 const float& process_noise)
 	{
 		skeleton.addNode(node, parent);
-		skeleton.setScalePoseNode(node, poseInitial, scaleInitial);
+		skeleton.setPoseNode(node, poseInitial, Node::State::Parameters(constraint_centre, constraint_variance), process_noise);
+	}
+
+	void Core::addScalePoseNode(const NodeDescriptor & node, const NodeDescriptor & parent,
+							 const Transform3D& poseInitial, const Eigen::Vector3f& scaleInitial,
+							 const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
+							 const float& process_noise)
+	{
+		skeleton.addNode(node, parent);
+		skeleton.setScalePoseNode(node, poseInitial, scaleInitial, Node::State::Parameters(constraint_centre, constraint_variance),process_noise);
 	}
 
 
@@ -62,6 +78,11 @@ namespace spooky {
 	void Core::setSystemLatency(const SystemDescriptor& system, const float& latency){
 		sysLatencies[system] = latency;
 	}
+	
+	void Core::setJointStiffness(const float& stiffness) {
+		skeleton.setAllJointStiffness(stiffness);
+	}
+
 
 
 	// =================

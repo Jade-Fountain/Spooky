@@ -4,7 +4,7 @@
 	"VersionName": "0.1",
 	"FriendlyName": "Spooky",
 	"Description": "Sensor calibration and fusion for skeleton trackers",
-	"Category": "Virtual Reality",
+	"Category": "Sensor Fusion",
 	"CreatedBy": "Jake Fountain",
 	"CreatedByURL": "",
 	"DocsURL": "",

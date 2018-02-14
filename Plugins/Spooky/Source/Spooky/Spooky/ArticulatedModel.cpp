@@ -33,8 +33,7 @@ namespace spooky {
 	}
 
 	Transform3D Node::getFinalGlobalPose(){
-		Transform3D pose = getGlobalPose();
-		return pose * homePose;
+		return getGlobalPose() * homePose;
 	}
 
 	Transform3D Node::getLocalPose(){
@@ -45,6 +44,174 @@ namespace spooky {
 		return pose;
 	}
 
+	Transform3D Node::getLocalPoseAt(const Eigen::VectorXf & theta)
+	{
+		Transform3D pose = Transform3D::Identity();
+		assert(theta.size() == getDimension());
+		int block_start = 0;
+		for (int i = 0; i < articulations.size(); i++) {
+			int block_size = local_state.articulation[i].expectation.size();
+			pose = pose * articulations[i].getTransform<float>(theta.block(block_start,0,block_size,1));
+			block_start += block_size;
+		}
+		return pose;
+	}
+	
+	Eigen::Matrix<float,6,6> Node::getLocalPoseVariance(){
+		Eigen::Matrix<float,6,6> var = Eigen::Matrix<float,6,6>::Zero();
+		for (int i = 0; i < articulations.size(); i++) {
+			//Assume decoupling of variances between articulations - only true for linear cases (position only)
+			//TODO: implement this method in articulation
+			assert(false);
+			//var += articulations[i].getPoseVariance(local_state.articulation[i].expectation,local_state.articulation[i].variance);
+		}	
+		return var;
+	}
+
+	
+	int Node::getPDoF(bool hasLeverChild){
+		int pdof = 0;
+		for (int i = 0; i < articulations.size(); i++) {
+			pdof += articulations[i].getPDoF(hasLeverChild);
+		}
+		return pdof;
+	}
+	
+	int Node::getRDoF(){
+		int rdof = 0;
+		for (int i = 0; i < articulations.size(); i++) {
+			rdof += articulations[i].getRDoF();
+		}
+		return rdof;
+	}
+
+	int Node::getSDoF(){
+		int sdof = 0;
+		for (int i = 0; i < articulations.size(); i++) {
+			sdof += articulations[i].getSDoF();
+		}
+		return sdof;
+	}
+
+	int Node::getDimension() {
+		int dim = 0;
+		for (int i = 0; i < articulations.size(); i++) {
+			dim += local_state.articulation[i].expectation.size();
+		}
+		return dim;
+	}
+
+
+	//Set state parameters
+	void Node::setState(const State::Parameters& new_state){
+		int pos = 0;
+		for(int i = 0; i < articulations.size(); i++){
+			int dim = local_state.articulation[i].expectation.size();
+			local_state.articulation[i] = new_state.getSubstate(pos,dim);
+			pos += dim;
+		}
+		//Indicate that this node needs its local pose to be recomputed
+		recacheRequired = true;
+		//TODO:Add timestamp?
+		//local_state.last_update_time = t;
+	}
+
+	Node::State::Parameters Node::getState(){
+		//Construct new parameters set for combined articulations
+		State::Parameters p(getDimension());
+		int pos = 0;
+		for(int i = 0; i < articulations.size(); i++){
+			int dim = local_state.articulation[i].expectation.size();
+			p.insertSubstate(pos,local_state.articulation[i]);
+			pos += dim;
+		}
+		return p;
+	}
+
+	Node::State::Parameters Node::getConstraints(){
+		//Construct new parameters set for combined articulations
+		State::Parameters p(getDimension());
+		int pos = 0;
+		for(int i = 0; i < articulations.size(); i++){
+			int dim = local_state.constraints[i].expectation.size();
+			p.insertSubstate(pos,local_state.constraints[i]);
+			pos += dim;
+		}
+		return p;
+	}
+
+	Node::State::Parameters Node::getProcessNoise(){
+		//Construct new parameters set for combined articulations
+		State::Parameters p(getDimension());
+		int pos = 0;
+		for(int i = 0; i < articulations.size(); i++){
+			int dim = local_state.process_noise[i].expectation.size();
+			p.insertSubstate(pos,local_state.process_noise[i]);
+			pos += dim;
+		}
+		return p;
+	}
+
+
+	Node::State::Parameters Node::getChainParameters(std::function<Node::State::Parameters (Node&)> getParams, const int& chain_length) {
+		//Precompute State size
+		int inputDimension = 0;
+		//TODO: dont use raw pointer
+		Node* node = this;
+		for (int i = 0; i < chain_length; i++) {
+			inputDimension += node->getDimension();
+			if (node->parent == NULL) break;
+			node = node->parent.get();
+		}
+		//Reset for actual calculation
+		node = this;
+		State::Parameters result(inputDimension);
+		int position = 0;
+		for (int i = 0; i < chain_length; i++) {
+			int dim = node->getDimension();
+			result.insertSubstate(position,getParams(*node));
+			position += dim;
+			if (node->parent == NULL) break;
+			node = node->parent.get();
+		}
+		return result;
+	}
+
+	Node::State::Parameters Node::getChainState(const int& chain_length) {		
+		return getChainParameters(
+			std::function<Node::State::Parameters(Node&)>(&Node::getState)
+			, chain_length);
+	}
+
+	Node::State::Parameters Node::getChainConstraints(const int& chain_length) {		
+		return getChainParameters(
+			std::function<Node::State::Parameters(Node&)>(&Node::getConstraints)
+			, chain_length);
+	}
+
+	Node::State::Parameters Node::getChainProcessNoise(const int& chain_length) {		
+		return getChainParameters(
+			std::function<Node::State::Parameters(Node&)>(&Node::getProcessNoise)
+			, chain_length);
+	}
+
+	void Node::setChainState(const int& chain_length, const State::Parameters& state_params) {
+		//Precompute Jacobian size
+		//TODO: dont use raw pointer
+		Node* node = this;
+		int last_block_end = 0;
+		for (int i = 0; i < chain_length; i++) {
+			int dim = node->getDimension();
+			node->setState(state_params.getSubstate(last_block_end,dim));
+			last_block_end += dim;
+			if (node->parent == NULL) break;
+			node = node->parent.get();
+		}
+
+	}
+
+
+		//TODO: clean up old functions
 	void Node::updateState(const State& new_state, const float& timestamp, const float& latency) {
 		recacheRequired = true;
 		//TODO: add latency prediction
@@ -58,46 +225,80 @@ namespace spooky {
 		local_state.articulation.clear();
 		int max_n_rows = 1;
 		for(int i = 0; i < articulations.size(); i++){	
-			local_state.articulation.push_back(Node::State::Parameters());
-			local_state.articulation[i].expectation = Articulation::getInitialState(articulations[i].getType());
+			auto init = Articulation::getInitialState(articulations[i].getType());
+			local_state.articulation.push_back(Node::State::Parameters(init.size()));
+			local_state.constraints.push_back(Node::State::Parameters(init.size()));
+			local_state.process_noise.push_back(Node::State::Parameters(init.size()));
+			local_state.articulation[i].expectation = init;
 			//TODO: generate covariance initial per aticulation
 			local_state.articulation[i].variance = initial_covariance * Eigen::MatrixXf::Identity(local_state.articulation[i].expectation.size(),
 																							      local_state.articulation[i].expectation.size());
 		}
 	}
 
+	void Node::setConstraintForArticulation(const int& i, const Node::State::Parameters& c){
+		local_state.constraints[i] = c;
+	}
+
+	void Node::setConstraints(const Node::State::Parameters& c){
+		int pos = 0;
+		for(int i = 0; i < articulations.size(); i++){
+			int dim = local_state.articulation[i].expectation.size();
+			local_state.constraints[i] = c.getSubstate(pos,dim);
+			pos += dim;
+		}
+	}
+
+	void Node::setProcessNoiseForArticulation(const int& i, const Node::State::Parameters& p){
+		local_state.process_noise[i] = p;
+	}
+
+	void Node::setProcessNoises(const Node::State::Parameters& p){
+		int pos = 0;
+		for(int i = 0; i < articulations.size(); i++){
+			int dim = local_state.articulation[i].expectation.size();
+			local_state.process_noise[i] = p.getSubstate(pos,dim);
+			pos += dim;
+		}
+	}
+
 	void Node::fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem){
-		Transform3D parent_pose = Transform3D::Identity();
 		
 		//If this node has a parent, recursively fuse until we know its transform
 		if (parent != NULL) {
 			parent->fuse(calib, referenceSystem);
-			parent_pose = parent->getGlobalPose();
 		}
-		
-		//SPOOKY_LOG("Fusing node " + desc.name + " t = ");
 
 		for(auto& m : measurements){
 			//Throwout bad measurements
+			//TODO: use confidence better
 			if (m->confidence < 0.75) {
 				continue;
 			}
 
 			//Get mapping to correct reference frame
 			//TODO: Optimise this access somehow?
-			CalibrationResult calibResult = calib.getResultsFor(referenceSystem, m->getSystem());
+			Transform3D toFusionSpace = Transform3D::Identity();
+			CalibrationResult calibResult = calib.getResultsFor(m->getSystem(),referenceSystem);
 			if (calibResult.calibrated()) {
-				parent_pose = calibResult.transform * parent_pose;
+				toFusionSpace = calibResult.transform;
 			}
 
-			Node::State new_state = local_state;
-			new_state.valid = false;
-			for(int i = 0; i < articulations.size(); i++){
-				//Iteratively enters data into new_state
-				insertMeasurement(i,m,parent_pose,&new_state);
-				//If we can use the data, update the local state
+			switch(m->type){
+				case(Measurement::Type::POSITION):
+					fusePositionMeasurement(m,toFusionSpace);
+					break;
+				case(Measurement::Type::ROTATION):
+					fuseRotationMeasurement(m,toFusionSpace);
+					break;
+				case(Measurement::Type::RIGID_BODY):
+					fuseRigidMeasurement(m,toFusionSpace);
+					break;
+				case(Measurement::Type::SCALE):
+					fuseScaleMeasurement(m,toFusionSpace);
+					break;
+
 			}
-			if(new_state.valid) updateState(new_state, m->getTimestamp(), m->getLatency());
 		}
 		//Dont use data twice
 		measurements.clear();
@@ -112,7 +313,6 @@ namespace spooky {
 			//Simple update based on parent pose
 			state->articulation[i].expectation = Eigen::Quaternionf(parent_pose.rotation().inverse() * m->getRotation()).coeffs();
 			state->articulation[i].expectation.normalize();
-			//TODO: make names consitent
 			state->articulation[i].variance = m->getRotationVar();
 			state->valid = true;
 		} 
@@ -228,37 +428,72 @@ namespace spooky {
 
 	void ArticulatedModel::fuse(const Calibrator& calib) {
 		for(auto& node : nodes){
-			//TODO: support other fusion methods
 			node.second->fuse(calib, reference_system);
 		}
 		clearMeasurements();
 	}
 
-	void ArticulatedModel::setBoneForNode(const NodeDescriptor& node, const Transform3D& boneTransform) {
+	void ArticulatedModel::setFixedNode(const NodeDescriptor& node, const Transform3D& pose) {
+		std::vector<Articulation> art;
+		art.push_back(Articulation::createFixed(pose));
+		nodes[node]->setModel(art);
+		nodes[node]->local_state.articulation[0].expectation = Eigen::VectorXf(0);
+	}
+
+
+	void ArticulatedModel::setBoneForNode(const NodeDescriptor& node, const Transform3D& boneTransform,
+										  const Node::State::Parameters& constraints, const float& process_noise) {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createBone(boneTransform.translation()));
 		nodes[node]->setModel(art);
-		nodes[node]->local_state.articulation[0].expectation = Eigen::Quaternionf(boneTransform.rotation()).coeffs();
+		Eigen::AngleAxisf aa(boneTransform.rotation());
+		nodes[node]->local_state.articulation[0].expectation = aa.angle() * aa.axis();
+		assert(constraints.size() == nodes[node]->getDimension());
+		nodes[node]->setConstraints(constraints);
+		Node::State::Parameters PN(nodes[node]->getDimension());
+		PN.variance = process_noise * Eigen::MatrixXf::Identity(nodes[node]->getDimension(),nodes[node]->getDimension());
+		nodes[node]->setProcessNoises(PN);
 	}
 
 
-	void ArticulatedModel::setPoseNode(const NodeDescriptor& node, const Transform3D& poseTransform) {
+	void ArticulatedModel::setPoseNode(const NodeDescriptor& node, const Transform3D& poseTransform,
+									   const Node::State::Parameters& constraints, const float& process_noise) {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createPose());
 		nodes[node]->setModel(art);
-		nodes[node]->local_state.articulation[0].expectation = Measurement::getPosQuatFromTransform(poseTransform);
+		nodes[node]->local_state.articulation[0].expectation = utility::toAxisAnglePos(poseTransform);
+		assert(constraints.size() == nodes[node]->getDimension());
+		nodes[node]->setConstraints(constraints);
+		Node::State::Parameters PN(nodes[node]->getDimension());
+		PN.variance = process_noise * Eigen::MatrixXf::Identity(nodes[node]->getDimension(),nodes[node]->getDimension());
+		nodes[node]->setProcessNoises(PN);
 	}
 	
-	void ArticulatedModel::setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial) {
+	void ArticulatedModel::setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial,
+											const Node::State::Parameters& constraints, const float& process_noise) {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createPose());
 		//Scale in local space x'=T*S*x
 		art.push_back(Articulation::createScale());
 		nodes[node]->setModel(art);
-		nodes[node]->local_state.articulation[0].expectation = Measurement::getPosQuatFromTransform(poseTransform);
+		nodes[node]->local_state.articulation[0].expectation = utility::toAxisAnglePos(poseTransform);
 		nodes[node]->local_state.articulation[1].expectation = scaleInitial;
+		assert(constraints.size() == nodes[node]->getDimension());
+		nodes[node]->setConstraints(constraints);
+		Node::State::Parameters PN(nodes[node]->getDimension());
+		PN.variance = process_noise * Eigen::MatrixXf::Identity(nodes[node]->getDimension(),nodes[node]->getDimension());
+		nodes[node]->setProcessNoises(PN);
 	}
 
+	void ArticulatedModel::setJointStiffness(const NodeDescriptor & node, const float& stiffness) {
+		utility::safeAccess(nodes,node)->joint_stiffness = stiffness;
+	}
+
+	void ArticulatedModel::setAllJointStiffness(const float& stiffness) {
+		for (auto& node : nodes) {
+			node.second->joint_stiffness = stiffness;
+		}
+	}
 
 	void ArticulatedModel::addGenericNode(const NodeDescriptor & node) {
 		if (nodes.count(node) == 0) {
@@ -295,8 +530,6 @@ namespace spooky {
 			node.second->measurements.clear();
 		}
 	}
-
-
 
 
 }

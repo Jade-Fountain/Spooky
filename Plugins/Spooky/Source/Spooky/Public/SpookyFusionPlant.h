@@ -23,6 +23,7 @@
 
 #include "Spooky/Core.h"
 #include "Spooky/FusionTypes.h"
+#include "SpookySkeletalMeshComponent.h"
 
 #include <iostream>
 #include <vector>
@@ -54,8 +55,7 @@ class USpookyFusionPlant : public UActorComponent
 	spooky::Core spookyCore;
 
 	//Input Skeletons
-	std::vector<USkeletalMeshComponent*> skeletons;
-	std::vector<Eigen::Matrix<float, 7, 1>> skeletonCovariances;
+	std::vector<USpookySkeletalMeshComponent*> skeletal_spirits;
 
 public:	
 
@@ -76,13 +76,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void Configure(float input_units_m = 1, float output_units_m = 1);
 
+	UFUNCTION(BlueprintCallable, Category = "Spooky")
+	void SetJointStiffness(float stiffness);
+
 	//Add complete skeleton to list of fusion objects
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddSkeleton(USkeletalMeshComponent* skeletal_mesh, FVector position_var, FVector4 quaternion_var);
+	void AddSkeleton(USpookySkeletalMeshComponent* spooky_skeletal_mesh);
 
 	//Set the output target which will have the complete fused skeleton pose applied
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddOutputTarget(USkeletalMeshComponent* skeletal_mesh);
+	void AddOutputTarget(USkeletalMeshComponent* skeletal_mesh, const TArray<FName>& fixedJoints, float default_constraint_flexibility = 1, float default_process_noise = 0.1);
 	
 	//Perform some setup postprocessing
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
@@ -188,6 +191,8 @@ public:
 	spooky::Measurement::Ptr CreateRotationMeasurement(FString system_name, int sensorID, float timestamp_sec, FQuat rotation, FVector4 uncertainty, float confidence = 1);
 	spooky::Measurement::Ptr CreateScaleMeasurement(FString system_name, int sensorID, float timestamp_sec, FVector scale, FVector uncertainty, float confidence = 1);
 	spooky::Measurement::Ptr CreatePoseMeasurement(FString system_name, int sensorID, float timestamp_sec, FVector v, FQuat q, Eigen::Matrix<float,7,1> uncertainty, float confidence = 1);
+	spooky::Measurement::Ptr CreatePoseMeasurement(FString system_name, int sensorID, float timestamp_sec, FVector v, FQuat q, FVector position_var, FVector4 quaternion_var, float confidence);
+
 	
 	//Sets data common to all types of measurements
 	void SetCommonMeasurementData(spooky::Measurement::Ptr& m, FString system_name, int sensorID, float timestamp_sec, float confidence);

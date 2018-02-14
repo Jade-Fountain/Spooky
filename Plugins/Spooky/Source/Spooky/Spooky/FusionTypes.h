@@ -33,6 +33,7 @@ namespace spooky {
 
 	//Mapping between two affine spaces
 	typedef Eigen::Transform<float, 3, Eigen::Affine> Transform3D;
+	typedef Eigen::Transform<std::complex<double>, 3, Eigen::Affine> Transform3Dcd;
 	
 	//Define isometry for fast inverses when possible
 	class Isometry3D : Transform3D {
@@ -75,7 +76,10 @@ namespace spooky {
 	};
 
 	//Node descriptor uses the same class as systemdescriptor
-	typedef SystemDescriptor NodeDescriptor;
+	class NodeDescriptor : public SystemDescriptor {
+	public:
+		NodeDescriptor(std::string n = "") :  SystemDescriptor(n){}
+	};
 
 	//Map key types
 	typedef std::pair<SystemDescriptor, SystemDescriptor> SystemPair;
@@ -321,15 +325,9 @@ namespace spooky {
 		//=========================
 
 		//Setup Methods
-		bool check_consistent() {
-			return (size == data.size() == uncertainty.rows() == uncertainty.cols());
-		}
+		bool check_consistent();
 
-		bool setMetaData(float timestamp_sec, float confidence_){
-			timestamp = timestamp_sec;
-			confidence = confidence_;
-			return check_consistent();
-		}
+		bool setMetaData(float timestamp_sec, float confidence_);
 
 		//=========================
 		//Static factory methods:
@@ -370,6 +368,9 @@ namespace spooky {
 		Eigen::VectorXf difference(const Measurement::Ptr & other);
 		float compare(const Measurement::Ptr & other);
 
+
+		//Transform this measurement to a new space
+		Measurement transform(const Transform3D& T) const;
 
 		//Synchronises the source stream with the target stream
 		// It is assumed that the two  streams are chronologically sorted
@@ -467,6 +468,44 @@ namespace spooky {
 			return sensor->getLatency();
 		}
 
+		int getRequiredPDoF(){
+			switch(type){
+				case(Type::POSITION):
+					return 3;
+				case(Type::GENERIC):
+					return data.size();
+				case(Type::RIGID_BODY):
+					return 3;
+				case(ROTATION):
+					return 0;
+				case(SCALE):
+					return 0;
+			}
+			return 0;
+		}
+		int getRequiredRDoF(){
+			switch(type){
+				case(Type::POSITION):
+					return 0;
+				case(Type::GENERIC):
+					return data.size();
+				case(Type::RIGID_BODY):
+					return 3;
+				case(ROTATION):
+					return 3;
+				case(SCALE):
+					return 0;
+			}
+			return 0;
+		}
+		int getRequiredSDoF(){
+			if(type == Type::SCALE)
+			{
+				return 3;
+			} else {
+  				return 0;
+			}
+		}
 	};
 
 	class MeasurementBuffer {

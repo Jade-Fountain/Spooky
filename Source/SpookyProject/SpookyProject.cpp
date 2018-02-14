@@ -14,6 +14,6 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#include "UnrealFusion.h"
+#include "SpookyProject.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, UnrealFusion, "UnrealFusion" );
+IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, SpookyProject, "SpookyProject" );
