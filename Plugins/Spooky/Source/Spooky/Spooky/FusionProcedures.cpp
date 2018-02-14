@@ -48,9 +48,9 @@ namespace spooky{
     // }
 
     //Following method is static for shared ptr reasons
-    std::vector<Node::Ptr> Node::getAllParents(const Node::Ptr& node){
+    std::vector<Node::Ptr> Node::getAllParents(){
         std::vector<Node::Ptr> result;
-        Node::Ptr n = node;
+        Node::Ptr n = shared_from_this();
         while(true){
             result.push_back(n);
             if(n->parent == NULL){
@@ -62,10 +62,19 @@ namespace spooky{
         return result;
     }
 
-    std::vector<Node::Ptr> getRequiredChain(const Node::Ptr& srcNode, const Node::Ptr& destNode, const Measurement::Ptr& m){
+    std::vector<Node::Ptr> getRequiredChain(const Node::Ptr& destNode, const Measurement::Ptr& m){
+        Node::Ptr srcNode = shared_from_this();
+
+        //If not in global space, we only receive info about this node
+        if(!m->globalSpace){
+            std::vector<Node::Ptr> single_node;
+            single_node.push_back(srcNode);
+            return single_node;
+        }
+        
         //Get all nodes from the sensor root to the global root node
-        std::vector<Node::Ptr> destParents = getAllParents(destNode);
-        std::vector<Node::Ptr> srcParents = getAllParents(srcNode);
+        std::vector<Node::Ptr> destParents = destNode.getAllParents();
+        std::vector<Node::Ptr> srcParents = srcNode.getAllParents();
 
         int max_search_distance = std::min(destParents.size(),srcParents.size());
         int diverge_point = 0;
@@ -93,7 +102,6 @@ namespace spooky{
         int s_dof_req = m->getRequiredSDoF();
         int r_dof_req = m->getRequiredRDoF();
 
-        const float flex_threshold = 0.9;
         bool hasLeverChild = false;
 		//Iterate down node chain and up dest chain until enough DOF found
         std::vector<Node::Ptr> result;
@@ -120,7 +128,8 @@ namespace spooky{
     void Node::fusePositionMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 
         Eigen::VectorXf pstate;
-        std::vector<Node::Ptr> fusion_chain;
+        //Fuse by modifying some parents if necessary
+        std::vector<Node::Ptr> fusion_chain = getRequiredChainLength(shared_from_this(),rootNode,m);
 
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
@@ -128,8 +137,6 @@ namespace spooky{
 
         if (m->globalSpace) {
             pstate = getGlobalPose().translation();
-            //Fuse by modifying some parents if necessary
-			fusion_chain = getRequiredChainLength(m, rootNode);
         }
         else {
             pstate = getLocalPose().translation();
@@ -171,7 +178,7 @@ namespace spooky{
 
         //Calculate error
         Eigen::VectorXf wpstate;
-        std::vector<Node::Ptr> fusion_chain;
+        std::vector<Node::Ptr> fusion_chain = getRequiredChainLength(shared_from_this(),rootNode,m);
 
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
@@ -180,8 +187,6 @@ namespace spooky{
         
         if (m->globalSpace) {
             wpstate = utility::toAxisAnglePos(getGlobalPose()).head(3);
-            //Fuse by modifying some parents if necessary
-            fusion_chain = getRequiredChainLength(m, rootNode);
         }
         else {
             wpstate = utility::toAxisAnglePos(getLocalPose()).head(3);
@@ -227,17 +232,17 @@ namespace spooky{
     void Node::fuseRigidMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 		//Calculate error
         Eigen::VectorXf wpstate;
-		std::vector<Node::Ptr> fusion_chain;
+
+		//Fuse by modifying some parents if necessary
+        std::vector<Node::Ptr> fusion_chain = getRequiredChainLength(shared_from_this(),rootNode,m);
         
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
         Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
 
         
-		if (m->globalSpace) {
+        if (m->globalSpace) {
             wpstate = utility::toAxisAnglePos(getGlobalPose());
-			//Fuse by modifying some parents if necessary
-			fusion_chain = getRequiredChain(m,rootNode);
         }
         else {
             wpstate = utility::toAxisAnglePos(getLocalPose());
@@ -292,7 +297,9 @@ namespace spooky{
     void Node::fuseScaleMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 
         Eigen::VectorXf pstate;
-        std::vector<Node::Ptr> fusion_chain;
+        //Fuse by modifying some parents if necessary
+        std::vector<Node::Ptr> fusion_chain = getRequiredChainLength(shared_from_this(),rootNode,m);
+        
 
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
@@ -300,10 +307,8 @@ namespace spooky{
 
         
         if (m->globalSpace) {
-			//TODO: change to return class so I can use .scale(), .pos(), etc?
+            //TODO: change to return class so I can use .scale(), .pos(), etc?
             pstate = utility::toAxisAnglePosScale(getGlobalPose()).tail(3);
-            //Fuse by modifying some parents if necessary
-            fusion_chain = getRequiredChain(m);
         }
         else {
             pstate = utility::toAxisAnglePosScale(getLocalPose()).tail(3);

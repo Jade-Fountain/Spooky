@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace spooky {
 
-	class Node{
+	class Node : public std::enable_shared_from_this<Node>{
 	public:
 		//Constructor
 		Node();
@@ -174,8 +174,8 @@ namespace spooky {
 		void fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem, const std::map<NodeDescriptor,Node::Ptr>& nodes);
 
 		//Get required parents for fusing measurement m
-		static std::vector<Node::Ptr> getAllParents(const Node::Ptr& node);
-	    static std::vector<Node::Ptr> getRequiredChain(const Node::Ptr& fromNode, const Node::Ptr& toNode, const Measurement::Ptr& m);
+		std::vector<Node::Ptr> getAllParents(const Node::Ptr& node);
+	    std::vector<Node::Ptr> getRequiredChain(const Node::Ptr& fromNode, const Node::Ptr& toNode, const Measurement::Ptr& m);
 
 		//Fusion of particular mesurement types (defined in FusionProcedures.cpp)
 		void fusePositionMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
