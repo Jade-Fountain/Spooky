@@ -47,10 +47,6 @@ struct FSpookySkeletonBoneInfo{
 	//--------------------------------
 	//		FIXED PARAMETERS
 	//--------------------------------
-	//Name of the system which the sensor belongs to
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	FString system_name;
-
 	//Name of the bone in the skeleton heirarchy
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
 	FName name;
@@ -109,17 +105,30 @@ class USpookySkeletalMeshComponent :
 	GENERATED_UCLASS_BODY()
 
 private: 
+
 	//List of bones which carry measurements of  with associated meta info
 	std::map<FName,FSpookySkeletonBoneInfo> activeBones;
 
 	std::unique_ptr<FSpookySkeletonBoneInfo> defaultBoneInfo;
 
+	bool setup = false;
+
 public:
 
+	//Name of the system which the sensor belongs to
+	FString system_name;
+	//Name of the root node that the sensor system rests on
+	FString root_node;
+	//The transform of the sensor system relative to the root node
+	FTransform root_node_offset;
 
 	//--------------------------------
 	//		INITIALISATION
 	//--------------------------------
+
+	UFUNCTION(BlueprintCallable, Category = "Spooky")
+	void SetSystemInfo(const FString& systemName, const FString& rootNode, const FTransform& rootNodeOffset);
+
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void SetDefaultBoneInfo(const FSpookySkeletonBoneInfo& info);
 

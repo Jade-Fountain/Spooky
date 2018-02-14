@@ -223,9 +223,14 @@ namespace spooky {
 		//Typedef ptr to this class for neater code later
 		typedef std::shared_ptr<Sensor> Ptr;
 
+		//Root node from to which the sensor is attached
+		//Defaults to the first node in the model
+		NodeDescriptor rootNode = "";
+
 		//Accessors:
 		bool isResolved() { return utility::setDiff(nodes, eliminatedNodes).size() == 1; }
 		bool isAmbiguous() { return nodes.size() != 1; }
+		NodeDescriptor getRootNode(){return rootNode;}
 
 		//Returns a valid node only when there is only one possibility
 		NodeDescriptor getNode() {

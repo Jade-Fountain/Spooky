@@ -150,6 +150,7 @@ namespace spooky {
 
 		//Generic grouped parameter methods
 		State::Parameters getChainParameters(std::function<Node::State::Parameters(Node&)> getParams, const int& chain_length);
+		
 		//Set and get an entire chain of nodes starting with this and recursing up parents
 		void setChainState(const int & chain_length, const State::Parameters & state);
 		State::Parameters getChainState(const int & chain_length);
@@ -170,16 +171,16 @@ namespace spooky {
 		void setProcessNoises(const Node::State::Parameters& p);
 
 		//Local fusion of all buffered measurements
-		void fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem);
+		void fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem, const std::map<NodeDescriptor,Node::Ptr>& nodes);
 
 		//Get required parents for fusing measurement m
 	    int getRequiredChainLength(const Measurement::Ptr& m);
 
 		//Fusion of particular mesurement types (defined in FusionProcedures.cpp)
-		void fusePositionMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
-		void fuseRotationMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
-		void fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
-		void fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace);
+		void fusePositionMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
+		void fuseRotationMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
+		void fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
+		void fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
 		
 		//Basic math for performing EKF with prior, constraints and measurement
 	    Node::State::Parameters 

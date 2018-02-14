@@ -83,6 +83,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void AddSkeleton(USpookySkeletalMeshComponent* spooky_skeletal_mesh);
 
+	//Sets the name of the root node of a system
+	UFUNCTION(BlueprintCallable, Category = "Spooky")
+	void SetSystemRootNode(FString system, FString rootNode, const FTransform& rootNodeOffset);
+
 	//Set the output target which will have the complete fused skeleton pose applied
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void AddOutputTarget(USkeletalMeshComponent* skeletal_mesh, const TArray<FName>& fixedJoints, float default_constraint_flexibility = 1, float default_process_noise = 0.1);

@@ -262,7 +262,7 @@ namespace spooky {
 		}
 	}
 
-	void Node::fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem){
+	void Node::fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem, const std::map<NodeDescriptor,Node::Ptr>& nodes){
 		
 		//If this node has a parent, recursively fuse until we know its transform
 		if (parent != NULL) {
@@ -283,21 +283,23 @@ namespace spooky {
 			if (calibResult.calibrated()) {
 				toFusionSpace = calibResult.transform;
 			}
+			
+			NodeDescriptor rootName = m->getSensor()->getRootNode();
+			Node::Ptr rootNode = nodes.count(rootName) > 0 ? nodes[rootName] : NULL;
 
 			switch(m->type){
 				case(Measurement::Type::POSITION):
-					fusePositionMeasurement(m,toFusionSpace);
+					fusePositionMeasurement(m,toFusionSpace,rootNode);
 					break;
 				case(Measurement::Type::ROTATION):
-					fuseRotationMeasurement(m,toFusionSpace);
+					fuseRotationMeasurement(m,toFusionSpace,rootNode);
 					break;
 				case(Measurement::Type::RIGID_BODY):
-					fuseRigidMeasurement(m,toFusionSpace);
+					fuseRigidMeasurement(m,toFusionSpace,rootNode);
 					break;
 				case(Measurement::Type::SCALE):
-					fuseScaleMeasurement(m,toFusionSpace);
+					fuseScaleMeasurement(m,toFusionSpace,rootNode);
 					break;
-
 			}
 		}
 		//Dont use data twice

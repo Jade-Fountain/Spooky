@@ -25,6 +25,12 @@ USpookySkeletalMeshComponent::USpookySkeletalMeshComponent(class FObjectInitiali
 }
 
 
+void USpookySkeletalMeshComponent::SetSystemInfo(const FString& systemName, const FString& rootNode, const FTransform& rootNodeOffset){
+	system_name = systemName;
+	root_node = rootNode;
+	root_node_offset = rootNodeOffset;
+	setup = true;
+}
 
 void USpookySkeletalMeshComponent::SetDefaultBoneInfo(const FSpookySkeletonBoneInfo& info){
 	defaultBoneInfo = std::make_unique<FSpookySkeletonBoneInfo>(info);
@@ -73,11 +79,13 @@ void USpookySkeletalMeshComponent::SetBoneInfo(const FSpookySkeletonBoneInfo& in
 
 
 void USpookySkeletalMeshComponent::UpdateTimestamp(const FName& bone,const float& t_sec){
+	if(!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
 	activeBones[bone].timestamp_sec = t_sec;
 }
 
 
 void USpookySkeletalMeshComponent::UpdateAllTimestamps(const float& t_sec){
+	if(!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
 	for(auto& bone : activeBones){
 		bone.second.timestamp_sec = t_sec;
 	}
@@ -85,6 +93,7 @@ void USpookySkeletalMeshComponent::UpdateAllTimestamps(const float& t_sec){
 
 
 void USpookySkeletalMeshComponent::UpdateConfidence(const FName& bone,const float& confidence){
+	if(!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
 	activeBones[bone].confidence = confidence;
 }
 

@@ -93,7 +93,7 @@ namespace spooky{
         return nodecount;
     }
 
-    void Node::fusePositionMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace){
+    void Node::fusePositionMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 
         Eigen::VectorXf pstate;
         int fusion_chain = 1;
@@ -143,7 +143,7 @@ namespace spooky{
         local_state.last_update_time = m->getTimestamp();
     }
 
-    void Node::fuseRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace){
+    void Node::fuseRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 
         //Calculate error
         Eigen::VectorXf wpstate;
@@ -200,7 +200,7 @@ namespace spooky{
         local_state.last_update_time = m->getTimestamp();
     }
 
-    void Node::fuseRigidMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace){
+    void Node::fuseRigidMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 		//Calculate error
         Eigen::VectorXf wpstate;
 		int fusion_chain = 1;
@@ -265,7 +265,7 @@ namespace spooky{
 
     }
 
-    void Node::fuseScaleMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace){
+    void Node::fuseScaleMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 
         Eigen::VectorXf pstate;
         int fusion_chain = 1;

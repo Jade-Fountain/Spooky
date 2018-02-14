@@ -53,6 +53,7 @@ namespace spooky {
 
 		//Latency data per system
 		std::map<SystemDescriptor, float> sysLatencies;
+		std::map<SystemDescriptor, NodeDescriptor> rootNodes;
 		
 	public:
 
@@ -109,6 +110,9 @@ namespace spooky {
 
 		//Set fusion joint stiffness
 		void setJointStiffness(const float& stiffness);
+
+		//Sets the (possibly moving) node which the sensor system is attached
+		void setSystemRootNode(const SystemDescriptor& system, const NodeDescriptor& node, const FTransform& rootNodeOffset);
 
 		////////////////////////////////////////////////////
 		//					Input at runtime

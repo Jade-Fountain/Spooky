@@ -87,7 +87,20 @@ UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::AddSk
 {
 	//Add skeleton reference
 	skeletal_spirits.push_back(spooky_skeletal_mesh);
+	//Set the root node of the system associated with the skeleton
+	SetSystemRootNode(skeleton->system_name,skeleton->root_node,skeleton->root_node_offset);
 	return;
+}
+
+UFUNCTION(BlueprintCallable, Category = "Spooky")
+void USpookyFusionPlant::SetSystemRootNode(FString system, FString rootNode, const FTransform& rootNodeOffset) {
+	spooky::SystemDescriptor sys(TCHAR_TO_UTF8(*skeleton.system));
+	spooky::NodeDescriptor root(TCHAR_TO_UTF8(*skeleton.root_node));
+	//Add node representing offset from the root node
+	//The node has the same as the system with the suffix "_root"
+	spookyCore.addFixedNode(spooky::NodeDescriptor(sys.name + "_root"),root,rootNodeOffset);
+	//Attach to sensor model
+	spookyCore.setSystemRootNode(sys,spooky::NodeDescriptor(sys.name + "_root"));
 }
 
 
@@ -213,19 +226,19 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 				//TODO: local vs global variance?
 				case(ESpookyMeasurementType::GENERIC):
 					//TODO: support generic measurement
-					m = CreatePositionMeasurement(spookyBoneInfo.system_name, i, spookyBoneInfo.timestamp_sec, localTransform.GetTranslation(), spookyBoneInfo.position_var, spookyBoneInfo.confidence);
+					m = CreatePositionMeasurement(skeleton.system_name, i, spookyBoneInfo.timestamp_sec, localTransform.GetTranslation(), spookyBoneInfo.position_var, spookyBoneInfo.confidence);
 					break;
 				case(ESpookyMeasurementType::POSITION):
-					m = CreatePositionMeasurement(spookyBoneInfo.system_name, i, spookyBoneInfo.timestamp_sec,localTransform.GetTranslation(), spookyBoneInfo.position_var, spookyBoneInfo.confidence);
+					m = CreatePositionMeasurement(skeleton.system_name, i, spookyBoneInfo.timestamp_sec,localTransform.GetTranslation(), spookyBoneInfo.position_var, spookyBoneInfo.confidence);
 					break;
 				case(ESpookyMeasurementType::ROTATION):
-					m = CreateRotationMeasurement(spookyBoneInfo.system_name, i, spookyBoneInfo.timestamp_sec, localTransform.GetRotation(), spookyBoneInfo.quaternion_var, spookyBoneInfo.confidence);
+					m = CreateRotationMeasurement(skeleton.system_name, i, spookyBoneInfo.timestamp_sec, localTransform.GetRotation(), spookyBoneInfo.quaternion_var, spookyBoneInfo.confidence);
 					break;
 				case(ESpookyMeasurementType::RIGID_BODY):
-					m = CreatePoseMeasurement(spookyBoneInfo.system_name, i, spookyBoneInfo.timestamp_sec, localTransform.GetTranslation(), localTransform.GetRotation(), spookyBoneInfo.position_var, spookyBoneInfo.quaternion_var, spookyBoneInfo.confidence);
+					m = CreatePoseMeasurement(skeleton.system_name, i, spookyBoneInfo.timestamp_sec, localTransform.GetTranslation(), localTransform.GetRotation(), spookyBoneInfo.position_var, spookyBoneInfo.quaternion_var, spookyBoneInfo.confidence);
 					break;
 				case(ESpookyMeasurementType::SCALE):
-					m = CreateScaleMeasurement(spookyBoneInfo.system_name, i, spookyBoneInfo.timestamp_sec, localTransform.GetScale3D(),  spookyBoneInfo.scale_var, spookyBoneInfo.confidence);
+					m = CreateScaleMeasurement(skeleton.system_name, i, spookyBoneInfo.timestamp_sec, localTransform.GetScale3D(),  spookyBoneInfo.scale_var, spookyBoneInfo.confidence);
 					break;
 			}
 			m->globalSpace = false;

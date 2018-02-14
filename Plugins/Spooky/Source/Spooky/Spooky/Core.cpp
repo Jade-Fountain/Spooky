@@ -67,6 +67,8 @@ namespace spooky {
 			sensors[system][sensorID]->id = sensorID;
 			//If we have system latencies for this system, use those and override with individual sensor latencies
 			sensors[system][sensorID]->latency = sysLatencies.count(system) == 0 ? 0 : sysLatencies[system];
+			sensors[system][sensorID]->rootNode = rootNodes.count(system) == 0 ? "" : rootNodes[system];
+
 		}
 	}
 
@@ -76,11 +78,25 @@ namespace spooky {
 	}
 
 	void Core::setSystemLatency(const SystemDescriptor& system, const float& latency){
+		//Set existing sensors
+		for(auto& sensor : utility::safeAccess(sensors,system)){
+			sensor.second->latency = latency;
+		}
+		//Record for future sensors 
 		sysLatencies[system] = latency;
 	}
 	
 	void Core::setJointStiffness(const float& stiffness) {
 		skeleton.setAllJointStiffness(stiffness);
+	}
+	
+	void Core::setSystemRootNode(const SystemDescriptor& system, const NodeDescriptor& node){
+		//Set existing sensors
+		for(auto& sensor : utility::safeAccess(sensors,system)){
+			sensor.second->rootNode = node;
+		}
+		//Record for future sensors 
+		rootNodes[system] = node;
 	}
 
 
