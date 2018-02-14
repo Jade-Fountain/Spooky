@@ -153,59 +153,47 @@ namespace spooky {
 	}
 
 
-	Node::State::Parameters Node::getChainParameters(std::function<Node::State::Parameters (Node&)> getParams, const int& chain_length) {
+	Node::State::Parameters Node::getChainParameters(std::function<Node::State::Parameters (Node&)> getParams, const std::vector<Node::Ptr>& node_chain) {
 		//Precompute State size
 		int inputDimension = 0;
-		//TODO: dont use raw pointer
-		Node* node = this;
-		for (int i = 0; i < chain_length; i++) {
+		for (auto& node : node_chain) {
 			inputDimension += node->getDimension();
-			if (node->parent == NULL) break;
-			node = node->parent.get();
 		}
 		//Reset for actual calculation
-		node = this;
 		State::Parameters result(inputDimension);
 		int position = 0;
-		for (int i = 0; i < chain_length; i++) {
+		for (auto& node : node_chain) {
 			int dim = node->getDimension();
 			result.insertSubstate(position,getParams(*node));
 			position += dim;
-			if (node->parent == NULL) break;
-			node = node->parent.get();
 		}
 		return result;
 	}
 
-	Node::State::Parameters Node::getChainState(const int& chain_length) {		
+	Node::State::Parameters Node::getChainState(const std::vector<Node::Ptr>& node_chain) {		
 		return getChainParameters(
 			std::function<Node::State::Parameters(Node&)>(&Node::getState)
-			, chain_length);
+			, node_chain);
 	}
 
-	Node::State::Parameters Node::getChainConstraints(const int& chain_length) {		
+	Node::State::Parameters Node::getChainConstraints(const std::vector<Node::Ptr>& node_chain) {		
 		return getChainParameters(
 			std::function<Node::State::Parameters(Node&)>(&Node::getConstraints)
-			, chain_length);
+			, node_chain);
 	}
 
-	Node::State::Parameters Node::getChainProcessNoise(const int& chain_length) {		
+	Node::State::Parameters Node::getChainProcessNoise(const std::vector<Node::Ptr>& node_chain) {		
 		return getChainParameters(
 			std::function<Node::State::Parameters(Node&)>(&Node::getProcessNoise)
-			, chain_length);
+			, node_chain);
 	}
 
-	void Node::setChainState(const int& chain_length, const State::Parameters& state_params) {
-		//Precompute Jacobian size
-		//TODO: dont use raw pointer
-		Node* node = this;
+	void Node::setChainState(const std::vector<Node::Ptr>& node_chain, const State::Parameters& state_params) {
 		int last_block_end = 0;
-		for (int i = 0; i < chain_length; i++) {
+		for (auto& node : node_chain) {
 			int dim = node->getDimension();
 			node->setState(state_params.getSubstate(last_block_end,dim));
 			last_block_end += dim;
-			if (node->parent == NULL) break;
-			node = node->parent.get();
 		}
 
 	}
@@ -285,7 +273,8 @@ namespace spooky {
 			}
 			
 			NodeDescriptor rootName = m->getSensor()->getRootNode();
-			Node::Ptr rootNode = nodes.count(rootName) > 0 ? nodes.at(rootName) : NULL;
+			//If no root node then go to static root
+			Node::Ptr rootNode = nodes.count(rootName) > 0 ? nodes.at(rootName) : nodes[0];
 
 			switch(m->type){
 				case(Measurement::Type::POSITION):

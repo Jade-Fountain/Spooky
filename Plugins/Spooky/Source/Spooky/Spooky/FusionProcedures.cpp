@@ -403,15 +403,11 @@ namespace spooky{
 	Eigen::Matrix<float, 9, Eigen::Dynamic> Node::getPoseChainJacobian(const int& chain_length, const bool& globalSpace) {
 		//Precompute Jacobian size
 		int inputDimension = 0;
-		//TODO: dont use raw pointer
-		Node* node = this;
-		for (int i = 0; i < chain_length; i++) {
+		for (auto& node : node_chain) {
 			inputDimension += node->getDimension();
-			if (node->parent == NULL) break;
-			node = node->parent.get();
 		}
-		//Reset for actual calculation
-		node = this;
+		
+        //Reset for actual calculation
 		float h = 0.0001;
 		Transform3D childPoses = Transform3D::Identity();
 		Transform3D parentPoses = (node->parent != NULL && globalSpace) ? parent->getGlobalPose() : Transform3D::Identity();
@@ -424,7 +420,7 @@ namespace spooky{
 		};
 
 		int block = 0;
-		for (int i = 0; i < chain_length; i++) {
+		for (auto& node : node_chain) {
 			//Loop through all dof of this node and get the jacobian (w,p) entries for each dof
 			int dof = node->getDimension();
 

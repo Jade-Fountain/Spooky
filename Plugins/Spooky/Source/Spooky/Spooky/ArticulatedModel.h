@@ -149,14 +149,17 @@ namespace spooky {
 		State::Parameters getProcessNoise();
 
 		//Generic grouped parameter methods
-		State::Parameters getChainParameters(std::function<Node::State::Parameters(Node&)> getParams, const int& chain_length);
+		static State::Parameters getChainParameters(std::function<Node::State::Parameters(Node&)> getParams, const std::vector<Node::Ptr>& node_chain);
 		
 		//Set and get an entire chain of nodes starting with this and recursing up parents
-		void setChainState(const int & chain_length, const State::Parameters & state);
-		State::Parameters getChainState(const int & chain_length);
-		State::Parameters getChainConstraints(const int & chain_length);
-		State::Parameters getChainProcessNoise(const int & chain_length);
+		static void setChainState(const std::vector<Node::Ptr>& node_chain, const State::Parameters & state);
+		static State::Parameters getChainState(const std::vector<Node::Ptr>& node_chain);
+		static State::Parameters getChainConstraints(const std::vector<Node::Ptr>& node_chain);
+		static State::Parameters getChainProcessNoise(const std::vector<Node::Ptr>& node_chain);
 
+		//Get the jocobian of an entire pose chain mapping state |-> (w,p) axis-angle and position
+		static Eigen::Matrix<float, 9, Eigen::Dynamic> getPoseChainJacobian(const std::vector<Node::Ptr>& node_chain, const bool& globalSpace);
+		
 		//---------------------------------------
 
 		//Updates the state of this node (e.g. angle, quaternion, etc.)
@@ -174,8 +177,8 @@ namespace spooky {
 		void fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem, const std::map<NodeDescriptor,Node::Ptr>& nodes);
 
 		//Get required parents for fusing measurement m
-		std::vector<Node::Ptr> getAllParents(const Node::Ptr& node);
-	    std::vector<Node::Ptr> getRequiredChain(const Node::Ptr& fromNode, const Node::Ptr& toNode, const Measurement::Ptr& m);
+		std::vector<Node::Ptr> getAllParents();
+	    std::vector<Node::Ptr> getRequiredChain(const Node::Ptr& destNode, const Measurement::Ptr& m);
 
 		//Fusion of particular mesurement types (defined in FusionProcedures.cpp)
 		void fusePositionMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
@@ -193,9 +196,6 @@ namespace spooky {
                             const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement);
   
 
-		//Get the jocobian of an entire pose chain mapping state |-> (w,p) axis-angle and position
-		Eigen::Matrix<float, 9, Eigen::Dynamic> getPoseChainJacobian(const int& chain_length, const bool& globalSpace);
-		
 	private:
 		Transform3D getGlobalPose();
 
