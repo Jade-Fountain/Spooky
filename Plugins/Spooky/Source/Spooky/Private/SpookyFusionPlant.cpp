@@ -98,7 +98,7 @@ void USpookyFusionPlant::SetSystemRootNode(FString system, FString rootNode, con
 	spooky::NodeDescriptor root(TCHAR_TO_UTF8(*rootNode));
 	//Add node representing offset from the root node
 	//The node has the same as the system with the suffix "_root"
-	spookyCore.addFixedNode(spooky::NodeDescriptor(sys.name + "_root"),root, convert(rootNodeOffset.ToMatrixWithScale()));
+	spookyCore.addFixedNode(spooky::NodeDescriptor(sys.name + "_root"), root, convert(rootNodeOffset.ToMatrixWithScale()));
 	//Attach to sensor model
 	spookyCore.setSystemRootNode(sys,spooky::NodeDescriptor(sys.name + "_root"));
 }
@@ -113,7 +113,6 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh,
 		//TODO: make more efficient
 		FTransform b = FTransform(skeletal_mesh->SkeletalMesh->GetRefPoseMatrix(i));
 		//Scale to spooky units
-		b.SetTranslation(b.GetTranslation() * spookyCore.config.units.input_m);
 		spooky::Transform3D bonePoseLocal = convert(b.ToMatrixWithScale());
 		//Set parent
 		spooky::NodeDescriptor parent_desc = (bone.ParentIndex >= 0) ?
@@ -264,7 +263,6 @@ FTransform USpookyFusionPlant::getBoneTransform(const FString& name) {
 	spooky::NodeDescriptor bone_name = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(name)));
 	spooky::Transform3D T = spookyCore.getNodeLocalPose(bone_name);
 	FTransform result(convert(T));
-	result.SetTranslation(result.GetTranslation() / spookyCore.config.units.output_m);
 	return result;
 }
 
@@ -299,10 +297,8 @@ FString USpookyFusionPlant::getCorrelationResult(FString s1, int sensorID)
 FTransform USpookyFusionPlant::getNodeGlobalPose(FString node)
 {
 	spooky::Transform3D result = spookyCore.getNodeGlobalPose(spooky::NodeDescriptor(TCHAR_TO_UTF8(*node)));
-	FMatrix unrealMatrix = convert(result);
-	unrealMatrix.ScaleTranslation(FVector(1,1,1) * 1 / spookyCore.config.units.output_m);
 	//UE_LOG(LogTemp, Warning, TEXT("getNodePose : %s"), *(unrealMatrix.ToString()));
-	return FTransform(unrealMatrix);
+	return convert(result);
 }
 //===========================
 //Data saving/loading functions
@@ -429,15 +425,18 @@ std::vector<spooky::NodeDescriptor> USpookyFusionPlant::convertToNodeDescriptors
 	return result;
 }
 
-FMatrix USpookyFusionPlant::convert(const spooky::Transform3D& T) {
+FTransform USpookyFusionPlant::convert(const spooky::Transform3D& T) {
 	FMatrix unrealMatrix;
 	memcpy(&(unrealMatrix.M[0][0]), T.data(), sizeof(float) * 16);
-	return unrealMatrix;
+	FTransform m(unrealMatrix);
+	m.SetTranslation(m.GetTranslation() / spookyCore.config.units.output_m);
+	return m;
 }
 
 spooky::Transform3D USpookyFusionPlant::convert(const FMatrix& T) {
 	spooky::Transform3D matrix;
 	memcpy(matrix.data(), &(T.M[0][0]), sizeof(float) * 16);
+	matrix.translation() *= spookyCore.config.units.input_m;
 	return matrix;
 }
 

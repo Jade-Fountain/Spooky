@@ -82,6 +82,7 @@ namespace spooky{
             if(destParents[destParents.size()-i-1] != srcParents[srcParents.size()-i-1]){
                 //Tree has diverged at last node
                 diverge_point = i-1;
+				break;
             }
         }
         //Combine chains to make a chain from src to dest including both
@@ -134,9 +135,13 @@ namespace spooky{
 		//Fuse by modifying some parents if necessary
 		std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode, m);
 
+        //Get root node space:
+        Transform3D rootNodePose = rootNode->getGlobalPose();
+        Transform3D globalToRootNode = rootNodePose.inverse();
+
         Eigen::VectorXf pstate;
         if (m->globalSpace) {
-            pstate = getGlobalPose().translation();
+            pstate = (globalToRootNode * getGlobalPose()).translation();
         }
         else {
             pstate = getLocalPose().translation();
@@ -162,7 +167,7 @@ namespace spooky{
         //Get Jacobian for the chain, mapping state to (w,v) global pose
         //TODO:
         // Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = getPositionChainJacobian(fusion_chain,m->globalSpace);
-        Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace, rootNode);
+        Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace, globalToRootNode);
         Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(3,0,3, poseJac.cols());
 
         State::Parameters newChainState = customEKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, pstate);
@@ -182,6 +187,10 @@ namespace spooky{
 
         //Calculate error
         std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode,m);
+
+        //Get root node space:
+        Transform3D rootNodePose = rootNode->getGlobalPose();
+        Transform3D globalToRootNode = rootNodePose.inverse();
 
         
         Eigen::VectorXf wpstate;
@@ -217,7 +226,7 @@ namespace spooky{
         
         //JACOBIAN:state -> measurement
         //Get Jacobian for the chain, mapping state to (w,v) global pose
-        Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace,rootNode);
+        Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace,globalToRootNode);
         Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(0,0,3, poseJac.cols());
 
         //TODO optimise ekf by using information matrices and inverting covariance per node
@@ -237,12 +246,15 @@ namespace spooky{
         //Fuse by modifying some parents if necessary
         std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode,m);
         
+        //Get root node space:
+        Transform3D rootNodePose = rootNode->getGlobalPose();
+        Transform3D globalToRootNode = rootNodePose.inverse();
 
         //Calculate error
         Eigen::VectorXf wpstate;
 
         if (m->globalSpace) {
-            wpstate = utility::toAxisAnglePos(getGlobalPose());
+            wpstate = utility::toAxisAnglePos(globalToRootNode * getGlobalPose());
         }
         else {
             wpstate = utility::toAxisAnglePos(getLocalPose());
@@ -275,7 +287,7 @@ namespace spooky{
         
         //JACOBIAN:state -> measurement
         //Get Jacobian for the chain, mapping state to (w,v) global pose
-        Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace,rootNode);
+        Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace,rootNodePose);
         Eigen::Matrix<float, 6, Eigen::Dynamic> measurementJacobian = poseJac.block(0,0,6, poseJac.cols());
 
         //TODO optimise ekf by using information matrices and inverting covariance per node
@@ -304,11 +316,15 @@ namespace spooky{
         //Fuse by modifying some parents if necessary
         std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode,m);
         
+                
+        //Get root node space:
+        Transform3D rootNodePose = rootNode->getGlobalPose();
+        Transform3D globalToRootNode = rootNodePose.inverse();
 
         Eigen::VectorXf pstate;
         if (m->globalSpace) {
             //TODO: change to return class so I can use .scale(), .pos(), etc?
-            pstate = utility::toAxisAnglePosScale(getGlobalPose()).tail(3);
+            pstate = utility::toAxisAnglePosScale(globalToRootNode * getGlobalPose()).tail(3);
         }
         else {
             pstate = utility::toAxisAnglePosScale(getLocalPose()).tail(3);
@@ -334,7 +350,7 @@ namespace spooky{
         //Get Jacobian for the chain, mapping state to (w,v) global pose
         //TODO:
         // Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = getPositionChainJacobian(fusion_chain,m->globalSpace);
-        Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace,rootNode);
+        Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace,globalToRootNode);
         Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(6,0,3,poseJac.cols());
 
         //TODO optimise ekf by using information matrices and inverting covariance per node
@@ -400,7 +416,7 @@ namespace spooky{
 
 
 
-	Eigen::Matrix<float, 9, Eigen::Dynamic> Node::getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain, const bool& globalSpace, const Node::Ptr& rootNode) {
+	Eigen::Matrix<float, 9, Eigen::Dynamic> Node::getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain, const bool& globalSpace, const Transform3D& globalToRootNode) {
 		//Precompute Jacobian size
 		int inputDimension = 0;
 		for (auto& node : fusion_chain) {
@@ -408,9 +424,7 @@ namespace spooky{
 		}
         //Reset for actual calculation
 		float h = 0.0001;
-        //Get root node space:
-        Transform3D rootNodePose = rootNode->getGlobalPose();
-        Transform3D globalToRootNode = rootNodePose.inverse();
+
 		//3DOF for each rot, pos, scale
 		Eigen::Matrix<float, 9, Eigen::Dynamic > J(9, inputDimension);
 		Transform3D childPoses = Transform3D::Identity();

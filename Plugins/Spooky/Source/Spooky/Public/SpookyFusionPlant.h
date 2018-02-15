@@ -205,7 +205,7 @@ public:
 	std::vector<spooky::NodeDescriptor> convertToNodeDescriptors(const TArray<FString>& names);
 
 	//Convert Transform3D to FMatrix
-	FMatrix convert(const spooky::Transform3D& T);
+	FTransform convert(const spooky::Transform3D& T);
 	spooky::Transform3D convert(const FMatrix& T);
 
 //===========================
