@@ -110,6 +110,7 @@ namespace spooky {
 		//Parent of this node
 		Ptr parent = NULL;
 		NodeDescriptor parent_desc;
+		NodeDescriptor rootNodeDesc;
 
 		//Pending measurements 
 		//TODO: ensure ordered by timestamp
@@ -158,7 +159,7 @@ namespace spooky {
 		static State::Parameters getChainProcessNoise(const std::vector<Node::Ptr>& node_chain);
 
 		//Get the jocobian of an entire pose chain mapping state |-> (w,p) axis-angle and position
-		static Eigen::Matrix<float, 9, Eigen::Dynamic> getPoseChainJacobian(const std::vector<Node::Ptr>& node_chain, const bool& globalSpace);
+		static Eigen::Matrix<float, 9, Eigen::Dynamic> getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain, const bool& globalSpace, const Node::Ptr& rootNode);
 		
 		//---------------------------------------
 

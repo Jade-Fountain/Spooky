@@ -274,7 +274,7 @@ namespace spooky {
 			
 			NodeDescriptor rootName = m->getSensor()->getRootNode();
 			//If no root node then go to static root
-			Node::Ptr rootNode = nodes.count(rootName) > 0 ? nodes.at(rootName) : nodes[0];
+			Node::Ptr rootNode = nodes.count(rootName) > 0 ? nodes.at(rootName) : nodes.at(rootNodeDesc);
 
 			switch(m->type){
 				case(Measurement::Type::POSITION):
@@ -391,6 +391,14 @@ namespace spooky {
 			if(nodes.count(parent) != 0 && parent != node.second->desc){
 				node.second->parent = nodes[parent];
 			}
+		}
+		std::set<NodeDescriptor> roots;
+		for (auto & node : nodes) {
+			node.second->rootNodeDesc = node.second->getAllParents().back()->desc;
+			roots.insert(node.second->rootNodeDesc);
+		}
+		if (roots.size() > 1) {
+			SPOOKY_LOG("******************************\n\n\n\n\n\n\n\n\n\n ArticulatedModel::enumerateHeirarchy() - line " + __LINE__ + std::string(" multiple root nodes found. This is not currently supported!!!!\n\n\n\n\n\n\n\n\n\n******************************"));
 		}
 	}
 
