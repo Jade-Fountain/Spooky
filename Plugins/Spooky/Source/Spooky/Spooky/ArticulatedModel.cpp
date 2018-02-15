@@ -30,6 +30,7 @@ namespace spooky {
 	Node::Node() {
 		homePose = Transform3D::Identity();
 		cachedPose = Transform3D::Identity();
+		parent_desc = NodeDescriptor("");
 	}
 
 	Transform3D Node::getFinalGlobalPose(){
@@ -374,20 +375,34 @@ namespace spooky {
 	//-------------------------------------------------------------------------------------------------------
 	//									Public
 	//-------------------------------------------------------------------------------------------------------
-
+	ArticulatedModel::ArticulatedModel(){
+		nodes[SPOOKY_WORLD_ROOT_DESC] = std::make_unique<Node>();
+		nodes[SPOOKY_WORLD_ROOT_DESC]->desc = SPOOKY_WORLD_ROOT_DESC;
+	}
 	void ArticulatedModel::setReferenceSystem(const SystemDescriptor& s) {
 		reference_system = s;
 	}
 
 	void ArticulatedModel::addNode(const NodeDescriptor & node, const NodeDescriptor & parent) {
 		//This line initialises the node entry if not already initialised
+		if (node == SPOOKY_WORLD_ROOT_DESC) {
+			//TODO throw exceptions
+			SPOOKY_LOG("******************************\n\n\n\n\n\n\n\n\n\n FATAL ERROR ArticulatedModel::addNode() - line " + __LINE__ + std::string(" " + SPOOKY_WORLD_ROOT_DESC.name + " is a protected node name!!!!\n\n\n\n\n\n\n\n\n\n******************************"));
+			throw "******************************\n\n\n\n\n\n\n\n\n\n FATAL ERROR ArticulatedModel::addNode() - line " + __LINE__ + std::string(" " + SPOOKY_WORLD_ROOT_DESC.name + " is a protected node name!!!!\n\n\n\n\n\n\n\n\n\n******************************");
+		}
 		utility::safeAccess(nodes, node)->desc = node;
-		nodes[node]->parent_desc = parent;
+		if (parent.name.size() == 0){
+			nodes[node]->parent_desc = SPOOKY_WORLD_ROOT_DESC;
+		}
+		else {
+			nodes[node]->parent_desc = parent;
+		}
 	}
 	
 	void ArticulatedModel::enumerateHeirarchy(){
-		for(auto& node : nodes){
+		for (auto& node : nodes) {
 			NodeDescriptor parent = node.second->parent_desc;
+			
 			if(nodes.count(parent) != 0 && parent != node.second->desc){
 				node.second->parent = nodes[parent];
 			}
@@ -398,7 +413,9 @@ namespace spooky {
 			roots.insert(node.second->rootNodeDesc);
 		}
 		if (roots.size() > 1) {
+			//TODO throw exceptions
 			SPOOKY_LOG("******************************\n\n\n\n\n\n\n\n\n\n ArticulatedModel::enumerateHeirarchy() - line " + __LINE__ + std::string(" multiple root nodes found. This is not currently supported!!!!\n\n\n\n\n\n\n\n\n\n******************************"));
+			throw ("******************************\n\n\n\n\n\n\n\n\n\n ArticulatedModel::enumerateHeirarchy() - line " + __LINE__ + std::string(" multiple root nodes found. This is not currently supported!!!!\n\n\n\n\n\n\n\n\n\n******************************"));
 		}
 	}
 

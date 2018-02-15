@@ -81,6 +81,8 @@ namespace spooky {
 		NodeDescriptor(std::string n = "") :  SystemDescriptor(n){}
 	};
 
+	static const NodeDescriptor SPOOKY_WORLD_ROOT_DESC = "spooky_world_root";
+
 	//Map key types
 	typedef std::pair<SystemDescriptor, SystemDescriptor> SystemPair;
 	typedef std::pair<SystemDescriptor, NodeDescriptor> SystemNodePair;
