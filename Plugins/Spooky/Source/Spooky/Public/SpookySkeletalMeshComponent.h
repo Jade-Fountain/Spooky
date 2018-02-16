@@ -95,6 +95,10 @@ struct FSpookySkeletonBoneInfo{
 	//When the measurement was recorded, relative to start of program
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
 	float timestamp_sec; 	
+	
+	//Whether to use a local or global route to fusion
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	bool useGlobalData; 	
 
 };
 
