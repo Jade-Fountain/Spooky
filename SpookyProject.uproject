@@ -5,7 +5,7 @@
 	"Description": "",
 	"Modules": [
 		{
-			"Name": "UnrealFusion",
+			"Name": "SpookyProject",
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
@@ -36,10 +36,14 @@
 		{
 			"Name": "LeapMotion",
 			"Enabled": true
+		},
+		{
+			"Name": "PerceptionNeuron",
+			"Enabled": true
 		}
 	],
 	"AdditionalPluginDirectories": [
-		"/../../../../../../../../../../../../../../../../../../../../UnrealFusion/Plugins/Spooky"
+		"/../../../../../../../../../../../../../../../../../../../../../../../../../UnrealFusion/Plugins/Spooky"
 	],
 	"TargetPlatforms": [
 		"WindowsNoEditor"
