@@ -275,7 +275,7 @@ namespace spooky {
 			
 			NodeDescriptor rootName = m->getSensor()->getRootNode();
 			//If no root node then go to static root
-			Node::Ptr rootNode = nodes.count(rootName) > 0 ? nodes.at(rootName) : nodes.at(rootNodeDesc);
+			Node::Ptr rootNode = nodes.count(rootName) > 0 ? nodes.at(rootName) : nodes.at(SPOOKY_WORLD_ROOT_DESC);
 
 			switch(m->type){
 				case(Measurement::Type::POSITION):
@@ -409,8 +409,7 @@ namespace spooky {
 		}
 		std::set<NodeDescriptor> roots;
 		for (auto & node : nodes) {
-			node.second->rootNodeDesc = node.second->getAllParents().back()->desc;
-			roots.insert(node.second->rootNodeDesc);
+			roots.insert(node.second->getAllParents().back()->desc);
 		}
 		if (roots.size() > 1) {
 			//TODO throw exceptions

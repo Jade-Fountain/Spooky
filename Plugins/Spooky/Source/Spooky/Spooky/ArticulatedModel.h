@@ -110,7 +110,6 @@ namespace spooky {
 		//Parent of this node
 		Ptr parent = NULL;
 		NodeDescriptor parent_desc;
-		NodeDescriptor rootNodeDesc;
 
 		//Pending measurements 
 		//TODO: ensure ordered by timestamp
