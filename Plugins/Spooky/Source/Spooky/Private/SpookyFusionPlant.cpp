@@ -217,6 +217,7 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 		spooky::NodeDescriptor bone_name = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
 		//If this bone is active then make new measurement
 		if (skeleton->isBoneActive(bone.Name)) {
+			spooky::NodeDescriptor targetNode = skeleton->getTargetNode(bone.Name);
 			FTransform T = skeleton->BoneSpaceTransforms[i];
 			const FSpookySkeletonBoneInfo& spookyBoneInfo = skeleton->getSpookyBoneInfo(bone.Name);
 
@@ -245,7 +246,7 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 					break;
 			}
 			m->globalSpace = spookyBoneInfo.useGlobalData;
-			spookyCore.addMeasurement(m, bone_name);
+			spookyCore.addMeasurement(m, targetNode);
 		}
 	}
 }

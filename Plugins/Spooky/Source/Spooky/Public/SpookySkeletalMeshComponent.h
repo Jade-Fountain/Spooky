@@ -111,7 +111,9 @@ class USpookySkeletalMeshComponent :
 private: 
 
 	//List of bones which carry measurements of  with associated meta info
-	std::map<FName,FSpookySkeletonBoneInfo> activeBones;
+	std::map<FName, FSpookySkeletonBoneInfo> activeBones;
+	//List of target nodes for each active bone
+	std::map<FName,spooky::NodeDescriptor> targetNodes;
 
 	std::unique_ptr<FSpookySkeletonBoneInfo> defaultBoneInfo;
 
@@ -125,7 +127,7 @@ public:
 	FString root_node;
 	//The transform of the sensor system relative to the root node
 	FTransform root_node_offset;
-
+	
 	//--------------------------------
 	//		INITIALISATION
 	//--------------------------------
@@ -137,7 +139,7 @@ public:
 	void SetDefaultBoneInfo(const FSpookySkeletonBoneInfo& info);
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
-	void AddActiveBones(const TArray<FName>& bones, ESpookyReturnStatus& branch);
+	void AddActiveBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, ESpookyReturnStatus& branch);
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
 	void SetBoneInfo(const FSpookySkeletonBoneInfo& info, ESpookyReturnStatus& branch);
@@ -168,5 +170,10 @@ public:
 	const FSpookySkeletonBoneInfo& getSpookyBoneInfo(const FName& name) {
 		return activeBones[name];
 	}
+
+	//Retrieve the spooky skeleton node being targeted by the given bone
+	//Defaults to bone.string if not specified otherwise
+	spooky::NodeDescriptor getTargetNode(const FName& bone);
+
 };
 

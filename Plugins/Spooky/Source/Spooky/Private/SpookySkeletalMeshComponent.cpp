@@ -37,7 +37,7 @@ void USpookySkeletalMeshComponent::SetDefaultBoneInfo(const FSpookySkeletonBoneI
 }
 
 
-void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, ESpookyReturnStatus& branch){
+void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, ESpookyReturnStatus& branch){
 	bool bones_exist = true;
 	if(!defaultBoneInfo){
 		branch = ESpookyReturnStatus::Failure;
@@ -49,6 +49,9 @@ void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, ES
 		bool thisBoneExists = this->SkeletalMesh->RefSkeleton.FindBoneIndex(bones[i]) != INDEX_NONE;
 		if (thisBoneExists) {
 			activeBones[bones[i]] = *defaultBoneInfo;
+			if (i < boneTargetNodes.Num() && boneTargetNodes[i].Compare("") != 0) {
+				targetNodes[boneTargetNodes[i]] = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(boneTargetNodes[i].ToString())));
+			}
 		}
 		else {
 			missingBones.push_back(bones[i]);
@@ -95,5 +98,14 @@ void USpookySkeletalMeshComponent::UpdateAllTimestamps(const float& t_sec){
 void USpookySkeletalMeshComponent::UpdateConfidence(const FName& bone,const float& confidence){
 	if(!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
 	activeBones[bone].confidence = confidence;
+}
+
+spooky::NodeDescriptor USpookySkeletalMeshComponent::getTargetNode(const FName& bone) {
+	if (targetNodes.count(bone) > 0) {
+		return targetNodes[bone];
+	}
+	else {
+		return spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.ToString())));
+	}
 }
 
