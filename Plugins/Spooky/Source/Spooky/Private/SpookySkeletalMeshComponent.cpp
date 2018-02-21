@@ -50,7 +50,7 @@ void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, co
 		if (thisBoneExists) {
 			activeBones[bones[i]] = *defaultBoneInfo;
 			if (i < boneTargetNodes.Num() && boneTargetNodes[i].Compare("") != 0) {
-				targetNodes[boneTargetNodes[i]] = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(boneTargetNodes[i].ToString())));
+				targetNodes[bones[i]] = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(boneTargetNodes[i].ToString())));
 			}
 		}
 		else {
