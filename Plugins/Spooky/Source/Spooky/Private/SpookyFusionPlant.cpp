@@ -227,6 +227,9 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 			if(spookyBoneInfo.useGlobalData){
 				T = componentSpaceTransforms[i];
 			}
+			//Retarget to new skeleton
+			FRotator retargetRotationOffset = skeleton->getRetargetRotator(bone.Name);
+			T.SetRotation(T.GetRotation() * retargetRotationOffset.Quaternion());
 			switch (spookyBoneInfo.measurementType) {
 				//TODO: local vs global variance?
 				case(ESpookyMeasurementType::GENERIC):

@@ -113,7 +113,8 @@ private:
 	//List of bones which carry measurements of  with associated meta info
 	std::map<FName, FSpookySkeletonBoneInfo> activeBones;
 	//List of target nodes for each active bone
-	std::map<FName,spooky::NodeDescriptor> targetNodes;
+	std::map<FName, spooky::NodeDescriptor> targetNodes;
+	std::map<FName, FRotator> retargetRotators;
 
 	std::unique_ptr<FSpookySkeletonBoneInfo> defaultBoneInfo;
 
@@ -139,7 +140,7 @@ public:
 	void SetDefaultBoneInfo(const FSpookySkeletonBoneInfo& info);
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
-	void AddActiveBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, ESpookyReturnStatus& branch);
+	void AddActiveBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, const TArray<FRotator>& boneRetargetRotators,ESpookyReturnStatus& branch);
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
 	void SetBoneInfo(const FSpookySkeletonBoneInfo& info, ESpookyReturnStatus& branch);
@@ -174,6 +175,7 @@ public:
 	//Retrieve the spooky skeleton node being targeted by the given bone
 	//Defaults to bone.string if not specified otherwise
 	spooky::NodeDescriptor getTargetNode(const FName& bone);
+	FRotator getRetargetRotator(const FName& bone);
 
 };
 

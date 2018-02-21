@@ -37,7 +37,7 @@ void USpookySkeletalMeshComponent::SetDefaultBoneInfo(const FSpookySkeletonBoneI
 }
 
 
-void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, ESpookyReturnStatus& branch){
+void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, const TArray<FRotator>& boneRetargetRotators, ESpookyReturnStatus& branch){
 	bool bones_exist = true;
 	if(!defaultBoneInfo){
 		branch = ESpookyReturnStatus::Failure;
@@ -51,6 +51,9 @@ void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, co
 			activeBones[bones[i]] = *defaultBoneInfo;
 			if (i < boneTargetNodes.Num() && boneTargetNodes[i].Compare("") != 0) {
 				targetNodes[bones[i]] = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(boneTargetNodes[i].ToString())));
+			}
+			if (i < boneRetargetRotators.Num()) {
+				retargetRotators[bones[i]] = boneRetargetRotators[i];
 			}
 		}
 		else {
@@ -106,6 +109,15 @@ spooky::NodeDescriptor USpookySkeletalMeshComponent::getTargetNode(const FName& 
 	}
 	else {
 		return spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.ToString())));
+	}
+}
+
+FRotator USpookySkeletalMeshComponent::getRetargetRotator(const FName& bone) {
+	if (retargetRotators.count(bone) > 0) {
+		return retargetRotators[bone];
+	}
+	else {
+		return FRotator(0,0,0);
 	}
 }
 
