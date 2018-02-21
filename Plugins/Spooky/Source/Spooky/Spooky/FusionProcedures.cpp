@@ -181,6 +181,14 @@ namespace spooky{
 
     void Node::fuseRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 
+		////DEBUG:
+		//if (articulations[0].getType() == Articulation::BONE) {
+		//	Node::State::Parameters p;
+		//	p.
+		//	setState();
+		//	return;
+		//}
+
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
         Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
@@ -195,7 +203,7 @@ namespace spooky{
         
         Eigen::VectorXf wpstate;
         if (m->globalSpace) {
-            wpstate = utility::toAxisAnglePos(getGlobalPose()).head(3);
+            wpstate = utility::toAxisAnglePos(globalToRootNode * getGlobalPose()).head(3);
         }
         else {
             wpstate = utility::toAxisAnglePos(getLocalPose()).head(3);
