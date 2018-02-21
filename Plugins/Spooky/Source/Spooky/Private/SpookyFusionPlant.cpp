@@ -129,8 +129,8 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh,
 		else if (bone.Name.GetPlainNameString() == "pelvis") {
 			//TODO: find better way to do this check for pose nodes
 			//The pelvis has 6DoF pose and 3DoF scale
-			Eigen::MatrixXf constraint_variance = Eigen::MatrixXf::Identity(9,9) * default_constraint_flexibility * 10000;
-			constraint_variance.bottomRightCorner(3,3) = Eigen::MatrixXf::Identity(3,3) * 0.000001;
+			Eigen::MatrixXf constraint_variance = Eigen::MatrixXf::Identity(9,9) * default_constraint_flexibility;
+			constraint_variance.bottomRightCorner(3,3) = Eigen::MatrixXf::Identity(3,3) * 0.001;
 			Eigen::VectorXf constraint_centre = Eigen::VectorXf::Zero(9);
 			constraint_centre.tail(3) = Eigen::Vector3f::Ones(); // Centre at unit scale
 			spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones(), constraint_centre, constraint_variance, default_process_noise);

@@ -51,10 +51,6 @@ struct FSpookySkeletonBoneInfo{
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
 	FName name;
 
-	//Index of bone in skeleton->BoneSpaceTransforms[i]
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	int bone_index;
-
 	//The type of measurement provided by this bone.
 	//Effectively masks out bone information which is known from being fused during runtime
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
