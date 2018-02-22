@@ -138,9 +138,12 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh,
 		else {
 			//TODO: read constraint and process noise from USpookySkeletalMeshComponent
 			Eigen::Matrix3f constraint_variance = Eigen::Matrix3f::Identity() * default_constraint_flexibility;
+			Eigen::MatrixXf pose_constraint_variance = Eigen::MatrixXf::Identity(6,6) * default_constraint_flexibility;
 			//x axis can pivot arbitrarily
 			//constraint_variance(0, 0) = 100000;
 			Eigen::Vector3f constraint_centre = Eigen::Vector3f::Zero();
+			Eigen::VectorXf pose_constraint_centre = Eigen::VectorXf::Zero(6);
+			//spookyCore.addPoseNode(bone_desc, parent_desc, bonePoseLocal, pose_constraint_centre, pose_constraint_variance, default_process_noise);
 			spookyCore.addBoneNode(bone_desc, parent_desc, bonePoseLocal, constraint_centre, constraint_variance, default_process_noise);
 		}
 		SPOOKY_LOG("Adding Bone: " + bone_desc.name + ", parent = " + parent_desc.name);
