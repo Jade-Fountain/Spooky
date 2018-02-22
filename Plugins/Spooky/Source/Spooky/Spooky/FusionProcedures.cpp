@@ -78,8 +78,8 @@ namespace spooky{
 
         int max_search_distance = std::min(destParents.size(),srcParents.size());
         int diverge_point = 0;
-        for(int i = 0; i < max_search_distance; i++){
-            if(destParents[destParents.size()-i-1] != srcParents[srcParents.size()-i-1]){
+        for(int i = 1; i <= max_search_distance; i++){
+            if(destParents[destParents.size()-i] != srcParents[srcParents.size()-i]){
                 //Tree has diverged at last node
                 diverge_point = i-1;
 				break;
@@ -88,7 +88,10 @@ namespace spooky{
         //Combine chains to make a chain from src to dest including both
         std::vector<Node::Ptr> node_chain;
         node_chain.insert(node_chain.end(),srcParents.begin(),srcParents.end()-diverge_point);
-        node_chain.insert(node_chain.end(),destParents.rbegin()+diverge_point+1,destParents.rend());
+		//only include destination chain if diverge occurs after matrix start
+		if (diverge_point > 0) {
+			node_chain.insert(node_chain.end(), destParents.rbegin() + diverge_point - 1, destParents.rend());
+		}
 
 
         //Iterate through parents until enough flex is found
