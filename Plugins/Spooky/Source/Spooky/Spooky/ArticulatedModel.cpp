@@ -104,7 +104,7 @@ namespace spooky {
 
 
 	//Set state parameters
-	void Node::setState(const State::Parameters& new_state){
+	void Node::setState(const State::Parameters& new_state, const float& t){
 		int pos = 0;
 		for(int i = 0; i < articulations.size(); i++){
 			int dim = local_state.articulation[i].expectation.size();
@@ -113,8 +113,7 @@ namespace spooky {
 		}
 		//Indicate that this node needs its local pose to be recomputed
 		recacheRequired = true;
-		//TODO:Add timestamp?
-		//local_state.last_update_time = t;
+		local_state.last_update_time = t;
 	}
 
 	Node::State::Parameters Node::getState(){
@@ -189,14 +188,13 @@ namespace spooky {
 			, node_chain);
 	}
 
-	void Node::setChainState(const std::vector<Node::Ptr>& node_chain, const State::Parameters& state_params) {
+	void Node::setChainState(const std::vector<Node::Ptr>& node_chain, const State::Parameters& state_params, const float& t) {
 		int last_block_end = 0;
 		for (auto& node : node_chain) {
 			int dim = node->getDimension();
-			node->setState(state_params.getSubstate(last_block_end,dim));
+			node->setState(state_params.getSubstate(last_block_end,dim),t);
 			last_block_end += dim;
 		}
-
 	}
 
 

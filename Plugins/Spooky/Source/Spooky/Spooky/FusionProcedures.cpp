@@ -177,9 +177,7 @@ namespace spooky{
         //State::Parameters newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, pstate);
 
 
-        setChainState(fusion_chain, newChainState);
-        //TODO: do this per node!
-        local_state.last_update_time = m->getTimestamp();
+        setChainState(fusion_chain, newChainState, m->getTimestamp());
     }
 
     void Node::fuseRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
@@ -215,8 +213,10 @@ namespace spooky{
         //CURRENT STATE
         State::Parameters chainState = getChainState(fusion_chain);
         //Process noise: max of ten seconds variance added
-        Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * std::fmin(10,m->getTimestamp() - local_state.last_update_time);
-        chainState.variance += process_noise;
+		float dt_sec = std::fmin(10, m->getTimestamp() - local_state.last_update_time);
+        Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * dt_sec;
+		//chainState.expectation += prediction;
+		chainState.variance += process_noise;
                     
         //JOINT CONSTRAINTS
         //Read quadratic constraints from joints in chain
@@ -256,11 +256,9 @@ namespace spooky{
 
 			chainState.expectation = newChainState.expectation;
 			//Move to next approximation
-			setChainState(fusion_chain, chainState);
+			setChainState(fusion_chain, chainState, m->getTimestamp());
 		}
-        setChainState(fusion_chain, newChainState);
-        //TODO: do this per node!
-        local_state.last_update_time = m->getTimestamp();
+        setChainState(fusion_chain, newChainState, m->getTimestamp());
     }
 
     void Node::fuseRigidMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
@@ -332,12 +330,10 @@ namespace spooky{
 
 			chainState.expectation = newChainState.expectation;
 			//Move to next approximation
-			setChainState(fusion_chain, chainState);
+			setChainState(fusion_chain, chainState, m->getTimestamp());
 		}
 		//Set final result
-		setChainState(fusion_chain, newChainState);
-		//TODO: do this per node!
-		local_state.last_update_time = m->getTimestamp();
+		setChainState(fusion_chain, newChainState, m->getTimestamp());
 
         //DEBUG
   //       std::stringstream ss;
@@ -396,9 +392,7 @@ namespace spooky{
         State::Parameters newChainState = customEKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, pstate);
         //State::Parameters newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, pstate);
 
-        setChainState(fusion_chain, newChainState);
-        //TODO: do this per node!
-        local_state.last_update_time = m->getTimestamp();
+        setChainState(fusion_chain, newChainState, m->getTimestamp());
     }
 
     Node::State::Parameters Node::customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,

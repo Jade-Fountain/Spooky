@@ -140,7 +140,7 @@ namespace spooky {
 		//Split and merging of state parameters:
 		//---------------------------------------
 		//Set state parameters
-		void setState(const State::Parameters& new_state);
+		void setState(const State::Parameters& new_state, const float& t);
 
 		State::Parameters getState();
 		//Get combined articulation constraints
@@ -152,7 +152,7 @@ namespace spooky {
 		static State::Parameters getChainParameters(std::function<Node::State::Parameters(Node&)> getParams, const std::vector<Node::Ptr>& node_chain);
 		
 		//Set and get an entire chain of nodes starting with this and recursing up parents
-		static void setChainState(const std::vector<Node::Ptr>& node_chain, const State::Parameters & state);
+		static void setChainState(const std::vector<Node::Ptr>& node_chain, const State::Parameters & state, const float& t);
 		static State::Parameters getChainState(const std::vector<Node::Ptr>& node_chain);
 		static State::Parameters getChainConstraints(const std::vector<Node::Ptr>& node_chain);
 		static State::Parameters getChainProcessNoise(const std::vector<Node::Ptr>& node_chain);
