@@ -295,18 +295,34 @@ namespace spooky{
 		measurement.expectation.tail(3) = wpm.tail(3);
 		measurement.variance.topLeftCorner(3, 3) = sigmaW;
 		measurement.variance.bottomRightCorner(3, 3) = m->getPositionVar();
-        
-        //JACOBIAN:state -> measurement
-        //Get Jacobian for the chain, mapping state to (w,v) global pose
-        Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace,rootNodePose);
-        Eigen::Matrix<float, 6, Eigen::Dynamic> measurementJacobian = poseJac.block(0,0,6, poseJac.cols());
+		
+		//Iterative update
+		State::Parameters newChainState(chainState.expectation.size());
+		for (int i = 0; i < 3; i++) {
+			globalToRootNode = rootNode->getGlobalPose().inverse();
+			if (m->globalSpace) {
+				wpstate = utility::toAxisAnglePos(globalToRootNode * getGlobalPose());
+			}
+			else {
+				wpstate = utility::toAxisAnglePos(getLocalPose());
+			}
 
-        //TODO optimise ekf by using information matrices and inverting covariance per node
-        State::Parameters newChainState = customEKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, wpstate);
+			//JACOBIAN:state -> measurement
+			//Get Jacobian for the chain, mapping state to (w,v) global pose
+			Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace,globalToRootNode);
+			Eigen::Matrix<float, 6, Eigen::Dynamic> measurementJacobian = poseJac.block(0,0,6, poseJac.cols());
 
-        //State::Parameters newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, wpstate);
-		setChainState(fusion_chain, newChainState);
-        //TODO: do this per node!
+			//TODO optimise ekf by using information matrices and inverting covariance per node
+			newChainState = customEKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, wpstate);
+			//State::Parameters newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, wpstate);
+
+			chainState.expectation = newChainState.expectation;
+			//Move to next approximation
+			setChainState(fusion_chain, chainState);
+		}
+		//Set final result
+		setChainState(fusion_chain, chainState);
+		//TODO: do this per node!
 		local_state.last_update_time = m->getTimestamp();
 
         //DEBUG
@@ -359,8 +375,6 @@ namespace spooky{
         
         //JACOBIAN:state -> measurement
         //Get Jacobian for the chain, mapping state to (w,v) global pose
-        //TODO:
-        // Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = getPositionChainJacobian(fusion_chain,m->globalSpace);
         Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace,globalToRootNode);
         Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(6,0,3,poseJac.cols());
 
