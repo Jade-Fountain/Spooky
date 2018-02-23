@@ -82,7 +82,6 @@ namespace spooky {
 			std::vector<Parameters> constraints;
 			std::vector<Parameters> process_noise;
 
-
 									   
 			//Last update time
 			float last_update_time = 0;
@@ -147,6 +146,9 @@ namespace spooky {
 		State::Parameters getConstraints();
 		//Get process noise for node
 		State::Parameters getProcessNoise();
+		//Get time since the data was updated
+		//Note: returns undefined variance
+		State::Parameters getTimeSinceUpdated();
 
 		//Generic grouped parameter methods
 		static State::Parameters getChainParameters(std::function<Node::State::Parameters(Node&)> getParams, const std::vector<Node::Ptr>& node_chain);
@@ -156,6 +158,7 @@ namespace spooky {
 		static State::Parameters getChainState(const std::vector<Node::Ptr>& node_chain);
 		static State::Parameters getChainConstraints(const std::vector<Node::Ptr>& node_chain);
 		static State::Parameters getChainProcessNoise(const std::vector<Node::Ptr>& node_chain);
+		static Eigen::VectorXf getChainTimeSinceUpdated(const std::vector<Node::Ptr>& node_chain);
 
 		//Get the jocobian of an entire pose chain mapping state |-> (w,p) axis-angle and position
 		static Eigen::Matrix<float, 9, Eigen::Dynamic> getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain, const bool& globalSpace, const Transform3D& globalToRootNode);
@@ -186,6 +189,16 @@ namespace spooky {
 		void fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
 		void fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
 		
+		//Main generic EKF algorithm
+	    void Node::computeEKFUpdate(
+	       const std::vector<Node::Ptr>& fusion_chain,
+	       const State::Parameters& measurement, 
+	       const State::Parameters& constraints, 
+	       const std::function<State::Parameters(const std::vector<Node::Ptr>&)> getPredictedState,
+	       const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
+	       const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian
+	    );
+	       
 		//Basic math for performing EKF with prior, constraints and measurement
 	    Node::State::Parameters 
 	    customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,

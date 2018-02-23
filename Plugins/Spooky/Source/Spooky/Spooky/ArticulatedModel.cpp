@@ -152,6 +152,18 @@ namespace spooky {
 		return p;
 	}
 
+	Node::State::Parameters Node::getTimeSinceUpdated() {
+		//Construct new parameters set for combined articulations
+		State::Parameters p(getDimension());
+		int pos = 0;
+		for (int i = 0; i < articulations.size(); i++) {
+			int dim = local_state.articulation[i].expectation.size();
+			p.expectation.block(pos, 0, dim, 1) = Eigen::VectorXf::Ones(dim) * local_state.last_update_time;
+			pos += dim;
+		}
+		return p;
+	}
+
 
 	Node::State::Parameters Node::getChainParameters(std::function<Node::State::Parameters (Node&)> getParams, const std::vector<Node::Ptr>& node_chain) {
 		//Precompute State size
@@ -187,6 +199,13 @@ namespace spooky {
 			std::function<Node::State::Parameters(Node&)>(&Node::getProcessNoise)
 			, node_chain);
 	}
+
+	Eigen::VectorXf Node::getChainTimeSinceUpdated(const std::vector<Node::Ptr>& node_chain) {
+		return getChainParameters(
+			std::function<Node::State::Parameters(Node&)>(&Node::getTimeSinceUpdated)
+			, node_chain).expectation;
+	}
+
 
 	void Node::setChainState(const std::vector<Node::Ptr>& node_chain, const State::Parameters& state_params, const float& t) {
 		int last_block_end = 0;
