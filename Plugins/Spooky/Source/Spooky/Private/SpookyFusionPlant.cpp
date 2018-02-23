@@ -129,20 +129,26 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh,
 		else if (bone.Name.GetPlainNameString() == "pelvis") {
 			//TODO: find better way to do this check for pose nodes
 			//The pelvis has 6DoF pose and 3DoF scale
-			Eigen::MatrixXf constraint_variance = Eigen::MatrixXf::Identity(9,9) * default_constraint_flexibility;
-			constraint_variance.bottomRightCorner(3,3) = Eigen::MatrixXf::Identity(3,3) * 0.001;
-			Eigen::VectorXf constraint_centre = Eigen::VectorXf::Zero(9);
-			constraint_centre.tail(3) = Eigen::Vector3f::Ones(); // Centre at unit scale
+			int dim = modelVelocity ? 18 : 9;
+			Eigen::MatrixXf constraint_variance = Eigen::MatrixXf::Identity(dim,dim) * default_constraint_flexibility;
+			Eigen::VectorXf constraint_centre = Eigen::VectorXf::Zero(dim);
+			if (modelVelocity) {
+				constraint_variance.block<3,3>(12, 12) = Eigen::MatrixXf::Identity(3, 3) * 0.001;
+				constraint_centre.segment(12, 3) = Eigen::Vector3f::Ones(); // Centre at unit scale
+			}
+			else {
+				constraint_variance.block<3, 3>(6, 6) = Eigen::MatrixXf::Identity(3, 3) * 0.001;
+				constraint_centre.segment(6, 3) = Eigen::Vector3f::Ones(); // Centre at unit scale
+			}
 			spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones(), constraint_centre, constraint_variance, default_process_noise, modelVelocity);
 		}
 		else {
 			//TODO: read constraint and process noise from USpookySkeletalMeshComponent
-			Eigen::Matrix3f constraint_variance = Eigen::Matrix3f::Identity() * default_constraint_flexibility;
-			Eigen::MatrixXf pose_constraint_variance = Eigen::MatrixXf::Identity(6,6) * default_constraint_flexibility;
+			int dim = modelVelocity ? 6 : 3;
+			Eigen::MatrixXf constraint_variance = Eigen::MatrixXf::Identity(dim, dim) * default_constraint_flexibility;
 			//x axis can pivot arbitrarily
 			//constraint_variance(0, 0) = 100000;
-			Eigen::Vector3f constraint_centre = Eigen::Vector3f::Zero();
-			Eigen::VectorXf pose_constraint_centre = Eigen::VectorXf::Zero(6);
+			Eigen::VectorXf constraint_centre = Eigen::VectorXf::Zero(dim);
 			//spookyCore.addPoseNode(bone_desc, parent_desc, bonePoseLocal, pose_constraint_centre, pose_constraint_variance, default_process_noise);
 			spookyCore.addBoneNode(bone_desc, parent_desc, bonePoseLocal, constraint_centre, constraint_variance, default_process_noise, modelVelocity);
 		}
