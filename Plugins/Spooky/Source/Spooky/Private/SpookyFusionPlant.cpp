@@ -201,11 +201,11 @@ void USpookyFusionPlant::AddPoseMeasurement(TArray<FString> nodeNames, FString s
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, float confidence)
+void USpookyFusionPlant::AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, bool globalSpace, float confidence)
 {
 	Measurement::Ptr m = CreateScaleMeasurement(systemName, sensorID, timestamp_sec, measurement, covariance, confidence);
 	//Scales always local to the node
-	m->globalSpace = false;
+	m->globalSpace = globalSpace;
 	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
 

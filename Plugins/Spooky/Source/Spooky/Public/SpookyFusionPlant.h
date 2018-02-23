@@ -131,7 +131,7 @@ public:
 	
 	//Add scale measurement in local space
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, float confidence = 1);
+	void AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, bool globalSpace = true, float confidence = 1);
 
 	//Adds measurements for whole skeleton
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
