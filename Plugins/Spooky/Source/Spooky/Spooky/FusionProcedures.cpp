@@ -293,7 +293,7 @@ namespace spooky{
 			//Get Jacobian for the chain, mapping state to (w,v) global pose
 			Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse());
 			Eigen::Matrix<float, 6, Eigen::Dynamic> measurementJacobian = poseJac.block(0, 0, 6, poseJac.cols());
-			return measurementJacobian
+			return measurementJacobian;
 		};
 
         auto getMeas = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain){
@@ -335,7 +335,7 @@ namespace spooky{
         //------------------------------------------------------------------
 
 
-        computeEKFUpdate(fusion_chain, chainState, measurement, constraints, getMeas, getMeasJac);
+        computeEKFUpdate(m->getTimestamp(),fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
         //DEBUG
   //       std::stringstream ss;
 		// ss << std::endl << "wpstate = " << wpstate.transpose() << std::endl;
@@ -397,18 +397,19 @@ namespace spooky{
     }
 
 
-    void Node::computeEKFUpdate(
+	void Node::computeEKFUpdate(
+	   const float& timestamp,
        const std::vector<Node::Ptr>& fusion_chain,
        const State::Parameters& measurement, 
        const State::Parameters& constraints, 
        const std::function<State::Parameters(const std::vector<Node::Ptr>&)> getPredictedState,
        const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
-       const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&> getMeasurementJacobian
+       const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian
     ){
         //Iterative update
-        State::Parameters newChainState(chainStatePrior.expectation.size());
         State::Parameters chainState = getPredictedState(fusion_chain);
-        for (int i = 0; i < 3; i++) {
+		State::Parameters newChainState(chainState.expectation.size());
+		for (int i = 0; i < 3; i++) {
             
             Eigen::VectorXf predictedMeasurement = getMeasurement(fusion_chain);
 
@@ -422,9 +423,9 @@ namespace spooky{
 
             chainState.expectation = newChainState.expectation;
             //Move to next approximation, but keep old variances
-            setChainState(fusion_chain, chainState, m->getTimestamp());
+            setChainState(fusion_chain, chainState, timestamp);
         }
-        setChainState(fusion_chain, newChainState, m->getTimestamp());
+        setChainState(fusion_chain, newChainState, timestamp);
     };
 
     Node::State::Parameters Node::customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,

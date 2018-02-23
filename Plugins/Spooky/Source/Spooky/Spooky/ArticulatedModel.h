@@ -191,12 +191,13 @@ namespace spooky {
 		
 		//Main generic EKF algorithm
 	    void Node::computeEKFUpdate(
-	       const std::vector<Node::Ptr>& fusion_chain,
-	       const State::Parameters& measurement, 
-	       const State::Parameters& constraints, 
-	       const std::function<State::Parameters(const std::vector<Node::Ptr>&)> getPredictedState,
-	       const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
-	       const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian
+			const float& timestamp,
+			const std::vector<Node::Ptr>& fusion_chain,
+			const State::Parameters& measurement, 
+			const State::Parameters& constraints, 
+			const std::function<State::Parameters(const std::vector<Node::Ptr>&)> getPredictedState,
+			const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
+			const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian
 	    );
 	       
 		//Basic math for performing EKF with prior, constraints and measurement
