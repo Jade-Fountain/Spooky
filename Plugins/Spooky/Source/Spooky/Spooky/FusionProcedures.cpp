@@ -131,97 +131,127 @@ namespace spooky{
 
     void Node::fusePositionMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 
+        //------------------------------------------------------------------
         //Transform measurement to fusion space
+        //------------------------------------------------------------------
         //TODO: optimise: dont transform when possible
         Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
+        //------------------------------------------------------------------
 
-		//Fuse by modifying some parents if necessary
-		std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode, m);
+        //------------------------------------------------------------------
+        //Get fusion chain
+        //------------------------------------------------------------------
+        std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode,m);
+        //------------------------------------------------------------------
+       
+        //------------------------------------------------------------------
+        //Models for Prediction, Measurement and Measurement Jacobian:
+        //------------------------------------------------------------------
+        auto getPredState = [&m](const std::vector<Node::Ptr>& fusion_chain){
+            //CURRENT STATE
+            State::Parameters chainState = getChainState(fusion_chain);
+            //Process noise: max of ten seconds variance added
+            Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * (m->getTimestamp() * Eigen::VectorXf::Ones(chainState.expectation.size()) - getChainTimeSinceUpdated(fusion_chain)).asDiagonal();
+            chainState.variance += process_noise;
+            //TODO: support velocity
+            return chainState;
+        };
 
-        //Get root node space:
-        Transform3D rootNodePose = rootNode->getGlobalPose();
-        Transform3D globalToRootNode = rootNodePose.inverse();
+        auto getMeasJac = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain) {
+            //JACOBIAN:state -> measurement
+            //Get Jacobian for the chain, mapping state to (w,v) global pose
+            Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse());
+            Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(3,0,3, poseJac.cols());
+            return measurementJacobian;
+        };
 
-        Eigen::VectorXf pstate;
-        if (m->globalSpace) {
-            pstate = (globalToRootNode * getGlobalPose()).translation();
-        }
-        else {
-            pstate = getLocalPose().translation();
-        }
+        auto getMeas = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain){
+            
+            Transform3D globalToRootNode = rootNode->getGlobalPose().inverse();
+           
+            Eigen::VectorXf pstate;
+            if (m->globalSpace) {
+                pstate = (globalToRootNode * fusion_chain[0]->getGlobalPose()).translation();
+            }
+            else {
+                pstate = fusion_chain[0]->getLocalPose().translation();
+            }
+            return pstate;
+        };
+        //------------------------------------------------------------------
 
-        //CURRENT STATE
-        State::Parameters chainState = getChainState(fusion_chain);
-        //Process noise: max of ten seconds variance added
-        Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * std::fmin(10,m->getTimestamp() - local_state.last_update_time);
-        chainState.variance += process_noise;
-                    
-        //JOINT CONSTRAINTS
-        //Read quadratic constraints from joints in chain
-        State::Parameters constraints = getChainConstraints(fusion_chain);
-
+        //------------------------------------------------------------------
+        //Transform measurement to appropriate coordinates
+        //------------------------------------------------------------------
         //THIS MEASUREMENT
         //Measurement information matrix
         State::Parameters measurement(3);
         measurement.expectation = m->getPosition();
         measurement.variance = m->getPositionVar();
+        //------------------------------------------------------------------
         
-        //JACOBIAN:state -> measurement
-        //Get Jacobian for the chain, mapping state to (w,v) global pose
-        //TODO:
-        // Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = getPositionChainJacobian(fusion_chain,m->globalSpace);
-        Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace, globalToRootNode);
-        Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(3,0,3, poseJac.cols());
-
-        State::Parameters newChainState = customEKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, pstate);
-        //State::Parameters newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, pstate);
+        //------------------------------------------------------------------
+        //JOINT CONSTRAINTS
+        //------------------------------------------------------------------
+        //Read quadratic constraints from joints in chain
+        State::Parameters constraints = getChainConstraints(fusion_chain);
+        //------------------------------------------------------------------
 
 
-        setChainState(fusion_chain, newChainState, m->getTimestamp());
+        computeEKFUpdate(m->getTimestamp(),fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
     }
 
     void Node::fuseRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
-
-		////DEBUG:
-		//if (articulations[0].getType() == Articulation::BONE) {
-		//	Node::State::Parameters p;
-		//	p.
-		//	setState();
-		//	return;
-		//}
 
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
         Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
 
-        //Calculate error
+        //Fuse by modifying some parents if necessary
         std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode,m);
 
-        //Get root node space:
-        Transform3D rootNodePose = rootNode->getGlobalPose();
-        Transform3D globalToRootNode = rootNodePose.inverse();
+        //------------------------------------------------------------------
+        //Models for Prediction, Measurement and Measurement Jacobian:
+        //------------------------------------------------------------------
+        auto getPredState = [&m](const std::vector<Node::Ptr>& fusion_chain){
+            //CURRENT STATE
+            State::Parameters chainState = getChainState(fusion_chain);
+            //Process noise: max of ten seconds variance added
+            Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * (m->getTimestamp() * Eigen::VectorXf::Ones(chainState.expectation.size()) - getChainTimeSinceUpdated(fusion_chain)).asDiagonal();
+            //TODO: test process noise calc
+            chainState.variance += process_noise;
+            //TODO: support velocity
+            return chainState;
+        };
 
-        
-        Eigen::VectorXf wpstate;
-        if (m->globalSpace) {
-            wpstate = utility::toAxisAnglePos(globalToRootNode * getGlobalPose()).head(3);
-        }
-        else {
-            wpstate = utility::toAxisAnglePos(getLocalPose()).head(3);
-        }
+        auto getMeasJac = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain) {
+            //JACOBIAN:state -> measurement
+            //Get Jacobian for the chain, mapping state to (w,v) global pose
+            Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse());
+            Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(0, 0, 3, poseJac.cols());
+            return measurementJacobian;
+        };
 
-        //CURRENT STATE
-        State::Parameters chainState = getChainState(fusion_chain);
-        //Process noise: max of ten seconds variance added
-		float dt_sec = std::fmin(10, m->getTimestamp() - local_state.last_update_time);
-        Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * dt_sec;
-		//chainState.expectation += prediction;
-		chainState.variance += process_noise;
-                    
+        auto getMeas = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain){
+
+            Transform3D globalToRootNode = rootNode->getGlobalPose().inverse();
+            
+            Eigen::VectorXf wpstate;
+            if (m->globalSpace) {
+                wpstate = utility::toAxisAnglePos(globalToRootNode * fusion_chain[0]->getGlobalPose()).head(3);
+            }
+            else {
+                wpstate = utility::toAxisAnglePos(fusion_chain[0]->getLocalPose()).head(3);
+            }
+            return wpstate;
+
+        };
+
         //JOINT CONSTRAINTS
         //Read quadratic constraints from joints in chain
         State::Parameters constraints = getChainConstraints(fusion_chain);
 
+        Eigen::VectorXf wpstate = getMeas(fusion_chain);
         //Compute relation between measurement quaternion and twist representation w
         Eigen::Matrix<float, 3, 4> quatToAxisJacobian = utility::getQuatToAxisJacobian(m->getRotation());
 
@@ -234,31 +264,9 @@ namespace spooky{
         State::Parameters measurement(3);
         measurement.expectation = utility::twistClosestRepresentation(wpm.head(3),wpstate.head(3));
         measurement.variance = sigmaW;
-        
-		State::Parameters newChainState(chainState.expectation.size());
-		for (int i = 0; i < 1; i++) {
-			globalToRootNode = rootNode->getGlobalPose().inverse();
-			if (m->globalSpace) {
-				wpstate = utility::toAxisAnglePos(globalToRootNode * getGlobalPose()).head(3);
-			}
-			else {
-				wpstate = utility::toAxisAnglePos(getLocalPose()).head(3);
-			}
-
-			//JACOBIAN:state -> measurement
-			//Get Jacobian for the chain, mapping state to (w,v) global pose
-			Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, globalToRootNode);
-			Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(0, 0, 3, poseJac.cols());
-
-			//TODO optimise ekf by using information matrices and inverting covariance per node
-			newChainState = customEKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, wpstate);
-			//State::Parameters newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, wpstate);
-
-			chainState.expectation = newChainState.expectation;
-			//Move to next approximation
-			setChainState(fusion_chain, chainState, m->getTimestamp());
-		}
-        setChainState(fusion_chain, newChainState, m->getTimestamp());
+                
+        //Perform computation
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
     }
 
     void Node::fuseRigidMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
@@ -353,27 +361,42 @@ namespace spooky{
 
         //Fuse by modifying some parents if necessary
         std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode,m);
-        
-                
-        //Get root node space:
-        Transform3D rootNodePose = rootNode->getGlobalPose();
-        Transform3D globalToRootNode = rootNodePose.inverse();
 
-        Eigen::VectorXf pstate;
-        if (m->globalSpace) {
-            //TODO: change to return class so I can use .scale(), .pos(), etc?
-            pstate = utility::toAxisAnglePosScale(globalToRootNode * getGlobalPose()).tail(3);
-        }
-        else {
-            pstate = utility::toAxisAnglePosScale(getLocalPose()).tail(3);
-        }
+        //------------------------------------------------------------------
+        //Models for Prediction, Measurement and Measurement Jacobian:
+        //------------------------------------------------------------------
+        auto getPredState = [&m](const std::vector<Node::Ptr>& fusion_chain){
+            //CURRENT STATE
+            State::Parameters chainState = getChainState(fusion_chain);
+            //Process noise: max of ten seconds variance added
+            Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * (m->getTimestamp() * Eigen::VectorXf::Ones(chainState.expectation.size()) - getChainTimeSinceUpdated(fusion_chain)).asDiagonal();
+            //TODO: test process noise calc
+            chainState.variance += process_noise;
+            //TODO: support velocity
+            return chainState;
+        };
 
-        //CURRENT STATE
-        State::Parameters chainState = getChainState(fusion_chain);
-        //Process noise: max of ten seconds variance added
-        Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * std::fmin(10,m->getTimestamp() - local_state.last_update_time);
-        chainState.variance += process_noise;
-                    
+        auto getMeasJac = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain) {
+            //JACOBIAN:state -> measurement
+            //Get Jacobian for the chain, mapping state to (w,v) global pose
+            Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse());
+            Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(6, 0, 3, poseJac.cols());
+            return measurementJacobian;
+        };
+
+        auto getMeas = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain){
+
+            Eigen::VectorXf pstate;
+            Transform3D globalToRootNode = rootNode->getGlobalPose().inverse();
+            if (m->globalSpace) {
+                //TODO: change to return class so I can use .scale(), .pos(), etc?
+                pstate = utility::toAxisAnglePosScale(globalToRootNode * fusion_chain[0]->getGlobalPose()).tail(3);
+            }
+            else {
+                pstate = utility::toAxisAnglePosScale(fusion_chain[0]->getLocalPose()).tail(3);
+            }
+            return pstate;
+        };
         //JOINT CONSTRAINTS
         //Read quadratic constraints from joints in chain
         State::Parameters constraints = getChainConstraints(fusion_chain);
@@ -384,16 +407,9 @@ namespace spooky{
         measurement.expectation = m->getScale();
         measurement.variance = m->getScaleVar();
         
-        //JACOBIAN:state -> measurement
-        //Get Jacobian for the chain, mapping state to (w,v) global pose
-        Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain,m->globalSpace,globalToRootNode);
-        Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(6,0,3,poseJac.cols());
+        //Perform computation
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
 
-        //TODO optimise ekf by using information matrices and inverting covariance per node
-        State::Parameters newChainState = customEKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, pstate);
-        //State::Parameters newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, pstate);
-
-        setChainState(fusion_chain, newChainState, m->getTimestamp());
     }
 
 
