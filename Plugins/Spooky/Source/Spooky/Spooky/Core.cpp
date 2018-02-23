@@ -30,28 +30,28 @@ namespace spooky {
 	void Core::addBoneNode(const NodeDescriptor & node, const NodeDescriptor & parent,
 							 const Transform3D& boneTransform,
 							 const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
-							 const float& process_noise)
+							 const float& process_noise, const bool& modelVelocity)
 	{
 		skeleton.addNode(node, parent);
-		skeleton.setBoneForNode(node, boneTransform, Node::State::Parameters(constraint_centre, constraint_variance), process_noise);
+		skeleton.setBoneForNode(node, boneTransform, Node::State::Parameters(constraint_centre, constraint_variance), process_noise, modelVelocity);
 	}
 
 	void Core::addPoseNode(const NodeDescriptor & node, const NodeDescriptor & parent,
 							 const Transform3D& poseInitial,
 							 const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
-							 const float& process_noise)
+							 const float& process_noise, const bool& modelVelocity)
 	{
 		skeleton.addNode(node, parent);
-		skeleton.setPoseNode(node, poseInitial, Node::State::Parameters(constraint_centre, constraint_variance), process_noise);
+		skeleton.setPoseNode(node, poseInitial, Node::State::Parameters(constraint_centre, constraint_variance), process_noise, modelVelocity);
 	}
 
 	void Core::addScalePoseNode(const NodeDescriptor & node, const NodeDescriptor & parent,
 							 const Transform3D& poseInitial, const Eigen::Vector3f& scaleInitial,
 							 const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
-							 const float& process_noise)
+							 const float& process_noise, const bool& modelVelocity)
 	{
 		skeleton.addNode(node, parent);
-		skeleton.setScalePoseNode(node, poseInitial, scaleInitial, Node::State::Parameters(constraint_centre, constraint_variance),process_noise);
+		skeleton.setScalePoseNode(node, poseInitial, scaleInitial, Node::State::Parameters(constraint_centre, constraint_variance),process_noise, modelVelocity);
 	}
 
 

@@ -105,7 +105,7 @@ void USpookyFusionPlant::SetSystemRootNode(FString system, FString rootNode, con
 
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh, const TArray<FName>& fixedJoints, float default_constraint_flexibility, float default_process_noise)
+void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh, const TArray<FName>& fixedJoints, float default_constraint_flexibility, float default_process_noise, bool modelVelocity)
 {
 	TArray<FMeshBoneInfo> boneInfo = skeletal_mesh->SkeletalMesh->RefSkeleton.GetRefBoneInfo();
 	for (int i = 0; i < boneInfo.Num(); i++) {
@@ -133,7 +133,7 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh,
 			constraint_variance.bottomRightCorner(3,3) = Eigen::MatrixXf::Identity(3,3) * 0.001;
 			Eigen::VectorXf constraint_centre = Eigen::VectorXf::Zero(9);
 			constraint_centre.tail(3) = Eigen::Vector3f::Ones(); // Centre at unit scale
-			spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones(), constraint_centre, constraint_variance, default_process_noise);
+			spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones(), constraint_centre, constraint_variance, default_process_noise, modelVelocity);
 		}
 		else {
 			//TODO: read constraint and process noise from USpookySkeletalMeshComponent
@@ -144,7 +144,7 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh,
 			Eigen::Vector3f constraint_centre = Eigen::Vector3f::Zero();
 			Eigen::VectorXf pose_constraint_centre = Eigen::VectorXf::Zero(6);
 			//spookyCore.addPoseNode(bone_desc, parent_desc, bonePoseLocal, pose_constraint_centre, pose_constraint_variance, default_process_noise);
-			spookyCore.addBoneNode(bone_desc, parent_desc, bonePoseLocal, constraint_centre, constraint_variance, default_process_noise);
+			spookyCore.addBoneNode(bone_desc, parent_desc, bonePoseLocal, constraint_centre, constraint_variance, default_process_noise, modelVelocity);
 		}
 		SPOOKY_LOG("Adding Bone: " + bone_desc.name + ", parent = " + parent_desc.name);
 	}

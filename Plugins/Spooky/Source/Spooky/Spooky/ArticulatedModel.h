@@ -76,6 +76,7 @@ namespace spooky {
 
 				}
 			};
+			bool modelVelocity = true;
 
 			//Paramters for each articulation
 			std::vector<Parameters> articulation;
@@ -88,7 +89,7 @@ namespace spooky {
 			//State is valid - false if state poorly initialised, etc...
 			bool valid = true;
 		};
-	
+	private:
 		//Current state
 		State local_state;
 		//Constant internal structure of the node
@@ -99,6 +100,7 @@ namespace spooky {
 		Transform3D homePose;
 
 	
+	public:
 		//////////////////////////////////////////////////////////////////
 		//Extrinsic info
 		//////////////////////////////////////////////////////////////////
@@ -170,7 +172,7 @@ namespace spooky {
 		//Updates the state of this node (e.g. angle, quaternion, etc.)
 		void updateState(const State& new_state, const float& timestamp, const float& latency);
 		//Sets the model for the articulations associated with this node
-		void setModel(std::vector<Articulation> art);
+		void setModel(std::vector<Articulation> art, const bool& modelVelocity);
 
 		//Set fusion parameters
 		void setConstraintForArticulation(const int& i, const Node::State::Parameters& c);
@@ -262,9 +264,9 @@ namespace spooky {
 
 			//Sets the structure parameters for the specified articulation as a bone according to the boneVec
 			void setFixedNode(const NodeDescriptor & node, const Transform3D& boneTransform);
-			void setBoneForNode(const NodeDescriptor & node, const Transform3D& boneTransform, const Node::State::Parameters& constraints, const float& process_noise);
-			void setPoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Node::State::Parameters& constraints, const float& process_noise);
-			void setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial, const Node::State::Parameters& constraints, const float& process_noise);
+			void setBoneForNode(const NodeDescriptor & node, const Transform3D& boneTransform, const Node::State::Parameters& constraints, const float& process_noise, const bool& modelVelocity);
+			void setPoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Node::State::Parameters& constraints, const float& process_noise, const bool& modelVelocity);
+			void setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial, const Node::State::Parameters& constraints, const float& process_noise, const bool& modelVelocity);
 			
 			//Stiffness settings
 			void setJointStiffness(const NodeDescriptor & node, const float& stiffness);

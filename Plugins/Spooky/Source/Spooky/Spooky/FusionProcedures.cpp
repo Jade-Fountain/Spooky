@@ -476,9 +476,12 @@ namespace spooky{
         //CURRENT STATE
         State::Parameters chainState = getChainState(fusion_chain);
         //Process noise: max of ten seconds variance added
-        Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * (timestamp * Eigen::VectorXf::Ones(chainState.expectation.size()) - getChainTimeSinceUpdated(fusion_chain)).asDiagonal();
-        //TODO: test process noise calc
+        auto time_matrix = (timestamp * Eigen::VectorXf::Ones(chainState.expectation.size()) - getChainTimeSinceUpdated(fusion_chain)).asDiagonal();
+        Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * time_matrix;
+        //Add process noise
         chainState.variance += process_noise;
+        //auto velocityMatrix = getChainVelocityEntries(fusion_chain);
+        //chainState.expectation += time_matrix * velocityMatrix * chainState.expectation;
         //TODO: support velocity
         return chainState;
     }

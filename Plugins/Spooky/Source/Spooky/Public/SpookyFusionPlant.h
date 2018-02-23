@@ -89,7 +89,7 @@ public:
 
 	//Set the output target which will have the complete fused skeleton pose applied
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddOutputTarget(USkeletalMeshComponent* skeletal_mesh, const TArray<FName>& fixedJoints, float default_constraint_flexibility = 1, float default_process_noise = 0.1);
+	void AddOutputTarget(USkeletalMeshComponent* skeletal_mesh, const TArray<FName>& fixedJoints, float default_constraint_flexibility = 1, float default_process_noise = 0.1, bool modelVelocity = true);
 	
 	//Perform some setup postprocessing
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
