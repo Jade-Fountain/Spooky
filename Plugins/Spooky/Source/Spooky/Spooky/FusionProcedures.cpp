@@ -63,7 +63,8 @@ namespace spooky{
     }
 
     std::vector<Node::Ptr> Node::getRequiredChain(const Node::Ptr& destNode, const Measurement::Ptr& m){
-        Node::Ptr srcNode = shared_from_this();
+        //TODO: support ignoring irrelevant nodes!!!
+		Node::Ptr srcNode = shared_from_this();
 
         //If not in global space, we only receive info about this node
         if(!m->globalSpace){
