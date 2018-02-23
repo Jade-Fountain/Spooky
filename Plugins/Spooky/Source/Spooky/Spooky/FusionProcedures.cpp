@@ -149,13 +149,7 @@ namespace spooky{
         //Models for Prediction, Measurement and Measurement Jacobian:
         //------------------------------------------------------------------
         auto getPredState = [&m](const std::vector<Node::Ptr>& fusion_chain){
-            //CURRENT STATE
-            State::Parameters chainState = getChainState(fusion_chain);
-            //Process noise: max of ten seconds variance added
-            Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * (m->getTimestamp() * Eigen::VectorXf::Ones(chainState.expectation.size()) - getChainTimeSinceUpdated(fusion_chain)).asDiagonal();
-            chainState.variance += process_noise;
-            //TODO: support velocity
-            return chainState;
+            return getChainPredictedState(fusion_chain, m->getTimestamp());
         };
 
         auto getMeasJac = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain) {
@@ -215,14 +209,7 @@ namespace spooky{
         //Models for Prediction, Measurement and Measurement Jacobian:
         //------------------------------------------------------------------
         auto getPredState = [&m](const std::vector<Node::Ptr>& fusion_chain){
-            //CURRENT STATE
-            State::Parameters chainState = getChainState(fusion_chain);
-            //Process noise: max of ten seconds variance added
-            Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * (m->getTimestamp() * Eigen::VectorXf::Ones(chainState.expectation.size()) - getChainTimeSinceUpdated(fusion_chain)).asDiagonal();
-            //TODO: test process noise calc
-            chainState.variance += process_noise;
-            //TODO: support velocity
-            return chainState;
+            return getChainPredictedState(fusion_chain, m->getTimestamp());
         };
 
         auto getMeasJac = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain) {
@@ -288,13 +275,7 @@ namespace spooky{
         //Models for Prediction, Measurement and Measurement Jacobian:
         //------------------------------------------------------------------
         auto getPredState = [&m](const std::vector<Node::Ptr>& fusion_chain){
-            //CURRENT STATE
-            State::Parameters chainState = getChainState(fusion_chain);
-            //Process noise: max of ten seconds variance added
-            Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * (m->getTimestamp() * Eigen::VectorXf::Ones(chainState.expectation.size()) - getChainTimeSinceUpdated(fusion_chain)).asDiagonal();
-            chainState.variance += process_noise;
-            //TODO: support velocity
-            return chainState;
+            return getChainPredictedState(fusion_chain, m->getTimestamp());
 		};
 
 		auto getMeasJac = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain) {
@@ -367,14 +348,7 @@ namespace spooky{
         //Models for Prediction, Measurement and Measurement Jacobian:
         //------------------------------------------------------------------
         auto getPredState = [&m](const std::vector<Node::Ptr>& fusion_chain){
-            //CURRENT STATE
-            State::Parameters chainState = getChainState(fusion_chain);
-            //Process noise: max of ten seconds variance added
-            Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * (m->getTimestamp() * Eigen::VectorXf::Ones(chainState.expectation.size()) - getChainTimeSinceUpdated(fusion_chain)).asDiagonal();
-            //TODO: test process noise calc
-            chainState.variance += process_noise;
-            //TODO: support velocity
-            return chainState;
+            return getChainPredictedState(fusion_chain, m->getTimestamp());
         };
 
         auto getMeasJac = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain) {
@@ -412,7 +386,6 @@ namespace spooky{
         computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
 
     }
-
 
 	void Node::computeEKFUpdate(
 	   const float& timestamp,
@@ -498,6 +471,17 @@ namespace spooky{
 	};
 
 
+
+    Node::State::Parameters Node::getChainPredictedState(const std::vector<Node::Ptr>& fusion_chain, const float& timestamp){
+        //CURRENT STATE
+        State::Parameters chainState = getChainState(fusion_chain);
+        //Process noise: max of ten seconds variance added
+        Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * (timestamp * Eigen::VectorXf::Ones(chainState.expectation.size()) - getChainTimeSinceUpdated(fusion_chain)).asDiagonal();
+        //TODO: test process noise calc
+        chainState.variance += process_noise;
+        //TODO: support velocity
+        return chainState;
+    }
 
 	Eigen::Matrix<float, 9, Eigen::Dynamic> Node::getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain, const bool& globalSpace, const Transform3D& globalToRootNode) {
 		//Precompute Jacobian size
