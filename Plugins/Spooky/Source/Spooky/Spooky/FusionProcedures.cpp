@@ -471,7 +471,7 @@ namespace spooky{
 	};
 
 
-
+	//TODO: always update, even when no measurements recieved
     Node::State::Parameters Node::getChainPredictedState(const std::vector<Node::Ptr>& fusion_chain, const float& timestamp){
         //CURRENT STATE
         State::Parameters chainState = getChainState(fusion_chain);
@@ -480,9 +480,16 @@ namespace spooky{
         Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * time_matrix;
         //Add process noise
         chainState.variance += process_noise;
-        //auto velocityMatrix = getChainVelocityEntries(fusion_chain);
-        //chainState.expectation += time_matrix * velocityMatrix * chainState.expectation;
+		//Use arrays for componentwise multiplication
+        Eigen::MatrixXf velocityMatrix = getChainVelocityMatrix(fusion_chain);
+		Eigen::VectorXf vel = time_matrix.diagonal() * velocityMatrix * chainState.expectation;
+        std::stringstream ss;
+        ss << "chainState.expectation before = " << std::endl << chainState.expectation << std::endl;
+        chainState.expectation += vel;
         //TODO: support velocity
+        ss << "velmatrix  = " << std::endl << velocityMatrix << std::endl;
+        ss << "vel  = " << std::endl << vel.transpose() << std::endl;
+		SPOOKY_LOG(ss.str());
         return chainState;
     }
 

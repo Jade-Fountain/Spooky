@@ -151,6 +151,9 @@ namespace spooky {
 		//Get time since the data was updated
 		//Note: returns undefined variance
 		State::Parameters getTimeSinceUpdated();
+		//Get which entries in state are velocities
+		//Note: returns undefined expectation
+		State::Parameters getVelocityMatrix();
 
 		//Generic grouped parameter methods
 		static State::Parameters getChainParameters(std::function<Node::State::Parameters(Node&)> getParams, const std::vector<Node::Ptr>& node_chain);
@@ -161,7 +164,8 @@ namespace spooky {
 		static State::Parameters getChainConstraints(const std::vector<Node::Ptr>& node_chain);
 		static State::Parameters getChainProcessNoise(const std::vector<Node::Ptr>& node_chain);
 		static Eigen::VectorXf getChainTimeSinceUpdated(const std::vector<Node::Ptr>& node_chain);
-    	
+		static Eigen::MatrixXf getChainVelocityMatrix(const std::vector<Node::Ptr>& node_chain);
+
     	//Get prediction
     	static State::Parameters getChainPredictedState(const std::vector<Node::Ptr>& fusion_chain, const float& timestamp);
 		//Get the jocobian of an entire pose chain mapping state |-> (w,p,s) axis-angle, position and scale, each with 3D

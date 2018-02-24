@@ -165,6 +165,28 @@ namespace spooky {
 	}
 
 
+	Node::State::Parameters Node::getVelocityMatrix() {
+		//Construct new parameters set for combined articulations
+		State::Parameters p(getDimension());
+		//Zero
+		p.variance = Eigen::MatrixXf::Zero(getDimension(),getDimension());
+		//if velocity not modelled, return zeros
+		if(!local_state.modelVelocity) return p;
+		//Otherwise, return ones for second half of each vector
+		int pos = 0;
+		for (int i = 0; i < articulations.size(); i++) {
+			int dim = local_state.articulation[i].expectation.size();
+			int dim_2 = dim / 2;
+			//Top right corner of each articulation is identity:
+			//[ 0, I
+			//  0, 0]
+			p.variance.block(0,pos+dim_2, dim_2, dim_2) = Eigen::MatrixXf::Identity(dim_2,dim_2);
+			pos += dim;
+		}
+		return p;
+	}
+
+
 	Node::State::Parameters Node::getChainParameters(std::function<Node::State::Parameters (Node&)> getParams, const std::vector<Node::Ptr>& node_chain) {
 		//Precompute State size
 		int inputDimension = 0;
@@ -204,6 +226,12 @@ namespace spooky {
 		return getChainParameters(
 			std::function<Node::State::Parameters(Node&)>(&Node::getTimeSinceUpdated)
 			, node_chain).expectation;
+	}
+
+	Eigen::MatrixXf Node::getChainVelocityMatrix(const std::vector<Node::Ptr>& node_chain) {
+		return getChainParameters(
+			std::function<Node::State::Parameters(Node&)>(&Node::getVelocityMatrix)
+			, node_chain).variance;
 	}
 
 
