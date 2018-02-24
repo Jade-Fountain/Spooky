@@ -476,20 +476,26 @@ namespace spooky{
         //CURRENT STATE
         State::Parameters chainState = getChainState(fusion_chain);
         //Process noise: max of ten seconds variance added
-        auto time_matrix = (timestamp * Eigen::VectorXf::Ones(chainState.expectation.size()) - getChainTimeSinceUpdated(fusion_chain)).asDiagonal();
+		Eigen::MatrixXf time_matrix = Eigen::MatrixXf::Zero(chainState.expectation.size(), chainState.expectation.size());
+		time_matrix.diagonal() = (timestamp * Eigen::VectorXf::Ones(chainState.expectation.size()) - getChainTimeSinceUpdated(fusion_chain));
         Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * time_matrix;
         //Add process noise
         chainState.variance += process_noise;
 		//Use arrays for componentwise multiplication
         Eigen::MatrixXf velocityMatrix = getChainVelocityMatrix(fusion_chain);
-		Eigen::VectorXf vel = time_matrix.diagonal() * velocityMatrix * chainState.expectation;
+		Eigen::VectorXf vel = time_matrix * velocityMatrix * chainState.expectation;
+        
+        //DEBUG
         std::stringstream ss;
-        ss << "chainState.expectation before = " << std::endl << chainState.expectation << std::endl;
-        chainState.expectation += vel;
+        ss << "chainState.expectation before = " << std::endl << chainState.expectation.transpose() << std::endl;
         //TODO: support velocity
+        ss << "time_matrix  = " << std::endl << time_matrix << std::endl;
         ss << "velmatrix  = " << std::endl << velocityMatrix << std::endl;
         ss << "vel  = " << std::endl << vel.transpose() << std::endl;
 		SPOOKY_LOG(ss.str());
+        //DEBUG END
+
+        chainState.expectation += vel;
         return chainState;
     }
 
