@@ -54,6 +54,10 @@ namespace spooky {
 		//Latency data per system
 		std::map<SystemDescriptor, float> sysLatencies;
 		std::map<SystemDescriptor, NodeDescriptor> rootNodes;
+
+		//Debug/Stats
+		float last_time = 0;
+		long int frame_count = 0;
 		
 	public:
 

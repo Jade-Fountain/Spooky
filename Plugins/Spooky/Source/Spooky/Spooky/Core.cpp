@@ -161,6 +161,8 @@ namespace spooky {
 
 	//Computes data added since last fuse() call. Should be called repeatedly	
 	void Core::fuse(const float& time) {
+		frame_count++;
+		last_time = time;
 		//TODO: add ifdefs for profiling
 		//Add new data to calibration, with checking for usefulness
 		utility::profiler.startTimer("Correlator");
@@ -233,6 +235,6 @@ namespace spooky {
 	}
 
 	std::string Core::getTimingSummary() {
-		return utility::profiler.getReport();
+		return utility::profiler.getReport() + "\n framerate = "  + std::to_string(frame_count / last_time);
 	}
 }

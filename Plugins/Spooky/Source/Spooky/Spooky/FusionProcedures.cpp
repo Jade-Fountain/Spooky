@@ -396,17 +396,20 @@ namespace spooky{
        const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
        const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian
     ){
-        //Iterative update
+		std::stringstream ss;
+		ss << "new Frame" << std::endl;
+		//Iterative update
         State::Parameters chainState = getPredictedState(fusion_chain);
+		State::Parameters originalChainState = chainState;
 		State::Parameters newChainState(chainState.expectation.size());
-		for (int i = 0; i < 3; i++) {
-            
-            Eigen::VectorXf predictedMeasurement = getMeasurement(fusion_chain);
+		
+		//Get the predicted measurment
+		Eigen::VectorXf predictedMeasurement = getMeasurement(fusion_chain);
+		//JACOBIAN:state -> measurement
+		//Get Jacobian for the chain, mapping state to (w,v) global pose
+		Eigen::MatrixXf measurementJacobian = getMeasurementJacobian(fusion_chain);
 
-            //JACOBIAN:state -> measurement
-            //Get Jacobian for the chain, mapping state to (w,v) global pose
-            Eigen::MatrixXf measurementJacobian = getMeasurementJacobian(fusion_chain);
-
+		for (int i = 0; i < 20; i++) {
             //TODO optimise ekf by using information matrices and inverting covariance per node
             newChainState = customEKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, predictedMeasurement);
             //newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, wpstate);
@@ -414,9 +417,23 @@ namespace spooky{
             chainState.expectation = newChainState.expectation;
             //Move to next approximation, but keep old variances
             setChainState(fusion_chain, chainState, timestamp);
+			
+			//Prepare for next update:
+			predictedMeasurement = getMeasurement(fusion_chain);
+			measurementJacobian = getMeasurementJacobian(fusion_chain);
+			//Error = 0 when we are at the most likely state
+			Eigen::VectorXf error_vec =
+						measurementJacobian.transpose() * measurement.variance.inverse() * (predictedMeasurement - measurement.expectation)
+						+ originalChainState.variance.inverse() * (chainState.expectation - originalChainState.expectation)
+						+ joint_stiffness * constraints.variance.inverse() * (chainState.expectation - constraints.expectation);
+			float error = error_vec.norm();
+			ss << "error_vec = " << error_vec.transpose() << std::endl;
+			ss << "error = " << error << std::endl;
+			if (error < 0.00001) break;			
         }
         setChainState(fusion_chain, newChainState, timestamp);
-    };
+		SPOOKY_LOG(ss.str());
+	};
 
     Node::State::Parameters Node::customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,
                                                         const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement)
