@@ -396,11 +396,12 @@ namespace spooky{
        const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
        const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian
     ){
-		std::stringstream ss;
-		ss << "new Frame" << std::endl;
+		//std::stringstream ss;
+		//ss << "new Frame" << std::endl;
 		//Iterative update
         State::Parameters chainState = getPredictedState(fusion_chain);
 		State::Parameters originalChainState = chainState;
+		State::Parameters lastChainState = chainState;
 		State::Parameters newChainState(chainState.expectation.size());
 		
 		//Get the predicted measurment
@@ -408,8 +409,11 @@ namespace spooky{
 		//JACOBIAN:state -> measurement
 		//Get Jacobian for the chain, mapping state to (w,v) global pose
 		Eigen::MatrixXf measurementJacobian = getMeasurementJacobian(fusion_chain);
+		float last_error = 9999999999999999;
+		int iterations = 0;
 
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 5; i++) {
+			iterations++;
             //TODO optimise ekf by using information matrices and inverting covariance per node
             newChainState = customEKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, predictedMeasurement);
             //newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, wpstate);
@@ -422,17 +426,46 @@ namespace spooky{
 			predictedMeasurement = getMeasurement(fusion_chain);
 			measurementJacobian = getMeasurementJacobian(fusion_chain);
 			//Error = 0 when we are at the most likely state
-			Eigen::VectorXf error_vec =
-						measurementJacobian.transpose() * measurement.variance.inverse() * (predictedMeasurement - measurement.expectation)
-						+ originalChainState.variance.inverse() * (chainState.expectation - originalChainState.expectation)
-						+ joint_stiffness * constraints.variance.inverse() * (chainState.expectation - constraints.expectation);
-			float error = error_vec.norm();
-			ss << "error_vec = " << error_vec.transpose() << std::endl;
-			ss << "error = " << error << std::endl;
-			if (error < 0.00001) break;			
+			//Eigen::VectorXf error_vec =
+			//			measurementJacobian.transpose() * measurement.variance.inverse() * (predictedMeasurement - measurement.expectation)
+			//			+ originalChainState.variance.inverse() * (chainState.expectation - originalChainState.expectation)
+			//			+ joint_stiffness * constraints.variance.inverse() * (chainState.expectation - constraints.expectation);
+			//float error = error_vec.norm();
+
+			
+			//Measurement error:
+			float m_error = ((predictedMeasurement - measurement.expectation).transpose() * measurement.variance.inverse() * (predictedMeasurement - measurement.expectation))(0, 0);
+			//Prior error
+			float p_error = ((chainState.expectation - originalChainState.expectation).transpose() * originalChainState.variance.inverse() * (chainState.expectation - originalChainState.expectation))(0, 0);
+			//Constraint Error
+			float c_error = (joint_stiffness *(chainState.expectation - constraints.expectation).transpose() * constraints.variance.inverse() * (chainState.expectation - constraints.expectation))(0, 0);
+			//Energy:
+			float error = m_error + p_error + c_error;
+
+			//ss << "error_vec = " << error_vec.transpose() << std::endl;
+			//ss << "error = " << error << std::endl;
+			//ss << "m_error = " << m_error << std::endl;
+			//ss << "p_error = " << p_error << std::endl;
+			//ss << "c_error = " << c_error << std::endl;
+			//Keep searching until error increases 
+			if (error > last_error) {
+				//But we want the last estimate:
+				newChainState = lastChainState;
+				break;
+			}
+			//or is very low
+			if(error < 1e-6) {
+				//We want the current state (aka newChainState)
+				break;
+			}
+			//Update Last variables
+			last_error = error;
+			lastChainState = newChainState;
         }
         setChainState(fusion_chain, newChainState, timestamp);
-		SPOOKY_LOG(ss.str());
+		//ss << "bone = " << fusion_chain[0]->desc.name << std::endl;
+		//ss << "iterations = " << iterations << std::endl;
+		//SPOOKY_LOG(ss.str());
 	};
 
     Node::State::Parameters Node::customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,
