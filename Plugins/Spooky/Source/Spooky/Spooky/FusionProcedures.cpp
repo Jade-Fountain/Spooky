@@ -486,13 +486,13 @@ namespace spooky{
 		Eigen::MatrixXf updateMatrix = velocityMatrix + Eigen::MatrixXf::Identity(dim, dim);
         
         //DEBUG
-        std::stringstream ss;
-        ss << "chainState.expectation before = " << std::endl << chainState.expectation.transpose() << std::endl;
-        //TODO: support velocity
-        ss << "time_matrix  = " << std::endl << time_matrix << std::endl;
-        ss << "velmatrix  = " << std::endl << velocityMatrix << std::endl;
-        ss << "updateMatrix  = " << std::endl << updateMatrix << std::endl;
-		SPOOKY_LOG(ss.str());
+  //      std::stringstream ss;
+  //      ss << "chainState.expectation before = " << std::endl << chainState.expectation.transpose() << std::endl;
+  //      //TODO: support velocity
+  //      ss << "time_matrix  = " << std::endl << time_matrix << std::endl;
+  //      ss << "velmatrix  = " << std::endl << velocityMatrix << std::endl;
+  //      ss << "updateMatrix  = " << std::endl << updateMatrix << std::endl;
+		//SPOOKY_LOG(ss.str());
         //DEBUG END
 
 		chainState.variance = updateMatrix * chainState.variance * updateMatrix.transpose() + process_noise;
