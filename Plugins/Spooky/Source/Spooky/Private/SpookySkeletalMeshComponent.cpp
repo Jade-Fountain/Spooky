@@ -32,14 +32,17 @@ void USpookySkeletalMeshComponent::SetSystemInfo(const FString& systemName, cons
 	setup = true;
 }
 
-void USpookySkeletalMeshComponent::SetDefaultBoneInfo(const FSpookySkeletonBoneInfo& info){
-	defaultBoneInfo = std::make_unique<FSpookySkeletonBoneInfo>(info);
+void USpookySkeletalMeshComponent::SetDefaultBoneOutputParams(const FSpookySkeletonBoneOutputParams& info){
+	defaultBoneOutputParams = std::make_unique<FSpookySkeletonBoneOutputParams>(info);
+}
+
+void USpookySkeletalMeshComponent::SetDefaultBoneInputParams(const FSpookyBoneInputParameters& params){
+	defaultBoneInputParams = std::make_unique<FSpookyBoneInputParameters>(params);
 }
 
 
-void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, const TArray<FRotator>& boneRetargetRotators, ESpookyReturnStatus& branch){
-	bool bones_exist = true;
-	if(!defaultBoneInfo){
+void USpookySkeletalMeshComponent::AddOutputBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, const TArray<FRotator>& boneRetargetRotators, ESpookyReturnStatus& branch){
+	if(!defaultBoneOutputParams){
 		branch = ESpookyReturnStatus::Failure;
 		SPOOKY_LOG("ERROR: NO DEFAULT BONE INFO SET SO CANNOT ADD ACTIVE BONES");
 		return;	
@@ -48,7 +51,7 @@ void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, co
 	for(int i = 0; i < bones.Num(); i++){
 		bool thisBoneExists = this->SkeletalMesh->RefSkeleton.FindBoneIndex(bones[i]) != INDEX_NONE;
 		if (thisBoneExists) {
-			activeBones[bones[i]] = *defaultBoneInfo;
+			outputBones[bones[i]] = *defaultBoneOutputParams;
 			if (i < boneTargetNodes.Num() && boneTargetNodes[i].Compare("") != 0) {
 				targetNodes[bones[i]] = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(boneTargetNodes[i].ToString())));
 			}
@@ -58,10 +61,9 @@ void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, co
 		}
 		else {
 			missingBones.push_back(bones[i]);
-			bones_exist = false;
 		}
 	}
-	if (!bones_exist) {
+	if (missingBones.size() > 0) {
 		branch = ESpookyReturnStatus::Failure;
 		SPOOKY_LOG("ERROR: THE FOLLOWING REQUESTED ACTIVE BONES DO NOT EXIST: ");
 		for (auto& b : missingBones) {
@@ -73,12 +75,50 @@ void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, co
 	}
 }
 
-void USpookySkeletalMeshComponent::SetBoneInfo(const FSpookySkeletonBoneInfo& info, ESpookyReturnStatus& branch){
-	if(activeBones.count(info.name) == 0){
+void USpookySkeletalMeshComponent::AddInputBones(const TArray<FName>& bones, ESpookyReturnStatus& branch){
+	if(!defaultBoneInputParams){
+		branch = ESpookyReturnStatus::Failure;
+		SPOOKY_LOG("ERROR: NO DEFAULT BONE INFO SET SO CANNOT ADD ACTIVE BONES");
+		return;	
+	}
+	std::vector<FName> missingBones;
+	for(int i = 0; i < bones.Num(); i++){
+		bool thisBoneExists = this->SkeletalMesh->RefSkeleton.FindBoneIndex(bones[i]) != INDEX_NONE;
+		if (thisBoneExists) {
+			inputBones[bones[i]] = *defaultBoneInputParams;
+		}
+		else {
+			missingBones.push_back(bones[i]);
+		}
+	}
+	if (missingBones.size() > 0) {
+		branch = ESpookyReturnStatus::Failure;
+		SPOOKY_LOG("ERROR: THE FOLLOWING REQUESTED ACTIVE BONES DO NOT EXIST: ");
+		for (auto& b : missingBones) {
+			SPOOKY_LOG(TCHAR_TO_UTF8(*(b.ToString())));
+		}
+	}
+	else {
+		branch = ESpookyReturnStatus::Success;
+	}
+}
+
+
+void USpookySkeletalMeshComponent::SetBoneOutputParams(const FSpookySkeletonBoneOutputParams& info, ESpookyReturnStatus& branch){
+	if(outputBones.count(info.name) == 0){
 		branch = ESpookyReturnStatus::Failure;
 	} else {
 		branch = ESpookyReturnStatus::Success;
-		activeBones[info.name] = info;
+		outputBones[info.name] = info;
+	}
+}
+
+void USpookySkeletalMeshComponent::SetBoneInputParams(const FSpookyBoneInputParameters& info, ESpookyReturnStatus& branch){
+	if(inputBones.count(info.name) == 0){
+		branch = ESpookyReturnStatus::Failure;
+	} else {
+		branch = ESpookyReturnStatus::Success;
+		inputBones[info.name] = info;
 	}
 }
 
@@ -86,25 +126,25 @@ void USpookySkeletalMeshComponent::SetBoneInfo(const FSpookySkeletonBoneInfo& in
 
 void USpookySkeletalMeshComponent::UpdateTimestamp(const FName& bone,const float& t_sec){
 	if(!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
-	activeBones[bone].timestamp_sec = t_sec;
+	outputBones[bone].timestamp_sec = t_sec;
 }
 
 
 void USpookySkeletalMeshComponent::UpdateAllTimestamps(const float& t_sec){
 	if(!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
-	for(auto& bone : activeBones){
+	for(auto& bone : outputBones){
 		bone.second.timestamp_sec = t_sec;
 	}
 }
 
 
-void USpookySkeletalMeshComponent::UpdateConfidence(const FName& bone,const float& confidence){
+void USpookySkeletalMeshComponent::UpdateOutputConfidence(const FName& bone,const float& confidence){
 	if(!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
-	activeBones[bone].confidence = confidence;
+	outputBones[bone].confidence = confidence;
 }
 
 
-spooky::NodeDescriptor USpookySkeletalMeshComponent::getTargetNode(const FName& bone) {
+spooky::NodeDescriptor USpookySkeletalMeshComponent::getOutputTargetNode(const FName& bone) {
 	if (targetNodes.count(bone) > 0) {
 		return targetNodes[bone];
 	}
@@ -113,7 +153,7 @@ spooky::NodeDescriptor USpookySkeletalMeshComponent::getTargetNode(const FName& 
 	}
 }
 
-FRotator USpookySkeletalMeshComponent::getRetargetRotator(const FName& bone) {
+FRotator USpookySkeletalMeshComponent::getOutputRetargetRotator(const FName& bone) {
 	if (retargetRotators.count(bone) > 0) {
 		return retargetRotators[bone];
 	}
@@ -124,100 +164,36 @@ FRotator USpookySkeletalMeshComponent::getRetargetRotator(const FName& bone) {
 
 
 ESpookyFusionType USpookySkeletalMeshComponent::GetBoneFusionType(const FName& bone){
-	if(fusionBones.count(bone) == 0){
+	if(inputBones.count(bone) == 0){
 		return ESpookyFusionType::FIXED;
 	} else {
-		return fusionBones.type;
+		return inputBones.type;
 	}
 }
 
 Eigen::VectorXf USpookySkeletalMeshComponent::GetConstraintCentre(const FName& bone){
-	if(fusionBones.count(bone) == 0){
+	if(inputBones.count(bone) == 0){
 		//TODO: make this nicer
 		throw ("Bone " + bone.ToString() + " doesn't exist! - tried to access fusion parameters!");
 	} else {
-		auto& info = fusionBones[bone];
-		switch (info.type) {
-			case(FIXED):
-			{
-				throw std::runtime_exception("Bone " + bone.toString() + " is fixed! - tried to access fusion parameters!");
-			}
-			case(BONE):
-			{
-				return Eigen::Vector4f(&(info.quaternion_centre[0]));
-			}
-			case(POSE):
-			{
-				Eigen::Quaternionf q(&(info.quaternion_centre[0]));
-				Eigen::Vector3f v(&(info.quaternion_centre[0]));
-				Eigen::VectorXf result;
-				result << spooky::utility::toAxisAngle(q.matrix()), v;
-				return result;
-			}
-			case(SCALE_POSE):
-			{
-				Eigen::Quaternionf q(&(info.quaternion_centre[0]));
-				Eigen::Vector3f v(&(info.quaternion_centre[0]));
-				Eigen::Vector3f s(&(info.scale_centre[0]));
-				Eigen::VectorXf result;
-				result << spooky::utility::toAxisAngle(q.matrix()), v, s;
-				return result;
-			}
-		}
-
+		return inputBones[bone].constraint_centre;
 	}
 
 }
 
 Eigen::MatrixXf USpookySkeletalMeshComponent::GetConstraintVariance(const FName& bone){
-	if(fusionBones.count(bone) == 0){
+	if(inputBones.count(bone) == 0){
 		throw std::runtime_exception("Bone " + bone.toString() + " doesn't exist! - tried to access fusion parameters!");
 	} else {
-		switch (fusionBones[bone].type) {
-			case(FIXED):
-			{
-				throw std::runtime_exception("Bone " + bone.toString() + " is fixed! - tried to access fusion parameters!");
-			}
-			case(BONE):
-			{
-				Eigen::Matrix3f V = Eigen::Matrix3f::Identity();
-				V.diagonal() = Eigen::Vector3f(info.quaternion_centre)
-			}
-			case(POSE):
-			{
-
-			}
-			case(SCALE_POSE):
-			{
-
-			}
-		}
-
+		return inputBones[bone].constraint_variance.asDiagonal();
 	}
 }
 
 Eigen::MatrixXf USpookySkeletalMeshComponent::GetProcessNoise(const FName& bone){
-	if(fusionBones.count(bone) == 0){
+	if(inputBones.count(bone) == 0){
 		throw ("Bone " + bone.ToString() + " doesn't exist! - tried to access fusion parameters!");
-	} else {
-		switch (fusionBones[bone].type) {
-			case(FIXED):
-			{
-				throw std::runtime_exception("Bone " + bone.toString() + " is fixed! - tried to access fusion parameters!");
-			}
-			case(BONE):
-			{
-
-			}
-			case(POSE):
-			{
-
-			}
-			case(SCALE_POSE):
-			{
-
-			}
-		}
+	} else {		
+		return inputBones[bone].process_noise.asDiagonal();
 	}
 }
 

@@ -120,49 +120,7 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh,
 			spooky::NodeDescriptor();
 		//Set bone name		
 		spooky::NodeDescriptor bone_desc = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
-// <<<<<<< HEAD : old way 
-// 		//Set different node types
-// 		if (i == 0 || fixedJoints.Contains(bone.Name)) {
-// 			//Root node - doesnt move but has a typically has a constant scale component
-// 			//TODO: use this skeletal_mesh->GetComponentTransform();
-// 			spookyCore.addFixedNode(bone_desc, parent_desc, bonePoseLocal);
-// 		}
-// 		else if (bone.Name.GetPlainNameString() == "pelvis") {
-// 			//TODO: find better way to do this check for pose nodes
-// 			//The pelvis has 6DoF pose and 3DoF scale
-// 			int dim = scalePelvis ?
-// 						(modelVelocity ? 18 : 9) :
-// 						(modelVelocity ? 12 : 6);
-// 			Eigen::MatrixXf constraint_variance = Eigen::MatrixXf::Identity(dim,dim) * default_constraint_flexibility;
-// 			Eigen::VectorXf constraint_centre = Eigen::VectorXf::Zero(dim);
-// 			if (scalePelvis) {
-// 				if (modelVelocity) {
-// 					constraint_variance.block<3, 3>(12, 12) = Eigen::MatrixXf::Identity(3, 3) * 0.001;
-// 					constraint_centre.segment(12, 3) = Eigen::Vector3f::Ones(); // Centre at unit scale
-// 				}
-// 				else {
-// 					constraint_variance.block<3, 3>(6, 6) = Eigen::MatrixXf::Identity(3, 3) * 0.001;
-// 					constraint_centre.segment(6, 3) = Eigen::Vector3f::Ones(); // Centre at unit scale
-// 				}
-// 			}
-			
-// 			if (scalePelvis) {
-// 				spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones(), constraint_centre, constraint_variance, default_process_noise, modelVelocity);
-// 			}
-// 			else {
-// 				spookyCore.addPoseNode(bone_desc, parent_desc, bonePoseLocal, constraint_centre, constraint_variance, default_process_noise, modelVelocity);
-// 			}
-// 		}
-// 		else {
-// 			//TODO: read constraint and process noise from USpookySkeletalMeshComponent
-// 			int dim = modelVelocity ? 6 : 3;
-// 			Eigen::MatrixXf constraint_variance = Eigen::MatrixXf::Identity(dim, dim) * default_constraint_flexibility;
-// 			//x axis can pivot arbitrarily
-// 			//constraint_variance(0, 0) = 100000;
-// 			Eigen::VectorXf constraint_centre = Eigen::VectorXf::Zero(dim);
-// 			//spookyCore.addPoseNode(bone_desc, parent_desc, bonePoseLocal, pose_constraint_centre, pose_constraint_variance, default_process_noise);
-// 			spookyCore.addBoneNode(bone_desc, parent_desc, bonePoseLocal, constraint_centre, constraint_variance, default_process_noise, modelVelocity);
-// =======
+
 
 		ESpookyFusionType fusionType = skeletal_mesh->GetBoneFusionType(bone.Name);
 		switch(fusionType){
@@ -270,10 +228,11 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 		FMeshBoneInfo& bone = boneInfo[i];
 		spooky::NodeDescriptor bone_name = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
 		//If this bone is active then make new measurement
+		//TODO: search other way around
 		if (skeleton->isBoneActive(bone.Name)) {
-			spooky::NodeDescriptor targetNode = skeleton->getTargetNode(bone.Name);
+			spooky::NodeDescriptor targetNode = skeleton->getOutputTargetNode(bone.Name);
 			FTransform T = skeleton->BoneSpaceTransforms[i];
-			const FSpookySkeletonBoneInfo& spookyBoneInfo = skeleton->getSpookyBoneInfo(bone.Name);
+			const FSpookySkeletonBoneInfo& spookyBoneInfo = skeleton->getSpookyBoneOutputParams(bone.Name);
 
 			//Create measurement
 			Measurement::Ptr m;
@@ -281,7 +240,7 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 				T = componentSpaceTransforms[i];
 			}
 			//Retarget to new skeleton
-			FRotator retargetRotationOffset = skeleton->getRetargetRotator(bone.Name);
+			FRotator retargetRotationOffset = skeleton->getOutputRetargetRotator(bone.Name);
 			T.SetRotation(T.GetRotation() * retargetRotationOffset.Quaternion());
 			switch (spookyBoneInfo.measurementType) {
 				//TODO: local vs global variance?

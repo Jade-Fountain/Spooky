@@ -268,9 +268,9 @@ namespace spooky {
 
 			//Sets the structure parameters for the specified articulation as a bone according to the boneVec
 			void setFixedNode(const NodeDescriptor & node, const Transform3D& boneTransform);
-			void setBoneForNode(const NodeDescriptor & node, const Transform3D& boneTransform, const Node::State::Parameters& constraints, const float& process_noise, const bool& modelVelocity);
-			void setPoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Node::State::Parameters& constraints, const float& process_noise, const bool& modelVelocity);
-			void setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial, const Node::State::Parameters& constraints, const float& process_noise, const bool& modelVelocity);
+			void setBoneForNode(const NodeDescriptor & node, const Transform3D& boneTransform, const Node::State::Parameters& constraints, const Eigen::MatrixXf& process_noise, const bool& modelVelocity);
+			void setPoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Node::State::Parameters& constraints, const Eigen::MatrixXf& process_noise, const bool& modelVelocity);
+			void setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial, const Node::State::Parameters& constraints, const Eigen::MatrixXf& process_noise, const bool& modelVelocity);
 			
 			//Stiffness settings
 			void setJointStiffness(const NodeDescriptor & node, const float& stiffness);

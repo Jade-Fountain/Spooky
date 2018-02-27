@@ -49,7 +49,7 @@ enum class ESpookyReturnStatus : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FSpookySkeletonBoneInfo{
+struct FSpookySkeletonBoneOutputParams{
 	GENERATED_BODY()
 
 	//--------------------------------
@@ -108,46 +108,61 @@ struct FSpookySkeletonBoneInfo{
 
 //Fusion parameters describe how the skeleton behaves when targeted by spooky
 USTRUCT(BlueprintType)
-struct FSpookyBoneFusionParameters{
+struct FSpookyBoneInputParams{
 	GENERATED_BODY()
+	//Name of the bone in the skeleton heirarchy
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	FName name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	ESpookyFusionType type;
+	ESpookyFusionType fusion_type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	bool model_velocity = true;
+		
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	TArray<float> constraint_centre;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	TArray<float> constraint_var;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	TArray<float> process_noise;
 
 	//Quadratic constraints Energy = centre^T * var^-1 * centre
 	//Position constraints
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	FVector position_centre;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	// FVector position_centre;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	FVector position_var;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	// FVector position_var;
 
-	//Rotation constraints
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	FVector4 quaternion_centre;
+	// //Rotation constraints
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	// FVector4 quaternion_centre;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	FVector4 quaternion_var;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	// FVector4 quaternion_var;
 
-	//Scale constraints
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	FVector scale_centre;
+	// //Scale constraints
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	// FVector scale_centre;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	FVector scale_var;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	// FVector scale_var;
 
-	//Process noises:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	FVector position_process_noise;
-	FVector vel_position_process_noise;
+	// //Process noises:
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	// FVector position_process_noise;
+	// FVector vel_position_process_noise;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	FVector4 quaternion_process_noise;
-	FVector4 vel_quaternion_process_noise;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	// FVector4 quaternion_process_noise;
+	// FVector4 vel_quaternion_process_noise;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	FVector scale_process_noise;
-	FVector vel_scale_process_noise;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
+	// FVector scale_process_noise;
+	// FVector vel_scale_process_noise;
 
 };
 
@@ -159,18 +174,21 @@ class USpookySkeletalMeshComponent :
 
 private: 
 
+	//OUTPUT => data will be fused by another skeleton
+	//INPUT => data from other skeletons will be fused here
+
 	//List of bones which carry measurements of  with associated meta info
-	std::map<FName, FSpookySkeletonBoneInfo> activeBones;
+	std::map<FName, FSpookySkeletonBoneOutputParams> outputBones;
 	//List of target nodes for each active bone
 	std::map<FName, spooky::NodeDescriptor> targetNodes;
 	std::map<FName, FRotator> retargetRotators;
 
-	//List of bones which can be modified by measurements when this skeleton is in output mode
-	std::map<FName,FSpookyBoneFusionParameters> fusionBones;
+	//List of bones which can be modified by measurements when this skeleton is targeted by spooky mode
+	std::map<FName,FSpookyBoneInputParams> inputBones;
 
 	//Default data for a new bones
-	std::unique_ptr<FSpookySkeletonBoneInfo> defaultBoneInfo;
-	std::unique_ptr<FSpookyBoneFusionParameters> defaultBoneFusionParams;
+	std::unique_ptr<FSpookySkeletonBoneOutputParams> defaultBoneOutputParams;
+	std::unique_ptr<FSpookyBoneInputParams> defaultBoneInputParams;
 
 	bool setup = false;
 
@@ -191,13 +209,22 @@ public:
 	void SetSystemInfo(const FString& systemName, const FString& rootNode, const FTransform& rootNodeOffset);
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void SetDefaultBoneInfo(const FSpookySkeletonBoneInfo& info);
+	void SetDefaultBoneOutputParams(const FSpookySkeletonBoneOutputParams& info);
+
+	UFUNCTION(BlueprintCallable, Category = "Spooky")
+	void SetDefaultBoneInputParams(const FSpookyBoneInputParams& params);
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
-	void AddActiveBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, const TArray<FRotator>& boneRetargetRotators,ESpookyReturnStatus& branch);
+	void AddOutputBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, const TArray<FRotator>& boneRetargetRotators,ESpookyReturnStatus& branch);
+	
+	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
+	void AddInputBones(const TArray<FName>& bones, ESpookyReturnStatus& branch);
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
-	void SetBoneInfo(const FSpookySkeletonBoneInfo& info, ESpookyReturnStatus& branch);
+	void SetBoneOutputParams(const FSpookySkeletonBoneOutputParams& info, ESpookyReturnStatus& branch);
+	
+	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
+	void SetBoneInputParams(const FSpookyBoneInputParams& info, ESpookyReturnStatus& branch);
 
 	//--------------------------------
 	//		INPUT
@@ -210,7 +237,7 @@ public:
 	void UpdateAllTimestamps(const float& t_sec);
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void UpdateConfidence(const FName& bone,const float& confidence);
+	void UpdateOutputConfidence(const FName& bone,const float& confidence);
 
 
 	//--------------------------------
@@ -226,14 +253,14 @@ public:
 		return activeBones.count(name) > 0;
 	}
 
-	const FSpookySkeletonBoneInfo& getSpookyBoneInfo(const FName& name) {
+	const FSpookySkeletonBoneOutputParams& getSpookyBoneOutputParams(const FName& name) {
 		return activeBones[name];
 	}
 
 	//Retrieve the spooky skeleton node being targeted by the given bone
 	//Defaults to bone.string if not specified otherwise
-	spooky::NodeDescriptor getTargetNode(const FName& bone);
-	FRotator getRetargetRotator(const FName& bone);
+	spooky::NodeDescriptor getOutputTargetNode(const FName& bone);
+	FRotator getOutputRetargetRotator(const FName& bone);
 
 };
 

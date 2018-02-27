@@ -509,7 +509,7 @@ namespace spooky {
 
 
 	void ArticulatedModel::setBoneForNode(const NodeDescriptor& node, const Transform3D& boneTransform,
-										  const Node::State::Parameters& constraints, const float& process_noise, const bool& modelVelocity) {
+										  const Node::State::Parameters& constraints, const Eigen::MatrixXf& process_noise, const bool& modelVelocity) {
 		//Create articulation
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createBone(boneTransform.translation()));
@@ -523,19 +523,26 @@ namespace spooky {
 		nodes[node]->setState(initial,0);
 		
 		if(constraints.expectation.size() != nodes[node]->getDimension()){
-			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in setBoneForNode. Dimension should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
+			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in " + __FUNCTION__ + " for node " + node.name + ".  Dimension is " + std::to_string(constraints.expectation.size()) + " but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
 			//TODO:
 			//SPOOKY_CLEAN_EXIT();
 		}
+
+		if(process_noise.cols() != nodes[node]->getDimension()){
+			SPOOKY_LOG("ERROR - process noise dimension does not match node dimension in " + __FUNCTION__ + " for node " + node.name + 
+				".  PNDimension is " + std::to_string(process_noise.cols()) + "x" +std::to_string(process_noise.cols()) + 
+				" but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
+		}
+
 		nodes[node]->setConstraints(constraints);
 		Node::State::Parameters PN(nodes[node]->getDimension());
-		PN.variance = process_noise * Eigen::MatrixXf::Identity(nodes[node]->getDimension(),nodes[node]->getDimension());
+		PN.variance = process_noise;
 		nodes[node]->setProcessNoises(PN);
 	}
 
 
 	void ArticulatedModel::setPoseNode(const NodeDescriptor& node, const Transform3D& poseTransform,
-									   const Node::State::Parameters& constraints, const float& process_noise, const bool& modelVelocity) {
+									   const Node::State::Parameters& constraints, const Eigen::MatrixXf& process_noise, const bool& modelVelocity) {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createPose());
 		nodes[node]->setModel(art,modelVelocity);
@@ -547,18 +554,24 @@ namespace spooky {
 		nodes[node]->setState(initial,0);
 
 		if(constraints.expectation.size() != nodes[node]->getDimension()){
-			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in setPoseNode. Dimension should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
+			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in " + __FUNCTION__ + " for node " + node.name + ".  Dimension is " + std::to_string(constraints.expectation.size()) + " but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
 			//TODO:
 			//SPOOKY_CLEAN_EXIT();
 		}
+		if(process_noise.cols() != nodes[node]->getDimension()){
+			SPOOKY_LOG("ERROR - process noise dimension does not match node dimension in " + __FUNCTION__ + " for node " + node.name + 
+				".  PNDimension is " + std::to_string(process_noise.cols()) + "x" +std::to_string(process_noise.cols()) + 
+				" but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
+		}
+
 		nodes[node]->setConstraints(constraints);
 		Node::State::Parameters PN(nodes[node]->getDimension());
-		PN.variance = process_noise * Eigen::MatrixXf::Identity(nodes[node]->getDimension(),nodes[node]->getDimension());
+		PN.variance = process_noise;
 		nodes[node]->setProcessNoises(PN);
 	}
 	
 	void ArticulatedModel::setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial,
-											const Node::State::Parameters& constraints, const float& process_noise, const bool& modelVelocity) {
+											const Node::State::Parameters& constraints, const Eigen::MatrixXf& process_noise, const bool& modelVelocity) {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createPose());
 		//Scale in local space x'=T*S*x
@@ -578,13 +591,20 @@ namespace spooky {
 		nodes[node]->setState(initial, 0);
 
 		if(constraints.expectation.size() != nodes[node]->getDimension()){
-			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in setScalePoseNode. Dimension should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
+			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in " + __FUNCTION__ + " for node " + node.name + ".  Dimension is " + std::to_string(constraints.expectation.size()) + " but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
 			//TODO:
 			//SPOOKY_CLEAN_EXIT();
 		}
+
+		if(process_noise.cols() != nodes[node]->getDimension()){
+			SPOOKY_LOG("ERROR - process noise dimension does not match node dimension in " + __FUNCTION__ + " for node " + node.name + 
+				".  PNDimension is " + std::to_string(process_noise.cols()) + "x" +std::to_string(process_noise.cols()) + 
+				" but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
+		}
+
 		nodes[node]->setConstraints(constraints);
 		Node::State::Parameters PN(nodes[node]->getDimension());
-		PN.variance = process_noise * Eigen::MatrixXf::Identity(nodes[node]->getDimension(),nodes[node]->getDimension());
+		PN.variance = process_noise;
 		nodes[node]->setProcessNoises(PN);
 	}
 

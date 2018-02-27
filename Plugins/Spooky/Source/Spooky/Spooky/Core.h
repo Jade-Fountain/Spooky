@@ -83,13 +83,13 @@ namespace spooky {
 		void addFixedNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& pose);
 		void addBoneNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& boneTransform,
 							const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
-					 		const float& process_noise, const bool& modelVelocity);
+					 		const Eigen::MatrixXf& process_noise, const bool& modelVelocity);
 		void addPoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial,
 							const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
-					 		const float& process_noise, const bool& modelVelocity);
+					 		const Eigen::MatrixXf& process_noise, const bool& modelVelocity);
 		void addScalePoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial, const Eigen::Vector3f& scaleInitial,
 							const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
-					 		const float& process_noise, const bool& modelVelocity);
+					 		const Eigen::MatrixXf& process_noise, const bool& modelVelocity);
 		
 		//Sets the reference system for the fused skeleton
 		//Joint values will be reported relative to this system
