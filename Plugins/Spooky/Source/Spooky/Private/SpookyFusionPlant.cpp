@@ -105,7 +105,7 @@ void USpookyFusionPlant::SetSystemRootNode(FString system, FString rootNode, con
 
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh, const TArray<FName>& fixedJoints, float default_constraint_flexibility, float default_process_noise, bool modelVelocity)
+void USpookyFusionPlant::AddOutputTarget(USpookySkeletalMeshComponent * skeletal_mesh)
 {
 	TArray<FMeshBoneInfo> boneInfo = skeletal_mesh->SkeletalMesh->RefSkeleton.GetRefBoneInfo();
 	for (int i = 0; i < boneInfo.Num(); i++) {
@@ -122,7 +122,7 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh,
 		spooky::NodeDescriptor bone_desc = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
 
 
-		ESpookyFusionType fusionType = skeletal_mesh->GetBoneFusionType(bone.Name);
+		ESpookyFusionType fusionType = skeletal_mesh->GetBoneInputFusionType(bone.Name);
 		switch(fusionType){
 			case(ESpookyFusionType::FIXED):
 			{
@@ -131,26 +131,26 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh,
 			case(ESpookyFusionType::BONE):
 			{
 				spookyCore.addBoneNode(bone_desc, parent_desc, bonePoseLocal,
-						skeletal_mesh->GetConstraintCentre(bone.Name), 
-						skeletal_mesh->GetConstraintVariance(bone.Name), 
-						skeletal_mesh->GetProcessNoise(bone.Name),
-						modelVelocity);
+						skeletal_mesh->GetInputConstraintCentre(bone.Name), 
+						skeletal_mesh->GetInputConstraintVariance(bone.Name), 
+						skeletal_mesh->GetInputProcessNoise(bone.Name),
+						skeletal_mesh->DoesBoneInputModelVelocity(bone.Name));
 			}break;
 			case(ESpookyFusionType::POSE):
 			{
-				spookyCore.addPoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones(),
-						skeletal_mesh->GetConstraintCentre(bone.Name), 
-						skeletal_mesh->GetConstraintVariance(bone.Name), 
-						skeletal_mesh->GetProcessNoise(bone.Name),
-						modelVelocity);
+				spookyCore.addPoseNode(bone_desc, parent_desc, bonePoseLocal,
+						skeletal_mesh->GetInputConstraintCentre(bone.Name), 
+						skeletal_mesh->GetInputConstraintVariance(bone.Name), 
+						skeletal_mesh->GetInputProcessNoise(bone.Name),
+						skeletal_mesh->DoesBoneInputModelVelocity(bone.Name));
 			}break;
 			case(ESpookyFusionType::SCALE_POSE):
 			{
 				spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones(),
-						skeletal_mesh->GetConstraintCentre(bone.Name), 
-						skeletal_mesh->GetConstraintVariance(bone.Name), 
-						skeletal_mesh->GetProcessNoise(bone.Name),
-						modelVelocity);
+						skeletal_mesh->GetInputConstraintCentre(bone.Name), 
+						skeletal_mesh->GetInputConstraintVariance(bone.Name), 
+						skeletal_mesh->GetInputProcessNoise(bone.Name),
+						skeletal_mesh->DoesBoneInputModelVelocity(bone.Name));
 			}break;
 		}
 
@@ -229,10 +229,10 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 		spooky::NodeDescriptor bone_name = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
 		//If this bone is active then make new measurement
 		//TODO: search other way around
-		if (skeleton->isBoneActive(bone.Name)) {
+		if (skeleton->isBoneOutputActive(bone.Name)) {
 			spooky::NodeDescriptor targetNode = skeleton->getOutputTargetNode(bone.Name);
 			FTransform T = skeleton->BoneSpaceTransforms[i];
-			const FSpookySkeletonBoneInfo& spookyBoneInfo = skeleton->getSpookyBoneOutputParams(bone.Name);
+			const FSpookySkeletonBoneOutputParams& spookyBoneInfo = skeleton->getSpookyBoneOutputParams(bone.Name);
 
 			//Create measurement
 			Measurement::Ptr m;

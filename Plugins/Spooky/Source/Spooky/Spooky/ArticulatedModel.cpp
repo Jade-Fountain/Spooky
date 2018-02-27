@@ -523,13 +523,13 @@ namespace spooky {
 		nodes[node]->setState(initial,0);
 		
 		if(constraints.expectation.size() != nodes[node]->getDimension()){
-			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in " + __FUNCTION__ + " for node " + node.name + ".  Dimension is " + std::to_string(constraints.expectation.size()) + " but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
+			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in setBoneForNode for node " + node.name + ".  Dimension is " + std::to_string(constraints.expectation.size()) + " but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
 			//TODO:
 			//SPOOKY_CLEAN_EXIT();
 		}
 
 		if(process_noise.cols() != nodes[node]->getDimension()){
-			SPOOKY_LOG("ERROR - process noise dimension does not match node dimension in " + __FUNCTION__ + " for node " + node.name + 
+			SPOOKY_LOG("ERROR - process noise dimension does not match node dimension in setBoneForNode for node " + node.name + 
 				".  PNDimension is " + std::to_string(process_noise.cols()) + "x" +std::to_string(process_noise.cols()) + 
 				" but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
 		}
@@ -554,12 +554,12 @@ namespace spooky {
 		nodes[node]->setState(initial,0);
 
 		if(constraints.expectation.size() != nodes[node]->getDimension()){
-			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in " + __FUNCTION__ + " for node " + node.name + ".  Dimension is " + std::to_string(constraints.expectation.size()) + " but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
+			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in setPoseNode for node " + node.name + ".  Dimension is " + std::to_string(constraints.expectation.size()) + " but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
 			//TODO:
 			//SPOOKY_CLEAN_EXIT();
 		}
 		if(process_noise.cols() != nodes[node]->getDimension()){
-			SPOOKY_LOG("ERROR - process noise dimension does not match node dimension in " + __FUNCTION__ + " for node " + node.name + 
+			SPOOKY_LOG("ERROR - process noise dimension does not match node dimension in setPoseNode for node " + node.name + 
 				".  PNDimension is " + std::to_string(process_noise.cols()) + "x" +std::to_string(process_noise.cols()) + 
 				" but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
 		}
@@ -591,13 +591,13 @@ namespace spooky {
 		nodes[node]->setState(initial, 0);
 
 		if(constraints.expectation.size() != nodes[node]->getDimension()){
-			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in " + __FUNCTION__ + " for node " + node.name + ".  Dimension is " + std::to_string(constraints.expectation.size()) + " but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
+			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in setScalePoseNode for node " + node.name + ".  Dimension is " + std::to_string(constraints.expectation.size()) + " but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
 			//TODO:
 			//SPOOKY_CLEAN_EXIT();
 		}
 
 		if(process_noise.cols() != nodes[node]->getDimension()){
-			SPOOKY_LOG("ERROR - process noise dimension does not match node dimension in " + __FUNCTION__ + " for node " + node.name + 
+			SPOOKY_LOG("ERROR - process noise dimension does not match node dimension in setScalePoseNode for node " + node.name + 
 				".  PNDimension is " + std::to_string(process_noise.cols()) + "x" +std::to_string(process_noise.cols()) + 
 				" but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
 		}

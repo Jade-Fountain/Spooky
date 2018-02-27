@@ -102,8 +102,7 @@ struct FSpookySkeletonBoneOutputParams{
 	
 	//Whether to use a local or global route to fusion
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	bool useGlobalData; 	
-	float timestamp_sec;
+	bool useGlobalData; 
 };
 
 //Fusion parameters describe how the skeleton behaves when targeted by spooky
@@ -244,17 +243,18 @@ public:
 	//		OUTPUT
 	//--------------------------------
 	
-	ESpookyFusionType GetBoneFusionType(const FName& bone);
-	Eigen::VectorXf GetConstraintCentre(const FName& bone);
-	Eigen::MatrixXf GetConstraintVariance(const FName& bone);
-	Eigen::MatrixXf GetProcessNoise(const FName& bone);
+	ESpookyFusionType GetBoneInputFusionType(const FName& bone);
+	Eigen::VectorXf GetInputConstraintCentre(const FName& bone);
+	Eigen::MatrixXf GetInputConstraintVariance(const FName& bone);
+	Eigen::MatrixXf GetInputProcessNoise(const FName& bone);
+	bool DoesBoneInputModelVelocity(const FName& bone);
 
-	bool isBoneActive(const FName& name) {
-		return activeBones.count(name) > 0;
+	bool isBoneOutputActive(const FName& name) {
+		return outputBones.count(name) > 0;
 	}
 
 	const FSpookySkeletonBoneOutputParams& getSpookyBoneOutputParams(const FName& name) {
-		return activeBones[name];
+		return outputBones[name];
 	}
 
 	//Retrieve the spooky skeleton node being targeted by the given bone

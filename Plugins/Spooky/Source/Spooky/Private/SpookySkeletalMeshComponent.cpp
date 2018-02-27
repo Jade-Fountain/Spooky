@@ -36,8 +36,8 @@ void USpookySkeletalMeshComponent::SetDefaultBoneOutputParams(const FSpookySkele
 	defaultBoneOutputParams = std::make_unique<FSpookySkeletonBoneOutputParams>(info);
 }
 
-void USpookySkeletalMeshComponent::SetDefaultBoneInputParams(const FSpookyBoneInputParameters& params){
-	defaultBoneInputParams = std::make_unique<FSpookyBoneInputParameters>(params);
+void USpookySkeletalMeshComponent::SetDefaultBoneInputParams(const FSpookyBoneInputParams& params){
+	defaultBoneInputParams = std::make_unique<FSpookyBoneInputParams>(params);
 }
 
 
@@ -113,7 +113,7 @@ void USpookySkeletalMeshComponent::SetBoneOutputParams(const FSpookySkeletonBone
 	}
 }
 
-void USpookySkeletalMeshComponent::SetBoneInputParams(const FSpookyBoneInputParameters& info, ESpookyReturnStatus& branch){
+void USpookySkeletalMeshComponent::SetBoneInputParams(const FSpookyBoneInputParams& info, ESpookyReturnStatus& branch){
 	if(inputBones.count(info.name) == 0){
 		branch = ESpookyReturnStatus::Failure;
 	} else {
@@ -163,37 +163,61 @@ FRotator USpookySkeletalMeshComponent::getOutputRetargetRotator(const FName& bon
 }
 
 
-ESpookyFusionType USpookySkeletalMeshComponent::GetBoneFusionType(const FName& bone){
+ESpookyFusionType USpookySkeletalMeshComponent::GetBoneInputFusionType(const FName& bone){
 	if(inputBones.count(bone) == 0){
 		return ESpookyFusionType::FIXED;
 	} else {
-		return inputBones.type;
+		return inputBones[bone].fusion_type;
 	}
 }
 
-Eigen::VectorXf USpookySkeletalMeshComponent::GetConstraintCentre(const FName& bone){
+Eigen::VectorXf USpookySkeletalMeshComponent::GetInputConstraintCentre(const FName& bone){
 	if(inputBones.count(bone) == 0){
 		//TODO: make this nicer
 		throw ("Bone " + bone.ToString() + " doesn't exist! - tried to access fusion parameters!");
 	} else {
-		return inputBones[bone].constraint_centre;
+		TArray<float> v_ = inputBones[bone].constraint_centre;
+		Eigen::VectorXf v(v_.Num());
+		for (int i = 0; i < v_.Num(); i++) {
+			v[i] = v_[i];
+		}
+		return v;
 	}
 
 }
 
-Eigen::MatrixXf USpookySkeletalMeshComponent::GetConstraintVariance(const FName& bone){
+Eigen::MatrixXf USpookySkeletalMeshComponent::GetInputConstraintVariance(const FName& bone){
 	if(inputBones.count(bone) == 0){
-		throw std::runtime_exception("Bone " + bone.toString() + " doesn't exist! - tried to access fusion parameters!");
+		throw ("Bone " + bone.ToString() + " doesn't exist! - tried to access fusion parameters!");
 	} else {
-		return inputBones[bone].constraint_variance.asDiagonal();
+		TArray<float> v_ = inputBones[bone].constraint_var;
+		Eigen::VectorXf v(v_.Num());
+		for (int i = 0; i < v_.Num(); i++) {
+			v[i] = v_[i];
+		}
+		return v.asDiagonal(); 
 	}
 }
 
-Eigen::MatrixXf USpookySkeletalMeshComponent::GetProcessNoise(const FName& bone){
+Eigen::MatrixXf USpookySkeletalMeshComponent::GetInputProcessNoise(const FName& bone){
 	if(inputBones.count(bone) == 0){
 		throw ("Bone " + bone.ToString() + " doesn't exist! - tried to access fusion parameters!");
 	} else {		
-		return inputBones[bone].process_noise.asDiagonal();
+		TArray<float> v_ = inputBones[bone].process_noise;
+		Eigen::VectorXf v(v_.Num());
+		for (int i = 0; i < v_.Num(); i++) {
+			v[i] = v_[i];
+		}
+		return v.asDiagonal(); 
 	}
 }
+
+bool USpookySkeletalMeshComponent::DoesBoneInputModelVelocity(const FName& bone){
+	if(inputBones.count(bone) == 0){
+		throw ("Bone " + bone.ToString() + " doesn't exist! - tried to access fusion parameters!");
+	} else {		
+		return inputBones[bone].model_velocity;
+	}
+}
+
 
