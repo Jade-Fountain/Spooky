@@ -519,7 +519,8 @@ namespace spooky {
 		Eigen::Vector3f scale;
 		initial.expectation.head(3) = utility::toAxisAngle<float>(boneTransform.matrix().topLeftCorner(3,3),&scale);
 		
-		if((scale - Eigen::Vector3f::Ones()).norm() > 0.001){
+		Eigen::Vector3f defaultScale = Eigen::Vector3f::Ones();
+		if(!scale.isApprox(defaultScale,0.001)){
 			SPOOKY_LOG("WARNING ArticulatedModel::setBoneForNode - scale of bone " + node.name + " is non unit, adding fixed scale transform");
 			Transform3D scaleT = Transform3D::Identity();
 			scaleT.matrix().diagonal().head(3) = scale;
@@ -559,7 +560,8 @@ namespace spooky {
 		Eigen::Vector3f scale;
 		initial.expectation.head(6) = utility::toAxisAnglePos(poseTransform, &scale);
 
-		if((scale - Eigen::Vector3f::Ones()).norm() > 0.001){
+		Eigen::Vector3f defaultScale = Eigen::Vector3f::Ones();
+		if(!scale.isApprox(defaultScale, 0.001)){
 			SPOOKY_LOG("WARNING ArticulatedModel::setPoseNode - scale of bone " + node.name + " is non unit, adding fixed scale transform");
 			Transform3D scaleT = Transform3D::Identity();
 			scaleT.matrix().diagonal().head(3) = scale;
