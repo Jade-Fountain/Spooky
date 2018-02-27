@@ -513,13 +513,21 @@ namespace spooky {
 		//Create articulation
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createBone(boneTransform.translation()));
-		nodes[node]->setModel(art,modelVelocity);
 
 		//Set initial state
-		Node::State::Parameters state = nodes[node]->getState();
-		Node::State::Parameters initial = state;
-		Eigen::AngleAxisf aa(boneTransform.rotation());
-		initial.expectation.head(3) = aa.angle() * aa.axis();
+		Node::State::Parameters initial = nodes[node]->getState();
+		Eigen::Vector3f scale;
+		initial.expectation.head(3) = utility::toAxisAngle<float>(boneTransform.matrix().topLeftCorner(3,3),&scale);
+		
+		if((scale - Eigen::Vector3f::Ones()).norm() > 0.001){
+			SPOOKY_LOG("WARNING ArticulatedModel::setBoneForNode - scale of bone " + node.name + " is non unit, adding fixed scale transform");
+			Transform3D scaleT = Transform3D::Identity();
+			scaleT.matrix().diagonal().head(3) = scale;
+			art.push_back(Articulation::createFixed(scaleT));
+		}
+
+
+		nodes[node]->setModel(art,modelVelocity);
 		nodes[node]->setState(initial,0);
 		
 		if(constraints.expectation.size() != nodes[node]->getDimension()){
@@ -545,14 +553,21 @@ namespace spooky {
 									   const Node::State::Parameters& constraints, const Eigen::MatrixXf& process_noise, const bool& modelVelocity) {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createPose());
-		nodes[node]->setModel(art,modelVelocity);
 
 		//Set initial state
-		Node::State::Parameters state = nodes[node]->getState();
-		Node::State::Parameters initial = state;
-		initial.expectation.head(6) = utility::toAxisAnglePos(poseTransform);
-		nodes[node]->setState(initial,0);
+		Node::State::Parameters initial = nodes[node]->getState();
+		Eigen::Vector3f scale;
+		initial.expectation.head(6) = utility::toAxisAnglePos(poseTransform, &scale);
 
+		if((scale - Eigen::Vector3f::Ones()).norm() > 0.001){
+			SPOOKY_LOG("WARNING ArticulatedModel::setPoseNode - scale of bone " + node.name + " is non unit, adding fixed scale transform");
+			Transform3D scaleT = Transform3D::Identity();
+			scaleT.matrix().diagonal().head(3) = scale;
+			art.push_back(Articulation::createFixed(scaleT));
+		}
+
+		nodes[node]->setModel(art,modelVelocity);
+		nodes[node]->setState(initial,0);
 		if(constraints.expectation.size() != nodes[node]->getDimension()){
 			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in setPoseNode for node " + node.name + ".  Dimension is " + std::to_string(constraints.expectation.size()) + " but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
 			//TODO:
@@ -570,7 +585,7 @@ namespace spooky {
 		nodes[node]->setProcessNoises(PN);
 	}
 	
-	void ArticulatedModel::setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform, const Eigen::Vector3f& scaleInitial,
+	void ArticulatedModel::setScalePoseNode(const NodeDescriptor & node, const Transform3D& poseTransform,
 											const Node::State::Parameters& constraints, const Eigen::MatrixXf& process_noise, const bool& modelVelocity) {
 		std::vector<Articulation> art;
 		art.push_back(Articulation::createPose());
@@ -579,14 +594,14 @@ namespace spooky {
 		nodes[node]->setModel(art, modelVelocity);
 
 		//Set initial state
-		Node::State::Parameters state = nodes[node]->getState();
-		Node::State::Parameters initial = state;
-		initial.expectation.head(6) = utility::toAxisAnglePos(poseTransform);
+		Node::State::Parameters initial = nodes[node]->getState();
+		Eigen::VectorXf aaps = utility::toAxisAnglePosScale(poseTransform);
+		initial.expectation.head(6) = aaps.head(6);
 		if (modelVelocity) {
-			initial.expectation.segment<3>(12) = scaleInitial;
+			initial.expectation.segment<3>(12) = aaps.tail(3);
 		}
 		else {
-			initial.expectation.segment<3>(6) = scaleInitial;
+			initial.expectation.segment<3>(6) = aaps.tail(3);
 		}
 		nodes[node]->setState(initial, 0);
 

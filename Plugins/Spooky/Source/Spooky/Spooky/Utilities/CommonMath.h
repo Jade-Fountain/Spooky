@@ -508,15 +508,15 @@ namespace spooky{
 		}
 
 		template <typename Scalar>
-		static inline Eigen::Matrix<Scalar, 3, 1> toAxisAngle(const Eigen::Matrix<Scalar, 3, 3>& R) {
-			return Sophus::SO3<Scalar>::log(Sophus::SO3<Scalar>(normalize3D(R)));
+		static inline Eigen::Matrix<Scalar, 3, 1> toAxisAngle(const Eigen::Matrix<Scalar, 3, 3>& R, Eigen::Vector3f* scale = NULL) {
+			return Sophus::SO3<Scalar>::log(Sophus::SO3<Scalar>(normalize3D(R,scale)));
 		}
 
 		template <typename Scalar>
-		static inline Eigen::Matrix<Scalar, 6, 1> toAxisAnglePos(const Eigen::Transform<Scalar, 3, Eigen::Affine>& T) {
+		static inline Eigen::Matrix<Scalar, 6, 1> toAxisAnglePos(const Eigen::Transform<Scalar, 3, Eigen::Affine>& T, Eigen::Vector3f* scale = NULL) {
 			Eigen::Matrix<Scalar, 6, 1> result;
 			//Warning - some functions squash imaginary component - e.g. transform.rotation()
-			result.head(3) = toAxisAngle<Scalar>(T.matrix().topLeftCorner(3,3));
+			result.head(3) = toAxisAngle<Scalar>(T.matrix().topLeftCorner(3, 3),scale);
 			result.tail(3) = T.translation();
 			return result;
 		}
@@ -526,8 +526,7 @@ namespace spooky{
 			Eigen::Matrix<Scalar, 9, 1> result;
 			//Warning - some functions squash imaginary component - e.g. transform.rotation()
 			Eigen::Vector3f scale;
-			Eigen::Matrix3f rot = normalize3D(T.matrix().topLeftCorner(3, 3), &scale);
-			result.head(3) = toAxisAngle<Scalar>(rot);
+			result.head(3) = toAxisAngle<Scalar>(T.matrix().topLeftCorner(3, 3),&scale);
 			result.segment<3>(3) = T.translation();
 			result.tail(3) = scale;
 			return result;

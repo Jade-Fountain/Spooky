@@ -87,7 +87,7 @@ namespace spooky {
 		void addPoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial,
 							const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
 					 		const Eigen::MatrixXf& process_noise, const bool& modelVelocity);
-		void addScalePoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial, const Eigen::Vector3f& scaleInitial,
+		void addScalePoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial,
 							const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
 					 		const Eigen::MatrixXf& process_noise, const bool& modelVelocity);
 		

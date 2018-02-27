@@ -46,12 +46,12 @@ namespace spooky {
 	}
 
 	void Core::addScalePoseNode(const NodeDescriptor & node, const NodeDescriptor & parent,
-							 const Transform3D& poseInitial, const Eigen::Vector3f& scaleInitial,
+							 const Transform3D& poseInitial,
 							 const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
 							 const Eigen::MatrixXf& process_noise, const bool& modelVelocity)
 	{
 		skeleton.addNode(node, parent);
-		skeleton.setScalePoseNode(node, poseInitial, scaleInitial, Node::State::Parameters(constraint_centre, constraint_variance),process_noise, modelVelocity);
+		skeleton.setScalePoseNode(node, poseInitial, Node::State::Parameters(constraint_centre, constraint_variance),process_noise, modelVelocity);
 	}
 
 

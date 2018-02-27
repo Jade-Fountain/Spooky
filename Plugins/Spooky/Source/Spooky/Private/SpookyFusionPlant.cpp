@@ -146,7 +146,7 @@ void USpookyFusionPlant::AddOutputTarget(USpookySkeletalMeshComponent * skeletal
 			}break;
 			case(ESpookyFusionType::SCALE_POSE):
 			{
-				spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones(),
+				spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal,
 						skeletal_mesh->GetInputConstraintCentre(bone.Name), 
 						skeletal_mesh->GetInputConstraintVariance(bone.Name), 
 						skeletal_mesh->GetInputProcessNoise(bone.Name),
