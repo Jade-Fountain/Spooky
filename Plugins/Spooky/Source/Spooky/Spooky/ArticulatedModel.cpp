@@ -515,11 +515,12 @@ namespace spooky {
 		art.push_back(Articulation::createBone(boneTransform.translation()));
 
 		//Set initial state
-		Node::State::Parameters initial = nodes[node]->getState();
 		Eigen::Vector3f scale;
-		initial.expectation.head(3) = utility::toAxisAngle<float>(boneTransform.matrix().topLeftCorner(3,3),&scale);
+		Eigen::Matrix3f R = boneTransform.matrix().topLeftCorner(3, 3);
+		Eigen::Vector3f startState = utility::toAxisAngle(R,&scale);
 		
-		Eigen::Vector3f defaultScale = Eigen::Vector3f::Ones();
+		Eigen::Vector3f defaultScale;
+		defaultScale.setOnes();
 		if(!scale.isApprox(defaultScale,0.001)){
 			SPOOKY_LOG("WARNING ArticulatedModel::setBoneForNode - scale of bone " + node.name + " is non unit, adding fixed scale transform");
 			Transform3D scaleT = Transform3D::Identity();
@@ -529,6 +530,8 @@ namespace spooky {
 
 
 		nodes[node]->setModel(art,modelVelocity);
+		Node::State::Parameters initial = nodes[node]->getState();
+		initial.expectation.head(3) = startState;
 		nodes[node]->setState(initial,0);
 		
 		if(constraints.expectation.size() != nodes[node]->getDimension()){
@@ -556,11 +559,11 @@ namespace spooky {
 		art.push_back(Articulation::createPose());
 
 		//Set initial state
-		Node::State::Parameters initial = nodes[node]->getState();
 		Eigen::Vector3f scale;
-		initial.expectation.head(6) = utility::toAxisAnglePos(poseTransform, &scale);
+		Eigen::VectorXf startState = utility::toAxisAnglePos(poseTransform, &scale);
 
-		Eigen::Vector3f defaultScale = Eigen::Vector3f::Ones();
+		Eigen::Vector3f defaultScale;
+		defaultScale.setOnes();
 		if(!scale.isApprox(defaultScale, 0.001)){
 			SPOOKY_LOG("WARNING ArticulatedModel::setPoseNode - scale of bone " + node.name + " is non unit, adding fixed scale transform");
 			Transform3D scaleT = Transform3D::Identity();
@@ -569,7 +572,10 @@ namespace spooky {
 		}
 
 		nodes[node]->setModel(art,modelVelocity);
+		Node::State::Parameters initial = nodes[node]->getState();
+		initial.expectation.head(6) = startState;
 		nodes[node]->setState(initial,0);
+
 		if(constraints.expectation.size() != nodes[node]->getDimension()){
 			SPOOKY_LOG("ERROR - constraint sizes do not match node dimension in setPoseNode for node " + node.name + ".  Dimension is " + std::to_string(constraints.expectation.size()) + " but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
 			//TODO:
