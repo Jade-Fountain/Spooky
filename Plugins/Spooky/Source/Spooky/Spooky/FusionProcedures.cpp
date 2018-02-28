@@ -223,8 +223,7 @@ namespace spooky{
         auto getMeasJac = [&rootNode, &m, &transformRepresentation](const std::vector<Node::Ptr>& fusion_chain) {
             //JACOBIAN:state -> measurement
             //Get Jacobian for the chain, mapping state to (w,v) global pose
-            Eigen::Matrix<float, 10, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation);
-            Eigen::Matrix<float, 4, Eigen::Dynamic> measurementJacobian = poseJac.block(0, 0, 4, poseJac.cols());
+            Eigen::Matrix<float, 4, Eigen::Dynamic> measurementJacobian = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation);
             return measurementJacobian;
         };
 
@@ -234,10 +233,10 @@ namespace spooky{
             
             Eigen::VectorXf wpstate;
             if (m->globalSpace) {
-                wpstate = transformRepresentation(globalToRootNode * fusion_chain[0]->getGlobalPose()).head(3);
+                wpstate = transformRepresentation(globalToRootNode * fusion_chain[0]->getGlobalPose());
             }
             else {
-                wpstate = transformRepresentation(fusion_chain[0]->getLocalPose()).head(3);
+                wpstate = transformRepresentation(fusion_chain[0]->getLocalPose());
             }
             return wpstate;
 
@@ -251,7 +250,7 @@ namespace spooky{
 		Eigen::Vector4f qmeas = m->getRotation().coeffs();
 		
 		State::Parameters measurement(4);
-		measurement.expectation = utility::quatClosestRepresentation(qmeas,qstate);
+		measurement.expectation = utility::quatClosestRepresentation(qmeas, qstate);
 		measurement.variance = m->getRotationVar();
 		
 		
