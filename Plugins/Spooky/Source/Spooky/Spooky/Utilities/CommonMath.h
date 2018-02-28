@@ -622,5 +622,15 @@ namespace spooky{
 				return  w * (w_angle + 2*M_PI*k)/w_angle;
 			}
 		}
+
+		static inline Eigen::Vector4f quatClosestRepresentation(const Eigen::Vector4f& q, const Eigen::Vector4f& target) {
+			Eigen::Vector4f neg_q = -q;
+			if ((q - target).norm() < (neg_q - target).norm()) {
+				return q;
+			}
+			else {
+				return neg_q;
+			}
+		}
 	}
 }

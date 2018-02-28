@@ -217,26 +217,27 @@ namespace spooky{
         };
 
 		std::function<Eigen::VectorXf(const Transform3D&)> transformRepresentation = [](const Transform3D& T) {
-			return utility::toAxisAnglePosScale(T);
+			return Eigen::Quaternionf(T.rotation()).coeffs();
 		};
+
         auto getMeasJac = [&rootNode, &m, &transformRepresentation](const std::vector<Node::Ptr>& fusion_chain) {
             //JACOBIAN:state -> measurement
             //Get Jacobian for the chain, mapping state to (w,v) global pose
-            Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation);
-            Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(0, 0, 3, poseJac.cols());
+            Eigen::Matrix<float, 10, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation);
+            Eigen::Matrix<float, 4, Eigen::Dynamic> measurementJacobian = poseJac.block(0, 0, 4, poseJac.cols());
             return measurementJacobian;
         };
 
-        auto getMeas = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain){
+        auto getMeas = [&rootNode, &m, &transformRepresentation](const std::vector<Node::Ptr>& fusion_chain){
 
             Transform3D globalToRootNode = rootNode->getGlobalPose().inverse();
             
             Eigen::VectorXf wpstate;
             if (m->globalSpace) {
-                wpstate = utility::toAxisAnglePos(globalToRootNode * fusion_chain[0]->getGlobalPose()).head(3);
+                wpstate = transformRepresentation(globalToRootNode * fusion_chain[0]->getGlobalPose()).head(3);
             }
             else {
-                wpstate = utility::toAxisAnglePos(fusion_chain[0]->getLocalPose()).head(3);
+                wpstate = transformRepresentation(fusion_chain[0]->getLocalPose()).head(3);
             }
             return wpstate;
 
@@ -246,25 +247,20 @@ namespace spooky{
         //Read quadratic constraints from joints in chain
         State::Parameters constraints = getChainConstraints(fusion_chain);
 
-        Eigen::VectorXf wpstate = getMeas(fusion_chain);
-        //Compute relation between measurement quaternion and twist representation w
-        Eigen::Matrix<float, 3, 4> quatToAxisJacobian = utility::getQuatToAxisJacobian(m->getRotation());
-
-        //THIS MEASUREMENT
-        //WARNING: Quat to be consistent: x,y,z,w is how eigen stores it internally, but its consrtuctor uses Quat(w,x,y,z)
-        //Information matrices (inverse Covariance)
-        Eigen::MatrixXf sigmaW = quatToAxisJacobian * m->getRotationVar() * quatToAxisJacobian.transpose();
-        //Measurement information matrix
-        Eigen::Matrix<float, 6, 1> wpm = utility::toAxisAnglePos(m->getTransform());
-        State::Parameters measurement(3);
-		measurement.expectation = utility::twistClosestRepresentation(wpm.head(3),wpstate.head(3));
+		Eigen::Vector4f qstate = getMeas(fusion_chain);
+		Eigen::Vector4f qmeas = m->getRotation().coeffs();
+		
+		State::Parameters measurement(4);
+		measurement.expectation = utility::quatClosestRepresentation(qmeas,qstate);
+		measurement.variance = m->getRotationVar();
+		
+		
 		std::stringstream ss;
-		ss << "twist closest rep:" << std::endl;
-		ss << "object wpm" << wpm.head(3).transpose() << std::endl;
-		ss << "target wpstate" << wpstate.head(3).transpose() << std::endl;
+		ss << "quat closest rep:" << std::endl;
+		ss << "qstate" << qstate.transpose() << std::endl;
+		ss << "qmeas" << qmeas.transpose() << std::endl;
 		ss << "result " << measurement.expectation.transpose() << std::endl;
 		SPOOKY_LOG(ss.str());
-        measurement.variance = sigmaW;
                 
         //Perform computation
         computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
