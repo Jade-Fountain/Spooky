@@ -618,9 +618,7 @@ namespace spooky{
 			else {
 				//Project target onto line of w, then round to nearest whole 2pi offset magnitude from w
 				int k = std::round(((target).dot(w/w_angle)-w_angle)/(2 * M_PI));
-				int sign = target.dot(w) > 0 ? 1 : -1;
 				//Two equivalent twists
-				
 				return  w * (w_angle + 2*M_PI*k)/w_angle;
 			}
 		}

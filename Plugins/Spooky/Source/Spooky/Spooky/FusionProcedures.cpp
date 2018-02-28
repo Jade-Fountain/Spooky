@@ -250,7 +250,13 @@ namespace spooky{
         //Measurement information matrix
         Eigen::Matrix<float, 6, 1> wpm = utility::toAxisAnglePos(m->getTransform());
         State::Parameters measurement(3);
-        measurement.expectation = utility::twistClosestRepresentation(wpm.head(3),wpstate.head(3));
+		measurement.expectation = utility::twistClosestRepresentation(wpm.head(3),wpstate.head(3));
+		std::stringstream ss;
+		ss << "twist closest rep:" << std::endl;
+		ss << "object wpm" << wpm.head(3).transpose() << std::endl;
+		ss << "target wpstate" << wpstate.head(3).transpose() << std::endl;
+		ss << "result " << measurement.expectation.transpose() << std::endl;
+		SPOOKY_LOG(ss.str());
         measurement.variance = sigmaW;
                 
         //Perform computation
@@ -396,8 +402,8 @@ namespace spooky{
        const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
        const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian
     ){
-		//std::stringstream ss;
-		//ss << "new Frame" << std::endl;
+		std::stringstream ss;
+		ss << "new Frame" << std::endl;
 		//Iterative update
         State::Parameters chainState = getPredictedState(fusion_chain);
 		State::Parameters originalChainState = chainState;
@@ -463,9 +469,10 @@ namespace spooky{
 			lastChainState = newChainState;
         }
         setChainState(fusion_chain, newChainState, timestamp);
-		//ss << "bone = " << fusion_chain[0]->desc.name << std::endl;
-		//ss << "iterations = " << iterations << std::endl;
-		//SPOOKY_LOG(ss.str());
+		ss << "bone = " << fusion_chain[0]->desc.name << std::endl;
+		ss << "newChainState = " << newChainState.expectation.transpose() << std::endl;
+		ss << "iterations = " << iterations << std::endl;
+		SPOOKY_LOG(ss.str());
 	};
 
     Node::State::Parameters Node::customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,
