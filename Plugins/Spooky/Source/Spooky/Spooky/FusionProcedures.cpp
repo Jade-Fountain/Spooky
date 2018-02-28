@@ -152,10 +152,14 @@ namespace spooky{
             return getChainPredictedState(fusion_chain, m->getTimestamp());
         };
 
-        auto getMeasJac = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain) {
+		std::function<Eigen::VectorXf(const Transform3D&)> transformRepresentation = [](const Transform3D& T) {
+			return utility::toAxisAnglePosScale(T);
+		};
+
+        auto getMeasJac = [&rootNode, &m, &transformRepresentation](const std::vector<Node::Ptr>& fusion_chain) {
             //JACOBIAN:state -> measurement
             //Get Jacobian for the chain, mapping state to (w,v) global pose
-            Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse());
+            Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation);
             Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(3,0,3, poseJac.cols());
             return measurementJacobian;
         };
@@ -212,10 +216,13 @@ namespace spooky{
             return getChainPredictedState(fusion_chain, m->getTimestamp());
         };
 
-        auto getMeasJac = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain) {
+		std::function<Eigen::VectorXf(const Transform3D&)> transformRepresentation = [](const Transform3D& T) {
+			return utility::toAxisAnglePosScale(T);
+		};
+        auto getMeasJac = [&rootNode, &m, &transformRepresentation](const std::vector<Node::Ptr>& fusion_chain) {
             //JACOBIAN:state -> measurement
             //Get Jacobian for the chain, mapping state to (w,v) global pose
-            Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse());
+            Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation);
             Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(0, 0, 3, poseJac.cols());
             return measurementJacobian;
         };
@@ -284,10 +291,14 @@ namespace spooky{
             return getChainPredictedState(fusion_chain, m->getTimestamp());
 		};
 
-		auto getMeasJac = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain) {
+		std::function<Eigen::VectorXf(const Transform3D&)> transformRepresentation = [](const Transform3D& T) {
+			return utility::toAxisAnglePosScale(T);
+		};
+
+		auto getMeasJac = [&rootNode, &m, &transformRepresentation](const std::vector<Node::Ptr>& fusion_chain) {
 			//JACOBIAN:state -> measurement
 			//Get Jacobian for the chain, mapping state to (w,v) global pose
-			Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse());
+			Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation);
 			Eigen::Matrix<float, 6, Eigen::Dynamic> measurementJacobian = poseJac.block(0, 0, 6, poseJac.cols());
 			return measurementJacobian;
 		};
@@ -357,10 +368,14 @@ namespace spooky{
             return getChainPredictedState(fusion_chain, m->getTimestamp());
         };
 
-        auto getMeasJac = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain) {
+		std::function<Eigen::VectorXf(const Transform3D&)> transformRepresentation = [](const Transform3D& T) {
+			return utility::toAxisAnglePosScale(T);
+		};
+
+        auto getMeasJac = [&rootNode, &m, &transformRepresentation](const std::vector<Node::Ptr>& fusion_chain) {
             //JACOBIAN:state -> measurement
             //Get Jacobian for the chain, mapping state to (w,v) global pose
-            Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse());
+            Eigen::MatrixXf poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation);
             Eigen::Matrix<float, 3, Eigen::Dynamic> measurementJacobian = poseJac.block(6, 0, 3, poseJac.cols());
             return measurementJacobian;
         };
@@ -557,7 +572,10 @@ namespace spooky{
         return chainState;
     }
 
-	Eigen::Matrix<float, 9, Eigen::Dynamic> Node::getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain, const bool& globalSpace, const Transform3D& globalToRootNode) {
+	Eigen::MatrixXf Node::getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain, 
+																	   const bool& globalSpace, 
+																	   const Transform3D& globalToRootNode,
+																	   const std::function<Eigen::VectorXf(const Transform3D&)>& transformRepresentation) {
 		//Precompute Jacobian size
 		int inputDimension = 0;
 		for (auto& node : fusion_chain) {
@@ -567,7 +585,8 @@ namespace spooky{
 		float h = 0.0001;
 
 		//3DOF for each rot, pos, scale
-		Eigen::Matrix<float, 9, Eigen::Dynamic > J(9, inputDimension);
+		int m_dim = transformRepresentation(Transform3D::Identity()).size();
+		Eigen::MatrixXf J(m_dim, inputDimension);
 		Transform3D childPoses = Transform3D::Identity();
 
 		int block = 0;
@@ -575,15 +594,16 @@ namespace spooky{
 			Transform3D parentPoses = (node->parent != NULL && globalSpace) ? globalToRootNode * node->parent->getGlobalPose() : Transform3D::Identity();
 		
 			//Lambda to be differentiated
-			auto mapToGlobalPose = [&childPoses, &parentPoses, &node](const Eigen::VectorXf& theta) {
-				return utility::toAxisAnglePosScale(parentPoses * node->getLocalPoseAt(theta) * childPoses);
+			auto mapToGlobalPose = [&childPoses, &parentPoses, &node, &transformRepresentation](const Eigen::VectorXf& theta) {
+				//return utility::toAxisAnglePosScale(parentPoses * node->getLocalPoseAt(theta) * childPoses);
+				return transformRepresentation(parentPoses * node->getLocalPoseAt(theta) * childPoses);
 			};
 
 			//Loop through all dof of this node and get the jacobian (w,p) entries for each dof
 			int dof = node->getDimension();
 
 			//Watch out for block assignments - they cause horrible hard to trace memory errors if not sized properly
-			J.block(0, block, 9, dof) = utility::numericalVectorDerivative<float>(mapToGlobalPose, node->getState().expectation, h);
+			J.block(0, block, m_dim, dof) = utility::numericalVectorDerivative<float>(mapToGlobalPose, node->getState().expectation, h);
 
 			block += dof;
 

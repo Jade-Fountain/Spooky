@@ -169,7 +169,7 @@ namespace spooky {
     	//Get prediction
     	static State::Parameters getChainPredictedState(const std::vector<Node::Ptr>& fusion_chain, const float& timestamp);
 		//Get the jocobian of an entire pose chain mapping state |-> (w,p,s) axis-angle, position and scale, each with 3D
-		static Eigen::Matrix<float, 9, Eigen::Dynamic> getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain, const bool& globalSpace, const Transform3D& globalToRootNode);
+		static Eigen::MatrixXf getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain, const bool& globalSpace, const Transform3D& globalToRootNode, const std::function<Eigen::VectorXf(const Transform3D&)>& transformRepresentation);
 		
 		//---------------------------------------
 
