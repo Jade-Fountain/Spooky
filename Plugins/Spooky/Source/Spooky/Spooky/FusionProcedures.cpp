@@ -283,25 +283,28 @@ namespace spooky{
 		};
 
 		std::function<Eigen::VectorXf(const Transform3D&)> transformRepresentation = [](const Transform3D& T) {
-			return utility::toAxisAnglePosScale(T);
+			Eigen::Matrix3f R = T.rotation();
+			Eigen::Map<Eigen::VectorXf> vec(R.data(), R.size());
+			Eigen::VectorXf result(vec.size() + 3);
+			result << vec, T.translation();
+			return result;
 		};
 
 		auto getMeasJac = [&rootNode, &m, &transformRepresentation](const std::vector<Node::Ptr>& fusion_chain) {
 			//JACOBIAN:state -> measurement
 			//Get Jacobian for the chain, mapping state to (w,v) global pose
-			Eigen::Matrix<float, 9, Eigen::Dynamic> poseJac = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation);
-			Eigen::Matrix<float, 6, Eigen::Dynamic> measurementJacobian = poseJac.block(0, 0, 6, poseJac.cols());
+			Eigen::MatrixXf measurementJacobian = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation);
 			return measurementJacobian;
 		};
 
-        auto getMeas = [&rootNode, &m](const std::vector<Node::Ptr>& fusion_chain){
+        auto getMeas = [&rootNode, &m, &transformRepresentation](const std::vector<Node::Ptr>& fusion_chain){
             Eigen::VectorXf wpstate;
             Transform3D globalToRootNode = rootNode->getGlobalPose().inverse();
             if (m->globalSpace) {
-                wpstate = utility::toAxisAnglePos(globalToRootNode * fusion_chain[0]->getGlobalPose());
+                wpstate = transformRepresentation(globalToRootNode * fusion_chain[0]->getGlobalPose());
             }
             else {
-                wpstate = utility::toAxisAnglePos(fusion_chain[0]->getLocalPose());
+                wpstate = transformRepresentation(fusion_chain[0]->getLocalPose());
             }
             return wpstate;
 		};
@@ -310,21 +313,15 @@ namespace spooky{
         //------------------------------------------------------------------
         //Transform measurement to appropriate coordinates
         //------------------------------------------------------------------
-        Eigen::VectorXf wpstate = getMeas(fusion_chain);
-        //THIS MEASUREMENT
-        //WARNING: Quat to be consistent: x,y,z,w is how eigen stores it internally, but its consrtuctor uses Quat(w,x,y,z)    
-        //Compute relation between measurement quaternion and twist representation w
-        Eigen::Matrix<float, 3, 4> quatToAxisJacobian = utility::getQuatToAxisJacobian(m->getRotation());
-        Eigen::MatrixXf sigmaW = quatToAxisJacobian * m->getRotationVar() * quatToAxisJacobian.transpose();
-        //Measurement information matrix
-        State::Parameters measurement(6);
-        Eigen::Matrix<float, 6, 1> wpm = utility::toAxisAnglePos(m->getTransform());
-        measurement.expectation.head(3) = utility::twistClosestRepresentation(wpm.head(3),wpstate.head(3));
-        measurement.expectation.tail(3) = wpm.tail(3);
-        measurement.variance.topLeftCorner(3, 3) = sigmaW / m->confidence;
-        measurement.variance.bottomRightCorner(3, 3) = m->getPositionVar() / m->confidence;
-        //------------------------------------------------------------------
-        
+		Transform3D Tmeas = m->getTransform();
+		Eigen::VectorXf vecTmeas = transformRepresentation(Tmeas);
+		State::Parameters measurement(vecTmeas.size());
+		measurement.expectation = vecTmeas;
+		//TODO: fix this hack: compute quaternion to vecMat Jacobian
+		measurement.variance.topLeftCorner(9,9) = m->getRotationVar()(0, 0) * Eigen::MatrixXf::Identity(9,9) / m->confidence;
+		measurement.variance.bottomRightCorner(3,3) = m->getPositionVar() / m->confidence;
+
+
         //------------------------------------------------------------------
         //JOINT CONSTRAINTS
         //------------------------------------------------------------------
@@ -333,7 +330,7 @@ namespace spooky{
         //------------------------------------------------------------------
 
 
-        computeEKFUpdate(m->getTimestamp(),fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
         //DEBUG
   //       std::stringstream ss;
 		// ss << std::endl << "wpstate = " << wpstate.transpose() << std::endl;
