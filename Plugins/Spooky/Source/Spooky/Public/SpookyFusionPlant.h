@@ -57,6 +57,8 @@ class USpookyFusionPlant : public UActorComponent
 	//Input Skeletons
 	std::vector<USpookySkeletalMeshComponent*> skeletal_spirits;
 
+	std::map<spooky::NodeDescriptor, size_t> lastHash;
+
 public:	
 
 	// Sets default values for this component's properties
@@ -207,6 +209,9 @@ public:
 	//Convert Transform3D to FMatrix
 	FTransform convert(const spooky::Transform3D& T);
 	spooky::Transform3D convert(const FMatrix& T);
+
+	//Hashing for change checking
+	static size_t hashFTransform(const FTransform& T);
 
 //===========================
 //DEBUG

@@ -18,6 +18,7 @@
 #include "Spooky.h"
 #include "SpookyFusionPlant.h"
 #include "Spooky/Utilities/TimeProfiling.h"
+#include "Spooky/Utilities/DataStructures.h"
 #include <iostream>
 
 
@@ -154,6 +155,7 @@ void USpookyFusionPlant::AddOutputTarget(USpookySkeletalMeshComponent * skeletal
 			}break;
 		}
 
+
 		SPOOKY_LOG("Adding Bone: " + bone_desc.name + ", parent = " + parent_desc.name);
 	}
 }
@@ -242,6 +244,13 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 			//Retarget to new skeleton
 			FRotator retargetRotationOffset = skeleton->getOutputRetargetRotator(bone.Name);
 			T.SetRotation(T.GetRotation() * retargetRotationOffset.Quaternion());
+			if (spookyBoneInfo.filterUnchanged) {
+				if(spooky::utility::safeAccess(lastHash,bone_name) == hashFTransform(T)){
+					continue;
+				} else {
+					lastHash[bone_name] = hashFTransform(T);
+				}
+			}
 			switch (spookyBoneInfo.measurementType) {
 				//TODO: local vs global variance?
 				case(ESpookyMeasurementType::GENERIC):
@@ -460,7 +469,18 @@ spooky::Transform3D USpookyFusionPlant::convert(const FMatrix& T) {
 	matrix.translation() *= spookyCore.config.units.input_m;
 	return matrix;
 }
-
+	
+size_t USpookyFusionPlant::hashFTransform(const FTransform& T){
+	size_t result = 0;
+	FMatrix Tmat = T.ToMatrixWithScale();
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 4; j++) {
+			//XOR
+			result = result ^ (std::hash<float>{}(Tmat.GetColumn(j)[i]) << 1);
+		}
+	}
+	return result;
+}
 //===========================
 //DEBUG
 //===========================

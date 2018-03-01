@@ -101,8 +101,11 @@ struct FSpookySkeletonBoneOutputParams{
 	float timestamp_sec; 	
 	
 	//Whether to use a local or global route to fusion
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	bool useGlobalData; 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky")
+	bool useGlobalData = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky")
+	bool filterUnchanged = false;
 };
 
 //Fusion parameters describe how the skeleton behaves when targeted by spooky
