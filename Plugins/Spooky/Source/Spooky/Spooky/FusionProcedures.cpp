@@ -186,7 +186,7 @@ namespace spooky{
         //Measurement information matrix
         State::Parameters measurement(3);
         measurement.expectation = m->getPosition();
-        measurement.variance = m->getPositionVar();
+        measurement.variance = m->getPositionVar() / m->confidence;
         //------------------------------------------------------------------
         
         //------------------------------------------------------------------
@@ -254,7 +254,7 @@ namespace spooky{
 		State::Parameters measurement(vecTmeas.size());
 		measurement.expectation = vecTmeas;
 		//TODO: fix this hack: compute quaternion to vecMat Jacobian
-		measurement.variance = m->getRotationVar()(0,0)* Eigen::MatrixXf::Identity(vecTmeas.size(), vecTmeas.size());
+		measurement.variance = m->getRotationVar()(0,0)* Eigen::MatrixXf::Identity(vecTmeas.size(), vecTmeas.size()) / m->confidence;
 		
                 
         //Perform computation
@@ -321,8 +321,8 @@ namespace spooky{
         Eigen::Matrix<float, 6, 1> wpm = utility::toAxisAnglePos(m->getTransform());
         measurement.expectation.head(3) = utility::twistClosestRepresentation(wpm.head(3),wpstate.head(3));
         measurement.expectation.tail(3) = wpm.tail(3);
-        measurement.variance.topLeftCorner(3, 3) = sigmaW;
-        measurement.variance.bottomRightCorner(3, 3) = m->getPositionVar();
+        measurement.variance.topLeftCorner(3, 3) = sigmaW / m->confidence;
+        measurement.variance.bottomRightCorner(3, 3) = m->getPositionVar() / m->confidence;
         //------------------------------------------------------------------
         
         //------------------------------------------------------------------
@@ -392,7 +392,7 @@ namespace spooky{
         //Measurement information matrix
         State::Parameters measurement(3);
         measurement.expectation = m->getScale();
-        measurement.variance = m->getScaleVar();
+        measurement.variance = m->getScaleVar() / m->confidence;
         
         //Perform computation
         computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
