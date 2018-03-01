@@ -217,13 +217,15 @@ namespace spooky{
         };
 
 		std::function<Eigen::VectorXf(const Transform3D&)> transformRepresentation = [](const Transform3D& T) {
-			return Eigen::Quaternionf(T.rotation()).coeffs();
+			Eigen::Matrix3f R = T.rotation();
+			Eigen::Map<Eigen::VectorXf> vec(R.data(), R.size());
+			return vec;
 		};
 
         auto getMeasJac = [&rootNode, &m, &transformRepresentation](const std::vector<Node::Ptr>& fusion_chain) {
             //JACOBIAN:state -> measurement
             //Get Jacobian for the chain, mapping state to (w,v) global pose
-            Eigen::Matrix<float, 4, Eigen::Dynamic> measurementJacobian = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation);
+            Eigen::MatrixXf measurementJacobian = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation);
             return measurementJacobian;
         };
 
@@ -246,20 +248,14 @@ namespace spooky{
         //Read quadratic constraints from joints in chain
         State::Parameters constraints = getChainConstraints(fusion_chain);
 
-		Eigen::Vector4f qstate = getMeas(fusion_chain);
-		Eigen::Vector4f qmeas = m->getRotation().coeffs();
+		Transform3D Tmeas = Transform3D::Identity();
+		Tmeas.rotate(m->getRotation());
+		Eigen::VectorXf vecTmeas = transformRepresentation(Tmeas);
+		State::Parameters measurement(vecTmeas.size());
+		measurement.expectation = vecTmeas;
+		//TODO: fix this hack: compute quaternion to vecMat Jacobian
+		measurement.variance = m->getRotationVar()(0,0)* Eigen::MatrixXf::Identity(vecTmeas.size(), vecTmeas.size());
 		
-		State::Parameters measurement(4);
-		measurement.expectation = utility::quatClosestRepresentation(qmeas, qstate);
-		measurement.variance = m->getRotationVar();
-		
-		
-		std::stringstream ss;
-		ss << "quat closest rep:" << std::endl;
-		ss << "qstate" << qstate.transpose() << std::endl;
-		ss << "qmeas" << qmeas.transpose() << std::endl;
-		ss << "result " << measurement.expectation.transpose() << std::endl;
-		SPOOKY_LOG(ss.str());
                 
         //Perform computation
         computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
@@ -412,8 +408,8 @@ namespace spooky{
        const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
        const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian
     ){
-		std::stringstream ss;
-		ss << "new Frame" << std::endl;
+		//std::stringstream ss;
+		//ss << "new Frame" << std::endl;
 		//Iterative update
         State::Parameters chainState = getPredictedState(fusion_chain);
 		State::Parameters originalChainState = chainState;
@@ -439,6 +435,7 @@ namespace spooky{
             setChainState(fusion_chain, chainState, timestamp);
 			
 			//Prepare for next update:
+			//TODO: use boxplus and box minus
 			predictedMeasurement = getMeasurement(fusion_chain);
 			measurementJacobian = getMeasurementJacobian(fusion_chain);
 			//Error = 0 when we are at the most likely state
@@ -479,10 +476,10 @@ namespace spooky{
 			lastChainState = newChainState;
         }
         setChainState(fusion_chain, newChainState, timestamp);
-		ss << "bone = " << fusion_chain[0]->desc.name << std::endl;
-		ss << "newChainState = " << newChainState.expectation.transpose() << std::endl;
-		ss << "iterations = " << iterations << std::endl;
-		SPOOKY_LOG(ss.str());
+		//ss << "bone = " << fusion_chain[0]->desc.name << std::endl;
+		//ss << "newChainState = " << newChainState.expectation.transpose() << std::endl;
+		//ss << "iterations = " << iterations << std::endl;
+		//SPOOKY_LOG(ss.str());
 	};
 
     Node::State::Parameters Node::customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,
