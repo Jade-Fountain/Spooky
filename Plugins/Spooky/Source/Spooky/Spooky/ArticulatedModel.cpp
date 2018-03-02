@@ -546,7 +546,21 @@ namespace spooky {
 				" but should be " + std::to_string(nodes[node]->getDimension()) + (modelVelocity ? " (modelling velocity)" : " (NOT modelling velocity)"));
 		}
 
-		nodes[node]->setConstraints(constraints);
+
+		auto transformFunc = [&boneTransform](const Eigen::Vector3f& w) {
+			Eigen::Matrix3f Rc = utility::rodriguezFormula<float>(w);
+			return utility::toAxisAngle(Eigen::Matrix3f(boneTransform.rotation() * Rc));
+		};
+		//Constraint is relative to bone default space
+		Node::State::Parameters constraintsDefaultSpace = constraints;
+		constraintsDefaultSpace.expectation.head(3) = transformFunc(constraints.expectation.head(3));
+		Eigen::Matrix3f J = utility::numericalVectorDerivative<float>(transformFunc, constraints.expectation.head(3));
+		constraintsDefaultSpace.variance.topLeftCorner(3, 3) = J * constraints.variance.topLeftCorner(3, 3) * J.transpose();
+		if (modelVelocity) {
+			constraintsDefaultSpace.expectation.tail(3) = J * constraintsDefaultSpace.expectation.tail(3);
+			constraintsDefaultSpace.variance.bottomRightCorner(3, 3) = J * constraints.variance.bottomRightCorner(3, 3) * J.transpose();
+		}
+		nodes[node]->setConstraints(constraintsDefaultSpace);
 		Node::State::Parameters PN(nodes[node]->getDimension());
 		PN.variance = process_noise;
 		nodes[node]->setProcessNoises(PN);
