@@ -291,13 +291,13 @@ namespace spooky {
 		std::vector<Measurement::Ptr> measurements2;
 
 		getRelevantMeasurements(
-			system1, 
+			system1,
 			system2,
-			measurements1,
-			measurements2,
+			&measurements1,
+			&measurements2,
 			minCountPerNode,
 			false
-		)
+		);
 
 		return std::make_pair<int,int>(measurements1.size(),measurements2.size());
 	}
