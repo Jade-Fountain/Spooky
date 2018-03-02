@@ -287,62 +287,19 @@ namespace spooky {
 	) {
 		//TODO:
 		// - incorporate latency 
-		std::pair<int, int> count = std::make_pair(0, 0);
+		std::vector<Measurement::Ptr> measurements1;
+		std::vector<Measurement::Ptr> measurements2;
 
-		//Loop through nodes and build up relevant measurements
-		for (auto& node : calibrationSet.nodes) {
+		getRelevantMeasurements(
+			system1, 
+			system2,
+			measurements1,
+			measurements2,
+			minCountPerNode,
+			false
+		)
 
-			//Keys for accessing data streams
-			SystemNodePair sysNode1(system1, node);
-			SystemNodePair sysNode2(system2, node);
-
-
-			//If there is an entry for each system in the table, check if there is sufficient data for calibration
-			if (calibrationSet.systemNodeTable.count(sysNode1) > 0 &&
-				calibrationSet.systemNodeTable.count(sysNode2) > 0)
-			{
-				//Get maximum length of sensor stream
-				int count1 = calibrationSet.systemNodeTable[sysNode1].totalCount(system1, system2);
-				int count2 = calibrationSet.systemNodeTable[sysNode2].totalCount(system1, system2);
-
-				//Streams of different length or not long enough- we cant use this data
-				if (count1 < minCountPerNode || count2 < minCountPerNode) {
-					continue; //cannot calibrate this pair of sensors yet
-				}
-
-				//Calibrate with complete bipartite graph of relationships
-				for (auto& pair1 : calibrationSet.systemNodeTable[sysNode1].sensors) {
-					SensorID id1 = pair1.first;
-					//utility::MultiStream<Measurement::Ptr,std::string>&
-					auto& m1_ = pair1.second;
-					//Get measurements
-					for (auto& pair2 : calibrationSet.systemNodeTable[sysNode2].sensors) {
-						//utility::MultiStream<Measurement::Ptr,std::string>&
-						auto& m2_ = pair2.second;
-
-						//Synchronise the two streams
-						std::vector<Measurement::Ptr> m1 = m1_.get(system1.name + system2.name);
-						std::vector<Measurement::Ptr> m2 = m2_.get(system1.name + system2.name);
-
-						if (m1.size() < m2.size()) {
-							Measurement::synchronise(m2, m1);
-						}
-						else if (m1.size() > m2.size()) {
-							Measurement::synchronise(m1, m2);
-						}
-
-						//If there are sufficient measurements remaining, then add them to the count
-						if (m1.size() > minCountPerNode && m2.size() > minCountPerNode)
-						{
-							count.first += m1.size();
-							count.second += m2.size();
-						}
-
-					}
-				}
-			}
-		}
-		return count;
+		return std::make_pair<int,int>(measurements1.size(),measurements2.size());
 	}
 
 	void Calibrator::determineCalibrationsRequired(
@@ -366,7 +323,7 @@ namespace spooky {
 				int count1 = calibrationSet.systemNodeTable[sysNode1].rawCount();
 				int count2 = calibrationSet.systemNodeTable[sysNode2].rawCount();
 
-				//Streams of different length or not long enough- we cant use this data
+				//Streams not long enough- we cant use this data
 				if (count1 < minCountPerNode || count2 < minCountPerNode) {
 					continue; //cannot calibrate this pair of sensors yet
 				}
@@ -432,8 +389,9 @@ namespace spooky {
 		//For each unordered pairing of systems, check if there are common nodes
 		for (std::set<SystemDescriptor>::iterator system1 = calibrationSet.systems.begin(); system1 != calibrationSet.systems.end(); system1++) {
 			for (std::set<SystemDescriptor>::iterator system2 = std::next(system1); system2 != calibrationSet.systems.end(); system2++) {
-				
+				//Quickly check if we might be able to calibrate:
 				determineCalibrationsRequired(*system1, *system2, config.min_count_per_node);
+				//Calibrate if we can:
 				calibrateSystems(*system1, *system2);
 				
 			}
