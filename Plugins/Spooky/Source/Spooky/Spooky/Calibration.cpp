@@ -243,15 +243,17 @@ namespace spooky {
 				for (auto& pair1 : calibrationSet.systemNodeTable[sysNode1].sensors) {
 					SensorID id1 = pair1.first;
 					//utility::MultiStream<Measurement::Ptr,std::string>&
-					auto& m1_ = pair1.second;
+					auto& stream_m1 = pair1.second;
 					//Get measurements
 					for (auto& pair2 : calibrationSet.systemNodeTable[sysNode2].sensors) {
 						//utility::MultiStream<Measurement::Ptr,std::string>&
-						auto& m2_ = pair2.second;
+						auto& stream_m2 = pair2.second;
 
 						//Synchronise the two streams
-						std::vector<Measurement::Ptr> m1 = m1_.get(system1.name + system2.name);
-						std::vector<Measurement::Ptr> m2 = m2_.get(system1.name + system2.name);
+						std::vector<Measurement::Ptr> m1 = stream_m1.get(system1.name + system2.name);
+						std::vector<Measurement::Ptr> m2 = stream_m2.get(system1.name + system2.name);
+
+						bool streamsCompatible = m1.back()->calibrationCompatible(m2.back()->type);
 
 						//TODO: retarget high noise measurements, not high latency - I no longer know what I meant by this
 						if (m1.size() < m2.size()) {
@@ -270,8 +272,8 @@ namespace spooky {
 						//Clear the data used for calibration
 						//Clear data even if it isnt used because it is not synchronised
 						if (clearMeasurementsWhenDone) {
-							m1_.clear(system1.name + system2.name);
-							m2_.clear(system1.name + system2.name);
+							stream_m1.clear(system1.name + system2.name);
+							stream_m2.clear(system1.name + system2.name);
 						}
 					}
 				}

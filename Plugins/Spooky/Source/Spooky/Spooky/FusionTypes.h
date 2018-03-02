@@ -483,9 +483,9 @@ namespace spooky {
 					return data.size();
 				case(Type::RIGID_BODY):
 					return 3;
-				case(ROTATION):
+				case(Type::ROTATION):
 					return 0;
-				case(SCALE):
+				case(Type::SCALE):
 					return 0;
 			}
 			return 0;
@@ -498,9 +498,9 @@ namespace spooky {
 					return data.size();
 				case(Type::RIGID_BODY):
 					return 3;
-				case(ROTATION):
+				case(Type::ROTATION):
 					return 3;
-				case(SCALE):
+				case(Type::SCALE):
 					return 0;
 			}
 			return 0;
@@ -512,6 +512,21 @@ namespace spooky {
 			} else {
   				return 0;
 			}
+		}
+		bool calibrationCompatible(const Type& other_type) {
+			switch (type) {
+				case(Type::POSITION):
+					return other_type == Type::POSITION || other_type == Type::RIGID_BODY;
+				case(Type::GENERIC):
+					return false;
+				case(Type::RIGID_BODY):
+					return other_type == Type::ROTATION || other_type == Type::POSITION;
+				case(Type::ROTATION):
+					return other_type == Type::ROTATION || other_type == Type::RIGID_BODY;
+				case(Type::SCALE):
+					return false;
+			}
+			return false;
 		}
 	};
 
