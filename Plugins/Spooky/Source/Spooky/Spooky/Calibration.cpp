@@ -254,7 +254,8 @@ namespace spooky {
 						std::vector<Measurement::Ptr> m2 = stream_m2.get(system1.name + system2.name);
 
 						bool streamsCompatible = m1.back()->calibrationCompatible(m2.back()->type);
-
+						if(!streamsCompatible) continue;
+						
 						//TODO: retarget high noise measurements, not high latency - I no longer know what I meant by this
 						if (m1.size() < m2.size()) {
 							Measurement::synchronise(m2, m1);
@@ -354,11 +355,19 @@ namespace spooky {
 			if (t2 == Measurement::Type::RIGID_BODY) {
 				//return calPos(m1, m2, calib);
 				//TODO: implement this:
-				return cal6DoF(m1, m2, calib);
+				return cal6DoF(m1, m2, calib, true);
 			}
 			else if (t2 == Measurement::Type::POSITION) {
 				return calPos(m1, m2, calib);
 			}
+			else if (t2 == Measurement::Type::ROTATION) {
+				return cal6DoF(m1, m2, calib, false);
+			}
+			break;
+		case Measurement::Type::ROTATION:
+			if (t2 == Measurement::Type::ROTATION || t2 == Measurement::Type::RIGID_BODY) {
+				return cal6DoF(m1, m2, calib, false);
+			} break;
 		}
 		SPOOKY_LOG("WARNING : no calibration model found for measurement types: " + std::to_string(t1) + " and " + std::to_string(t2));
 		return CalibrationResult();

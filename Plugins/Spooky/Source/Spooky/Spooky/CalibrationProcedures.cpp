@@ -213,13 +213,14 @@ namespace spooky {
 		return updateCalibration(result, currentCalibration);
 	}
 
-	CalibrationResult Calibrator::cal6DoF(const std::vector<Measurement::Ptr>& m1, const std::vector<Measurement::Ptr>& m2, const CalibrationResult& currentCalibration)const
+	CalibrationResult Calibrator::cal6DoF(const std::vector<Measurement::Ptr>& m1, const std::vector<Measurement::Ptr>& m2, const CalibrationResult& currentCalibration, const bool& includePosition)const
 	{
 		float qualityScaleFactor = 1;
 
 		//Debug
 		std::stringstream ss;
-		ss << "cal6Dof[" << m1.front()->getSensor()->system.name << ", " << m2.front()->getSensor()->system.name << "], samples =[" << m1.size() << ", " << m2.size() << "]" << std::endl;
+		ss  << "cal6Dof" << (includePosition ? "(Pos+Rot)":"(Just Rotation)") << "[" << m1.front()->getSensor()->system.name << ", " << m2.front()->getSensor()->system.name 
+			<< "], samples =[" << m1.size() << ", " << m2.size() << "]" << std::endl;
 
 		//Chunk measurements based on node
 		std::vector<std::vector<Eigen::Matrix4f>> pos1;
@@ -239,20 +240,19 @@ namespace spooky {
 			float error = 100;
 			// pos1[i][k] * X = Y * pos2[i][k] 
 			//Y:System2->System1
-			auto group_result = utility::calibration::Transform::twoSystems_Kronecker_Shah2013(pos1[i], pos2[i], &error);
+			auto group_result = utility::calibration::Transform::twoSystems_Kronecker_Shah2013(pos1[i], pos2[i], &error, includePosition);
 			transformsX.push_back(group_result.first);
 			transformsY.push_back(group_result.second);
 			weights.push_back(utility::qualityFromError(error, qualityScaleFactor));
 		}
 		//Compute mean transforms over each group
-		Transform3D transformX = utility::getMeanTransform(transformsX, weights);
 		Transform3D transformY = utility::getMeanTransform(transformsY, weights);
 		result.transform = transformY.inverse(); //Y':System1->System2
 
 		//Compute error
 		result.error = 0;
 		for (int i = 0; i < pos1.size(); i++) {
-			result.error += utility::calibration::Transform::getTwoSystemsError(transformX, transformY, pos1[i], pos2[i]);
+			result.error += utility::calibration::Transform::getTwoSystemsError(transformsX[i], transformY, pos1[i], pos2[i]);
 		}
 		result.error = result.error / pos1.size();
 
@@ -261,7 +261,6 @@ namespace spooky {
 		result.state = CalibrationResult::State::CALIBRATED;
 		result.weight = m1.size();
 		
-		ss << "Result: transformX = " << std::endl << transformX.matrix() << std::endl;
 		ss << "Result: transformY = " << std::endl << transformY.matrix() << std::endl;
 		ss << "Result: transform[" << result.systems.first.name << "->" << result.systems.second.name << "] = " << std::endl << result.transform.matrix() << std::endl;
 		ss << "Result: error[" << result.systems.first.name << "->" << result.systems.second.name << "] = " << std::endl << result.error << std::endl;

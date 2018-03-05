@@ -460,7 +460,8 @@ namespace spooky{
 				twoSystems_Kronecker_Shah2013(
 					const std::vector<Eigen::Matrix4f>& samplesA, 
 					const std::vector<Eigen::Matrix4f>& samplesB,
-					float* error = NULL)
+					float* error = NULL,
+					bool getTranslation = true)
 				{
 					if(samplesA.size() < 3 || samplesB.size() < 3){
 						std::cout << "CalibrationTools - NEED MORE THAN 2 SAMPLES" << std::endl;
@@ -530,7 +531,7 @@ namespace spooky{
 
 					//Translation part
 					bool success = false;
-					auto translation = getTranslationComponent(samplesA, samplesB, R_y, success);
+					auto translation = getTranslation ? getTranslationComponent(samplesA, samplesB, R_y, success) : std::make_pair(Eigen::Vector3f::Zero(),Eigen::Vector3f::Zero());
 
 					result.first.translate(translation.first);
 					result.second.translate(translation.second);

@@ -139,7 +139,7 @@ namespace spooky {
 		CalibrationResult calPos(const std::vector<Measurement::Ptr>& measurements1, const std::vector<Measurement::Ptr>& measurements2, const CalibrationResult& calib) const;
 
 		//Calibrate two rigidly linked 6DoF sensors
-		CalibrationResult cal6DoF(const std::vector<Measurement::Ptr>& m1, const std::vector<Measurement::Ptr>& m2, const CalibrationResult & currentCalibration) const;
+		CalibrationResult cal6DoF(const std::vector<Measurement::Ptr>& m1, const std::vector<Measurement::Ptr>& m2, const CalibrationResult & currentCalibration, const bool& includePosition) const;
 
 		//Estimate latencies of multiple concatenated streams of measurements
 		float estimateLatencies(const std::vector<Measurement::Ptr>& m1, const std::vector<Measurement::Ptr>& m2);
