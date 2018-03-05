@@ -248,10 +248,10 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 			FRotator retargetRotationOffset = skeleton->getOutputRetargetRotator(bone.Name);
 			T.SetRotation(T.GetRotation() * retargetRotationOffset.Quaternion());
 			if (spookyBoneInfo.filterUnchanged) {
-				if(spooky::utility::safeAccess(lastHash,bone_name) == hashFTransform(T)){
+				if(spooky::utility::safeAccess(lastHash,bone_name) == hashFTransform(skeleton->BoneSpaceTransforms[i])){
 					continue;
 				} else {
-					lastHash[bone_name] = hashFTransform(T);
+					lastHash[bone_name] = hashFTransform(skeleton->BoneSpaceTransforms[i]);
 				}
 			}
 			switch (spookyBoneInfo.measurementType) {
