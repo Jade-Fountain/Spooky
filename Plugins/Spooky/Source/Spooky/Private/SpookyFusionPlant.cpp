@@ -16,6 +16,7 @@
 */
 
 #include "Spooky.h"
+#include "Spooky/FusionTypes.h"
 #include "SpookyFusionPlant.h"
 #include "Spooky/Utilities/TimeProfiling.h"
 #include "Spooky/Utilities/DataStructures.h"
@@ -99,9 +100,11 @@ void USpookyFusionPlant::SetSystemRootNode(FString system, FString rootNode, con
 	spooky::NodeDescriptor root(TCHAR_TO_UTF8(*rootNode));
 	//Add node representing offset from the root node
 	//The node has the same as the system with the suffix "_root"
-	spookyCore.addFixedNode(spooky::NodeDescriptor(sys.name + "_root"), root, convert(rootNodeOffset.ToMatrixWithScale()));
-	//Attach to sensor model
-	spookyCore.setSystemRootNode(sys,spooky::NodeDescriptor(sys.name + "_root"));
+	if (root.name != "" && root.name != SPOOKY_WORLD_ROOT_DESC) {
+		spookyCore.addFixedNode(spooky::NodeDescriptor(sys.name + "_root"), root, convert(rootNodeOffset.ToMatrixWithScale()));
+		//Attach to sensor model
+		spookyCore.setSystemRootNode(sys, spooky::NodeDescriptor(sys.name + "_root"));
+	} 
 }
 
 
