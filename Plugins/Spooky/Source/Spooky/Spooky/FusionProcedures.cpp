@@ -512,7 +512,6 @@ namespace spooky{
 	Node::State::Parameters Node::EKFMeasurementUpdate(const State::Parameters& prior, const State::Parameters& measurement,
 		const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement)
 	{
-		//TODO: change to proper KF algorithm
 		assert(prior.size() == measurementJacobian.cols() && measurement.size() == measurementJacobian.rows() == state_measurement.size() == measurement.size());
 
 		//Variables as named pg 59 Thrun, Probabalistic Robotics
@@ -527,7 +526,7 @@ namespace spooky{
 		posterior.variance = (Eigen::MatrixXf::Identity(n,n) - K * H) * SigmaBar;
         Eigen::VectorXf error = (measurement.expectation - state_measurement);
         Eigen::VectorXf delta = K * error;
-		posterior.expectation = prior.expectation + K * (measurement.expectation - state_measurement);
+		posterior.expectation = prior.expectation + delta;
 		return posterior;
 	};
 

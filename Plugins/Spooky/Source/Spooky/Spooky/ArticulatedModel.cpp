@@ -306,6 +306,7 @@ namespace spooky {
 	void Node::fuse(const Calibrator& calib, const SystemDescriptor& referenceSystem, const std::map<NodeDescriptor,Node::Ptr>& nodes){
 		
 		//If this node has a parent, recursively fuse until we know its transform
+		//TODO: cache when we are all out of measurements
 		if (parent != NULL) {
 			parent->fuse(calib, referenceSystem, nodes);
 		}
@@ -328,6 +329,8 @@ namespace spooky {
 			NodeDescriptor rootName = m->getSensor()->getRootNode();
 			//If no root node then go to static root
 			Node::Ptr rootNode = nodes.count(rootName) > 0 ? nodes.at(rootName) : nodes.at(SPOOKY_WORLD_ROOT_DESC);
+			//TODO: Make sure the root node is fused and avoid loops
+			//rootNode->fuse(calib,referenceSystem,nodes);
 
 			switch(m->type){
 				case(Measurement::Type::POSITION):
@@ -393,7 +396,7 @@ namespace spooky {
 			return cachedPose;
 		}
 		//If we have a parent node
-		bool parentChanged =  parent->getCachedPoseHash() != lastParentHash;
+		bool parentChanged = parentHashesChanged();
 		//Check if cached
 		//If we need to recache, concatenate articulations
 		if(recacheRequired || parentChanged){
@@ -417,6 +420,10 @@ namespace spooky {
 		return cachedPoseHash;
 	}
 
+	bool Node::parentHashesChanged() {
+		if (parent == NULL) return false;
+		return parent->getCachedPoseHash() != lastParentHash || parent->parentHashesChanged();
+	}
 
 
 	

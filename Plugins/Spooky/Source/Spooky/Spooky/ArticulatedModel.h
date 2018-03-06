@@ -235,6 +235,8 @@ namespace spooky {
 		size_t lastParentHash = 0;
 		Transform3D getCachedPose();
 		size_t getCachedPoseHash();
+		//Checks the chain of parents for changes to transform
+		bool parentHashesChanged();
 	};
 
 	class ArticulatedModel{
