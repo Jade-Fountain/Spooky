@@ -205,7 +205,8 @@ namespace spooky {
 			const State::Parameters& constraints, 
 			const std::function<State::Parameters(const std::vector<Node::Ptr>&)> getPredictedState,
 			const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
-			const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian
+			const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian,
+			bool relaxConstraints
 	    );
 	       
 		//Basic math for performing EKF with prior, constraints and measurement

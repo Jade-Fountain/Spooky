@@ -197,7 +197,7 @@ namespace spooky{
         //------------------------------------------------------------------
 
 
-        computeEKFUpdate(m->getTimestamp(),fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
+        computeEKFUpdate(m->getTimestamp(),fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);
     }
 
     void Node::fuseRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
@@ -258,7 +258,7 @@ namespace spooky{
 		
                 
         //Perform computation
-        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);
     }
 
     void Node::fuseRigidMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
@@ -330,7 +330,7 @@ namespace spooky{
         //------------------------------------------------------------------
 
 
-        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);
         //DEBUG
   //       std::stringstream ss;
 		// ss << std::endl << "wpstate = " << wpstate.transpose() << std::endl;
@@ -392,7 +392,7 @@ namespace spooky{
         measurement.variance = m->getScaleVar() / m->confidence;
         
         //Perform computation
-        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac);
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);
 
     }
 
@@ -403,7 +403,8 @@ namespace spooky{
        const State::Parameters& constraints, 
        const std::function<State::Parameters(const std::vector<Node::Ptr>&)> getPredictedState,
        const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
-       const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian
+       const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian,
+       bool relaxConstraints = false
     ){
 		//std::stringstream ss;
 		//ss << "new Frame" << std::endl;
@@ -450,7 +451,8 @@ namespace spooky{
 			//Constraint Error
 			float c_error = (joint_stiffness *(chainState.expectation - constraints.expectation).transpose() * constraints.variance.inverse() * (chainState.expectation - constraints.expectation))(0, 0);
 			//Energy:
-			float error = p_error + c_error + m_error;
+            //TODO: why does this relaxation work?
+			float error = relaxConstraints ? m_error : p_error + c_error + m_error;
 
 			//ss << "error_vec = " << error_vec.transpose() << std::endl;
 			//ss << "error = " << error << std::endl;

@@ -106,6 +106,9 @@ struct FSpookySkeletonBoneOutputParams{
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky")
 	bool filterUnchanged = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky")
+	bool relaxConstraintsDuringFusion = false;
 };
 
 //Fusion parameters describe how the skeleton behaves when targeted by spooky

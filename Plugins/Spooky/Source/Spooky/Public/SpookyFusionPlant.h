@@ -121,19 +121,19 @@ public:
 //===========================
 	//Add vec3 measurement
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddPositionMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, bool globalSpace = true, float confidence = 1);
+	void AddPositionMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, bool globalSpace = true, float confidence = 1, bool relaxConstraints = false);
 	
 	//Add rotation quaternion method
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddRotationMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FRotator measurement, FVector4 covariance, bool globalSpace = true, float confidence = 1);
+	void AddRotationMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FRotator measurement, FVector4 covariance, bool globalSpace = true, float confidence = 1, bool relaxConstraints = false);
 
 	//Add transform measurement
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddPoseMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FTransform measurement, FVector position_var, FVector4 quaternion_var, bool globalSpace = true, float confidence = 1);
+	void AddPoseMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FTransform measurement, FVector position_var, FVector4 quaternion_var, bool globalSpace = true, float confidence = 1, bool relaxConstraints = false);
 	
 	//Add scale measurement in local space
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, float confidence = 1);
+	void AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, float confidence = 1, bool relaxConstraints = false);
 
 	//Adds measurements for whole skeleton
 	UFUNCTION(BlueprintCallable, Category = "Spooky")

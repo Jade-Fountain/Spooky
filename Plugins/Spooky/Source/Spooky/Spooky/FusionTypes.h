@@ -327,6 +327,9 @@ namespace spooky {
 		//Is measurement in global or parent relative space
 		bool globalSpace = true;
 
+		//Should the skeletal constraints and prior be relaxed during multiple fusion steps?
+		bool relaxConstraints = false;
+
 		//=========================
 		//			Methods
 		//=========================
