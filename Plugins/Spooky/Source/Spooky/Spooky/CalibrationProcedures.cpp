@@ -226,7 +226,12 @@ namespace spooky {
 		std::vector<std::vector<Eigen::Matrix4f>> pos1;
 		std::vector<std::vector<Eigen::Matrix4f>> pos2;
 
-		Measurement::chunkMeasurements<Eigen::Matrix4f,&Measurement::getTransformMatrix>(m1,m2,&pos1,&pos2);
+		if (includePosition) {
+			Measurement::chunkMeasurements<Eigen::Matrix4f, &Measurement::getTransformMatrix>(m1, m2, &pos1, &pos2);
+		}
+		else {
+			Measurement::chunkMeasurements<Eigen::Matrix4f, &Measurement::getRotationTransformMatrix>(m1, m2, &pos1, &pos2);
+		}
 
 		//Initialise new result metadata
 		CalibrationResult result;

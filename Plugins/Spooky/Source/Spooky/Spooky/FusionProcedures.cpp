@@ -450,7 +450,7 @@ namespace spooky{
 			//Constraint Error
 			float c_error = (joint_stiffness *(chainState.expectation - constraints.expectation).transpose() * constraints.variance.inverse() * (chainState.expectation - constraints.expectation))(0, 0);
 			//Energy:
-			float error = m_error;
+			float error = p_error + c_error + m_error;
 
 			//ss << "error_vec = " << error_vec.transpose() << std::endl;
 			//ss << "error = " << error << std::endl;

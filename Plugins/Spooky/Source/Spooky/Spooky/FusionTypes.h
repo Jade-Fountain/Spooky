@@ -365,6 +365,11 @@ namespace spooky {
 
 		Transform3D getTransform();
 		Eigen::Matrix4f getTransformMatrix() { return getTransform().matrix(); }
+		Eigen::Matrix4f getRotationTransformMatrix() { 
+			auto M = getTransform().matrix(); 
+			M.col(3).head(3) = Eigen::Vector3f(0,0,0);
+			return M;
+		}
 
 
 		//=========================
