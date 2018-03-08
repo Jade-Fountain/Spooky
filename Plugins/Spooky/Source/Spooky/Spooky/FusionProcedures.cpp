@@ -648,7 +648,7 @@ namespace spooky{
 			Transform3D parentPoses = (node->parent != NULL && globalSpace) ? globalToRootNode * node->parent->getGlobalPose() : Transform3D::Identity();
 		
 			//Lambda to be differentiated
-            auto mapToGlobalPose = [&childPoses, &parentPoses, &node, &transformRepresentation](const Eigen::VectorXf& theta) {
+            auto mapToGlobalPose = [&childPoses, &parentPoses, &node, &transformRepresentation,&deltaT](const Eigen::VectorXf& theta) {
                 //return utility::toAxisAnglePosScale(parentPoses * node->getLocalPoseAt(theta) * childPoses);
                 return  transformRepresentation(parentPoses * node->getLocalPoseAt(theta) * childPoses);
             };
@@ -662,7 +662,13 @@ namespace spooky{
 			int dof = node->getDimension();
 
 			//Watch out for block assignments - they cause horrible hard to trace memory errors if not sized properly
-			J.block(0, block, m_dim, dof) = utility::numericalVectorDerivative<float>(differential ? mapToDifferentialGlobalPose : mapToGlobalPose, node->getState().expectation, h);
+			std::function<Eigen::VectorXf(const Eigen::VectorXf&)> funcToDifferentiate;
+			if (differential) {
+				funcToDifferentiate = mapToDifferentialGlobalPose;
+			} else {
+				funcToDifferentiate = mapToGlobalPose;
+			}
+			J.block(0, block, m_dim, dof) = utility::numericalVectorDerivative<float>(funcToDifferentiate, node->getState().expectation, h);
 
 			block += dof;
 
