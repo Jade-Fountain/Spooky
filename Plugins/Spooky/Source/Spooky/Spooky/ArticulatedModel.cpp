@@ -59,13 +59,13 @@ namespace spooky {
 	}
 	
 	Transform3D Node::getLocalPosePredicted(const float& deltaT){
-		return getLocalPosePredictedAt(getState(),deltaT);
+		return getLocalPosePredictedAt(getState().expectation,deltaT);
 	}
 
 	Transform3D Node::getLocalPosePredictedAt(const Eigen::VectorXf& theta, const float& deltaT){
 		Transform3D pose = Transform3D::Identity();
 		int dim = getDimension();
-		Eigen::MatrixXf velocityMatrix = deltaT * getVelocityMatrix();
+		Eigen::MatrixXf velocityMatrix = deltaT * getVelocityMatrix().variance;
 		Eigen::MatrixXf updateMatrix = velocityMatrix + Eigen::MatrixXf::Identity(dim, dim);
 		return getLocalPoseAt(updateMatrix * theta);
 	}
