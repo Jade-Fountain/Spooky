@@ -261,6 +261,68 @@ namespace spooky{
         computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);
     }
 
+    void Node::fuseDeltaRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
+
+        //Transform measurement to fusion space
+        //TODO: optimise: dont transform when possible
+        Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
+        float deltaT = m->getTimestamp();//TODO: - lastTimeStamp;
+
+        //Fuse by modifying some parents if necessary
+        std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode,m);
+
+        //------------------------------------------------------------------
+        //Models for Prediction, Measurement and Measurement Jacobian:
+        //------------------------------------------------------------------
+        auto getPredState = [&m](const std::vector<Node::Ptr>& fusion_chain){
+            return getChainPredictedState(fusion_chain, m->getTimestamp());
+        };
+
+        std::function<Eigen::VectorXf(const Transform3D&)> transformRepresentation = [](const Transform3D& T) {
+            Eigen::Matrix3f R = T.rotation();
+            Eigen::Map<Eigen::VectorXf> vec(R.data(), R.size());
+            return vec;
+        };
+
+        auto getMeasJac = [&rootNode, &m, &transformRepresentation, &deltaT](const std::vector<Node::Ptr>& fusion_chain) {
+            //JACOBIAN:state -> measurement
+            //Get Jacobian for the chain, mapping state to (w,v) global pose
+            Eigen::MatrixXf measurementJacobian = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation, true, deltaT);
+            return measurementJacobian;
+        };
+
+        auto getMeas = [&rootNode, &m, &transformRepresentation, &deltaT](const std::vector<Node::Ptr>& fusion_chain){
+
+            Transform3D globalToRootNode = rootNode->getGlobalPose().inverse();
+            
+            Eigen::VectorXf deltaRot;
+            if (m->globalSpace) {
+                deltaRot = transformRepresentation(globalToRootNode * fusion_chain[0]->getGlobalPosePredicted(deltaT)) - transformRepresentation(globalToRootNode * fusion_chain[0]->getGlobalPose());
+            }
+            else {
+                deltaRot = transformRepresentation(fusion_chain[0]->getLocalPosePredicted(deltaT)) - transformRepresentation(fusion_chain[0]->getLocalPose());
+            }
+            return deltaRot;
+
+        };
+
+        //JOINT CONSTRAINTS
+        //Read quadratic constraints from joints in chain
+        State::Parameters constraints = getChainConstraints(fusion_chain);
+
+        Transform3D Tmeas = Transform3D::Identity();
+        Tmeas.rotate(m->getRotation());
+        Eigen::VectorXf vecTmeas = transformRepresentation(Tmeas);
+        State::Parameters measurement(vecTmeas.size());
+        measurement.expectation = vecTmeas;//TODO: - lastVecTMeas;
+        //TODO: fix this hack: compute quaternion to vecMat Jacobian
+        measurement.variance = m->getRotationVar()(0,0) * Eigen::MatrixXf::Identity(vecTmeas.size(), vecTmeas.size()) / m->confidence;
+        
+                
+        //Perform computation
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+    }
+
     void Node::fuseRigidMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
         //------------------------------------------------------------------
         //Transform measurement to fusion space
@@ -565,7 +627,9 @@ namespace spooky{
 	Eigen::MatrixXf Node::getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain, 
 																	   const bool& globalSpace, 
 																	   const Transform3D& globalToRootNode,
-																	   const std::function<Eigen::VectorXf(const Transform3D&)>& transformRepresentation) {
+																	   const std::function<Eigen::VectorXf(const Transform3D&)>& transformRepresentation,
+                                                                       const bool& differential,
+                                                                       const float& deltaT) {
 		//Precompute Jacobian size
 		int inputDimension = 0;
 		for (auto& node : fusion_chain) {
@@ -584,16 +648,21 @@ namespace spooky{
 			Transform3D parentPoses = (node->parent != NULL && globalSpace) ? globalToRootNode * node->parent->getGlobalPose() : Transform3D::Identity();
 		
 			//Lambda to be differentiated
-			auto mapToGlobalPose = [&childPoses, &parentPoses, &node, &transformRepresentation](const Eigen::VectorXf& theta) {
-				//return utility::toAxisAnglePosScale(parentPoses * node->getLocalPoseAt(theta) * childPoses);
-				return transformRepresentation(parentPoses * node->getLocalPoseAt(theta) * childPoses);
-			};
+            auto mapToGlobalPose = [&childPoses, &parentPoses, &node, &transformRepresentation](const Eigen::VectorXf& theta) {
+                //return utility::toAxisAnglePosScale(parentPoses * node->getLocalPoseAt(theta) * childPoses);
+                return  transformRepresentation(parentPoses * node->getLocalPoseAt(theta) * childPoses);
+            };
+            //Lambda to be differentiated
+            auto mapToDifferentialGlobalPose = [&childPoses, &parentPoses, &node, &transformRepresentation, &deltaT](const Eigen::VectorXf& theta) {
+                //return utility::toAxisAnglePosScale(parentPoses * node->getLocalPoseAt(theta) * childPoses);
+                return transformRepresentation(parentPoses * node->getLocalPosePredictedAt(theta,deltaT) * childPoses) - transformRepresentation(parentPoses * node->getLocalPoseAt(theta) * childPoses);
+            };
 
 			//Loop through all dof of this node and get the jacobian (w,p) entries for each dof
 			int dof = node->getDimension();
 
 			//Watch out for block assignments - they cause horrible hard to trace memory errors if not sized properly
-			J.block(0, block, m_dim, dof) = utility::numericalVectorDerivative<float>(mapToGlobalPose, node->getState().expectation, h);
+			J.block(0, block, m_dim, dof) = utility::numericalVectorDerivative<float>(differential ? mapToDifferentialGlobalPose : mapToGlobalPose, node->getState().expectation, h);
 
 			block += dof;
 

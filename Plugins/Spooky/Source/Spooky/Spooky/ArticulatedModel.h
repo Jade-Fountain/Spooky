@@ -127,6 +127,12 @@ namespace spooky {
 		Transform3D getLocalPose();
 		//Allows for speculative evaluation of pose based on expectation vector
 		Transform3D getLocalPoseAt(const Eigen::VectorXf& theta);
+		//Get the local pose deltaT seconds into the future based on velocity
+		Transform3D getLocalPosePredicted(const float& deltaT);
+		//Get the local pose deltaT seconds into the future based on velocity, at speculative state theta
+		Transform3D getLocalPosePredictedAt(const Eigen::VectorXf& theta, const float& deltaT);
+
+
 		//Returns variance associated with pose
 		Eigen::Matrix<float,6,6> getLocalPoseVariance();
 
@@ -169,7 +175,12 @@ namespace spooky {
     	//Get prediction
     	static State::Parameters getChainPredictedState(const std::vector<Node::Ptr>& fusion_chain, const float& timestamp);
 		//Get the jocobian of an entire pose chain mapping state |-> (w,p,s) axis-angle, position and scale, each with 3D
-		static Eigen::MatrixXf getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain, const bool& globalSpace, const Transform3D& globalToRootNode, const std::function<Eigen::VectorXf(const Transform3D&)>& transformRepresentation);
+		static Eigen::MatrixXf getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain,
+													const bool& globalSpace,
+													const Transform3D& globalToRootNode,
+													const std::function<Eigen::VectorXf(const Transform3D&)>& transformRepresentation,
+													const bool& differential = false,
+                                                    const float& deltaT = 0);
 		
 		//---------------------------------------
 
@@ -221,6 +232,8 @@ namespace spooky {
 
 	private:
 		Transform3D getGlobalPose();
+		//Gets the global pose deltaT seconds into the future
+		Transform3D getGlobalPosePredicted(const float& deltaT);
 
 		//Merges measurement m into state at slot i
 		void insertMeasurement(const int& i, const Measurement::Ptr& m, const Transform3D& parent_pose, State* state);
