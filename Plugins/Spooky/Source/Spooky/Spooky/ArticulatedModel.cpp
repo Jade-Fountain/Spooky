@@ -349,11 +349,11 @@ namespace spooky {
 				fusePositionMeasurement(m, toFusionSpace, rootNode);
 				break;
 			case(Measurement::Type::ROTATION):
-					if (m->sensorDrifts) {
-						fuseRotationMeasurement(m, toFusionSpace, rootNode);
+					if (m->sensorDrifts && measurementBuffer.count(m->getSensor()) > 0) {
+						fuseDeltaRotationMeasurement(m, toFusionSpace, rootNode);
 					}
 					else {
-						fuseDeltaRotationMeasurement(m, toFusionSpace, rootNode);
+						fuseRotationMeasurement(m, toFusionSpace, rootNode);
 					}
 					break;
 				case(Measurement::Type::RIGID_BODY):
