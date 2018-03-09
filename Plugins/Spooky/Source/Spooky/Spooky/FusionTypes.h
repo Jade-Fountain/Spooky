@@ -324,11 +324,18 @@ namespace spooky {
 		//Type of measurement
 		Type type;
 
+		//--------------------
+		//Postprocessing flags
+		//--------------------
 		//Is measurement in global or parent relative space
 		bool globalSpace = true;
 
 		//Should the skeletal constraints and prior be relaxed during multiple fusion steps?
 		bool relaxConstraints = false;
+
+		//Should the measurements 
+		bool sensorDrifts = false;
+		//--------------------
 
 		//=========================
 		//			Methods

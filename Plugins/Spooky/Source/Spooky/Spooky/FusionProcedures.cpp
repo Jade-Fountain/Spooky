@@ -262,11 +262,10 @@ namespace spooky{
     }
 
     void Node::fuseDeltaRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
-
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
         Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
-        float deltaT = m->getTimestamp();//TODO: - lastTimeStamp;
+		float deltaT = m->getTimestamp() - measurementBuffer.count(m->getSensor()) == 0 ? 0 : measurementBuffer.count(m->getSensor());
 
         //Fuse by modifying some parents if necessary
         std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode,m);
@@ -314,10 +313,15 @@ namespace spooky{
         Tmeas.rotate(m->getRotation());
         Eigen::VectorXf vecTmeas = transformRepresentation(Tmeas);
         State::Parameters measurement(vecTmeas.size());
-        measurement.expectation = vecTmeas;//TODO: - lastVecTMeas;
-        //TODO: fix this hack: compute quaternion to vecMat Jacobian
+		//If we dont have a last data:
+		if (measurementBuffer.count(m->getSensor()) == 0) {
+			measurementBuffer[m->getSensor()] = TimestampedData(vecTmeas, m->getTimestamp());
+		}
+		//m = p2 - p1
+        measurement.expectation = vecTmeas - measurementBuffer[m->getSensor()].data;
+		measurementBuffer[m->getSensor()] = TimestampedData(vecTmeas, m->getTimestamp());
+		//TODO: fix this hack: compute quaternion to vecMat Jacobian
         measurement.variance = m->getRotationVar()(0,0) * Eigen::MatrixXf::Identity(vecTmeas.size(), vecTmeas.size()) / m->confidence;
-        
                 
         //Perform computation
         computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);

@@ -344,12 +344,17 @@ namespace spooky {
 			//TODO: Make sure the root node is fused and avoid loops
 			//rootNode->fuse(calib,referenceSystem,nodes);
 
-			switch(m->type){
-				case(Measurement::Type::POSITION):
-					fusePositionMeasurement(m,toFusionSpace,rootNode);
-					break;
-				case(Measurement::Type::ROTATION):
-					fuseRotationMeasurement(m,toFusionSpace,rootNode);
+			switch (m->type) {
+			case(Measurement::Type::POSITION):
+				fusePositionMeasurement(m, toFusionSpace, rootNode);
+				break;
+			case(Measurement::Type::ROTATION):
+					if (m->sensorDrifts) {
+						fuseRotationMeasurement(m, toFusionSpace, rootNode);
+					}
+					else {
+						fuseDeltaRotationMeasurement(m, toFusionSpace, rootNode);
+					}
 					break;
 				case(Measurement::Type::RIGID_BODY):
 					fuseRigidMeasurement(m,toFusionSpace,rootNode);

@@ -190,41 +190,39 @@ void USpookyFusionPlant::SetSystemLatency(FString system_name, float latency){
 
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddPositionMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, bool globalSpace, float confidence, bool relaxConstraintsDuringFusion)
+void USpookyFusionPlant::AddPositionMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, FSpookyMeasurementFlags flags, float confidence)
 {
 	Measurement::Ptr m = CreatePositionMeasurement(systemName, sensorID, timestamp_sec, measurement, covariance, confidence);
-	m->globalSpace = globalSpace;
-	m->relaxConstraints = relaxConstraintsDuringFusion;
+	setFlags(m,flags);
 	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddRotationMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FRotator measurement, FVector4 covariance, bool globalSpace, float confidence, bool relaxConstraintsDuringFusion)
+void USpookyFusionPlant::AddRotationMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FRotator measurement, FVector4 covariance, FSpookyMeasurementFlags flags, float confidence)
 {
 	Measurement::Ptr m = CreateRotationMeasurement(systemName,sensorID,timestamp_sec, measurement.Quaternion(),covariance,confidence);
-	m->globalSpace = globalSpace;
-	m->relaxConstraints = relaxConstraintsDuringFusion;
+	setFlags(m,flags);	
 	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddPoseMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FTransform measurement, FVector position_var, FVector4 quaternion_var, bool globalSpace, float confidence, bool relaxConstraintsDuringFusion)
+void USpookyFusionPlant::AddPoseMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FTransform measurement, FVector position_var, FVector4 quaternion_var, FSpookyMeasurementFlags flags, float confidence)
 {
 	Measurement::Ptr m = CreatePoseMeasurement(systemName, sensorID, timestamp_sec, measurement.GetTranslation(), measurement.GetRotation(), position_var, quaternion_var, confidence);
-	m->globalSpace = globalSpace;
-	m->relaxConstraints = relaxConstraintsDuringFusion;
+	setFlags(m,flags);	
 	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, float confidence, bool relaxConstraintsDuringFusion)
+void USpookyFusionPlant::AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, FSpookyMeasurementFlags flags, float confidence)
 {
 	Measurement::Ptr m = CreateScaleMeasurement(systemName, sensorID, timestamp_sec, measurement, covariance, confidence);
+	setFlags(m,flags);	
 	//Scales always local to the node
 	m->globalSpace = false;
-	m->relaxConstraints = relaxConstraintsDuringFusion;
 	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
+
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
@@ -488,6 +486,12 @@ size_t USpookyFusionPlant::hashFTransform(const FTransform& T){
 		}
 	}
 	return result;
+}
+
+void USpookyFusionPlant::setFlags(spooky::Measurement::Ptr m, const FSpookyMeasurementFlags& flags){
+	m->globalSpace = flags.globalSpace;
+	m->relaxConstraints = flags.relaxConstraints;
+	m->sensorDrifts = flags.sensorDrifts;
 }
 //===========================
 //DEBUG

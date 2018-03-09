@@ -99,6 +99,17 @@ namespace spooky {
 		//If the articulations are not twists, then the home pose is the identity
 		Transform3D homePose;
 
+		struct TimestampedData {
+			Eigen::VectorXf data;
+			float t = 0;
+			TimestampedData() {}
+			TimestampedData(Eigen::VectorXf d, float t_) {
+				data = d;
+				t = t_;
+			}
+		};
+		std::map<Sensor::Ptr, TimestampedData> measurementBuffer;
+
 	
 	public:
 		//////////////////////////////////////////////////////////////////
