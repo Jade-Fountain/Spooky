@@ -243,13 +243,13 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 
 			//Create measurement
 			Measurement::Ptr m;
-			if(spookyBoneInfo.useGlobalData){
+			if(spookyBoneInfo.flags.globalSpace){
 				T = componentSpaceTransforms[i];
 			}
 			//Retarget to new skeleton
 			FRotator retargetRotationOffset = skeleton->getOutputRetargetRotator(bone.Name);
 			T.SetRotation(T.GetRotation() * retargetRotationOffset.Quaternion());
-			if (spookyBoneInfo.filterUnchanged) {
+			if (spookyBoneInfo.flags.filterUnchanged) {
 				if(spooky::utility::safeAccess(lastHash,bone_name) == hashFTransform(skeleton->BoneSpaceTransforms[i])){
 					continue;
 				} else {
@@ -275,8 +275,7 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 					m = CreateScaleMeasurement(skeleton->system_name, i, spookyBoneInfo.timestamp_sec, T.GetScale3D(),  spookyBoneInfo.scale_var, spookyBoneInfo.confidence);
 					break;
 			}
-			m->globalSpace = spookyBoneInfo.useGlobalData;
-			m->relaxConstraints = spookyBoneInfo.relaxConstraintsDuringFusion;
+			setFlags(m, spookyBoneInfo.flags);
 			spookyCore.addMeasurement(m, targetNode);
 		}
 	}

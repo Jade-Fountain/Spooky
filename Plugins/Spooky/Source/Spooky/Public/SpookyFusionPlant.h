@@ -31,14 +31,7 @@
 
 //Must be last include
 #include "SpookyFusionPlant.generated.h"
-//Unreal engine specific struct containing flags for different types of measurements, typically affecting the fusion algorithms
-USTRUCT()
-struct FSpookyMeasurementFlags {
-	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky") bool globalSpace = true;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky") bool relaxConstraints = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky") bool sensorDrifts = false;
-};
+
 //Unreal engine specific struct containing the results of a calibration between two 3D sensor systems
 USTRUCT()
 struct FCalibrationResult {

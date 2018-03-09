@@ -48,6 +48,16 @@ enum class ESpookyReturnStatus : uint8
 	Failure
 };
 
+//Unreal engine specific struct containing flags for different types of measurements, typically affecting the fusion algorithms
+USTRUCT(BlueprintType)
+struct FSpookyMeasurementFlags {
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky") bool globalSpace = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky") bool relaxConstraints = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky") bool sensorDrifts = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky") bool filterUnchanged = false;
+};
+
 USTRUCT(BlueprintType)
 struct FSpookySkeletonBoneOutputParams{
 	GENERATED_BODY()
@@ -102,13 +112,7 @@ struct FSpookySkeletonBoneOutputParams{
 	
 	//Whether to use a local or global route to fusion
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky")
-	bool useGlobalData = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky")
-	bool filterUnchanged = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky")
-	bool relaxConstraintsDuringFusion = false;
+	FSpookyMeasurementFlags flags;
 };
 
 //Fusion parameters describe how the skeleton behaves when targeted by spooky
