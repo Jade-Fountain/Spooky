@@ -257,7 +257,8 @@ namespace spooky{
 		measurement.variance = m->getRotationVar()(0,0)* Eigen::MatrixXf::Identity(vecTmeas.size(), vecTmeas.size()) / m->confidence;
 		
 		if (measurementBuffer.count(m->getSensor()) == 0) {
-			measurementBuffer[m->getSensor()] = TimestampedData(vecTmeas, m->getTimestamp());
+			//TODO: generalize this
+			measurementBuffer[m->getSensor()] = TimestampedData(utility::toAxisAngle(Tmeas.rotation()), m->getTimestamp());
 		}
                 
         //Perform computation
@@ -281,9 +282,9 @@ namespace spooky{
         };
 
         std::function<Eigen::VectorXf(const Transform3D&)> transformRepresentation = [](const Transform3D& T) {
-            Eigen::Matrix3f R = T.rotation();
-            Eigen::Map<Eigen::VectorXf> vec(R.data(), R.size());
-            return vec;
+            /*Eigen::Matrix3f R = T.rotation();
+            Eigen::Map<Eigen::VectorXf> vec(R.data(), R.size());*/
+            return utility::toAxisAngle(T.rotation());
         };
 
         auto getMeasJac = [&rootNode, &m, &transformRepresentation, &deltaT](const std::vector<Node::Ptr>& fusion_chain) {
@@ -296,15 +297,12 @@ namespace spooky{
         auto getMeas = [&rootNode, &m, &transformRepresentation, &deltaT](const std::vector<Node::Ptr>& fusion_chain){
 
             Transform3D globalToRootNode = rootNode->getGlobalPose().inverse();
-            
-            Eigen::VectorXf deltaRot;
-            if (m->globalSpace) {
-                deltaRot = transformRepresentation(globalToRootNode * fusion_chain[0]->getGlobalPosePredicted(deltaT)) - transformRepresentation(globalToRootNode * fusion_chain[0]->getGlobalPose());
-            }
-            else {
-                deltaRot = transformRepresentation(fusion_chain[0]->getLocalPosePredicted(deltaT)) - transformRepresentation(fusion_chain[0]->getLocalPose());
-            }
-            return deltaRot;
+			int dim = fusion_chain[0]->getDimension();
+			Eigen::MatrixXf velocityMatrix = deltaT * fusion_chain[0]->getVelocityMatrix().variance;
+			Eigen::MatrixXf updateMatrix = velocityMatrix + Eigen::MatrixXf::Identity(dim, dim);
+            Eigen::VectorXf deltaRot = updateMatrix * fusion_chain[0]->getState().expectation - fusion_chain[0]->getState().expectation;
+            //TODO: generalize
+            return deltaRot.tail(3);
 
         };
 
