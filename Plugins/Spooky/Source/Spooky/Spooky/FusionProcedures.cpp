@@ -269,7 +269,7 @@ namespace spooky{
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
         Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
-		float deltaT = m->getTimestamp() - measurementBuffer.count(m->getSensor());
+		float deltaT = m->getTimestamp() - measurementBuffer[m->getSensor()].t;
 
         //Fuse by modifying some parents if necessary
         std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode,m);
@@ -289,8 +289,14 @@ namespace spooky{
 
         auto getMeasJac = [&rootNode, &m, &transformRepresentation, &deltaT](const std::vector<Node::Ptr>& fusion_chain) {
             //JACOBIAN:state -> measurement
-            //Get Jacobian for the chain, mapping state to (w,v) global pose
-            Eigen::MatrixXf measurementJacobian = getPoseChainJacobian(fusion_chain, m->globalSpace, rootNode->getGlobalPose().inverse(), transformRepresentation, true, deltaT);
+			if (!fusion_chain[0]->local_state.modelVelocity 
+				|| fusion_chain[0]->articulations[0].getType() != Articulation::Type::BONE) 
+				return Eigen::MatrixXf(Eigen::MatrixXf::Zero(3, fusion_chain[0]->getDimension()));
+
+			Eigen::MatrixXf velocityMatrix = deltaT * fusion_chain[0]->getVelocityMatrix().variance;
+			//Half of the velocity matrix is zeros
+			Eigen::MatrixXf measurementJacobian = velocityMatrix.topLeftCorner(3, 6);
+            
             return measurementJacobian;
         };
 
@@ -302,7 +308,7 @@ namespace spooky{
 			Eigen::MatrixXf updateMatrix = velocityMatrix + Eigen::MatrixXf::Identity(dim, dim);
             Eigen::VectorXf deltaRot = updateMatrix * fusion_chain[0]->getState().expectation - fusion_chain[0]->getState().expectation;
             //TODO: generalize
-            return deltaRot.tail(3);
+            return deltaRot.head(3);
 
         };
 
@@ -316,7 +322,7 @@ namespace spooky{
         State::Parameters measurement(vecTmeas.size());
 
 		//m = p2 - p1
-        measurement.expectation = vecTmeas - measurementBuffer[m->getSensor()].data;
+        measurement.expectation = utility::twistClosestRepresentation(vecTmeas, measurementBuffer[m->getSensor()].data) - measurementBuffer[m->getSensor()].data;
 		measurementBuffer[m->getSensor()] = TimestampedData(vecTmeas, m->getTimestamp());
 		//TODO: fix this hack: compute quaternion to vecMat Jacobian
         measurement.variance = m->getRotationVar()(0,0) * Eigen::MatrixXf::Identity(vecTmeas.size(), vecTmeas.size()) / m->confidence;
@@ -629,9 +635,7 @@ namespace spooky{
 	Eigen::MatrixXf Node::getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain, 
 																	   const bool& globalSpace, 
 																	   const Transform3D& globalToRootNode,
-																	   const std::function<Eigen::VectorXf(const Transform3D&)>& transformRepresentation,
-                                                                       const bool& differential,
-                                                                       const float& deltaT) {
+																	   const std::function<Eigen::VectorXf(const Transform3D&)>& transformRepresentation) {
 		//Precompute Jacobian size
 		int inputDimension = 0;
 		for (auto& node : fusion_chain) {
@@ -651,28 +655,17 @@ namespace spooky{
 			Transform3D parentPoses = (node->parent != NULL && globalSpace) ? globalToRootNode * node->parent->getGlobalPose() : Transform3D::Identity();
 		
 			//Lambda to be differentiated
-            auto mapToGlobalPose = [&childPoses, &parentPoses, &node, &transformRepresentation,&deltaT](const Eigen::VectorXf& theta) {
+            auto mapToGlobalPose = [&childPoses, &parentPoses, &node, &transformRepresentation](const Eigen::VectorXf& theta) {
                 //return utility::toAxisAnglePosScale(parentPoses * node->getLocalPoseAt(theta) * childPoses);
                 return  transformRepresentation(parentPoses * node->getLocalPoseAt(theta) * childPoses);
-            };
-            //Lambda to be differentiated
-            auto mapToDifferentialGlobalPose = [&childPoses, &parentPoses, &node, &transformRepresentation, &deltaT](const Eigen::VectorXf& theta) {
-                //return utility::toAxisAnglePosScale(parentPoses * node->getLocalPoseAt(theta) * childPoses);
-				Eigen::VectorXf f_t2 = transformRepresentation(parentPoses * node->getLocalPosePredictedAt(theta, deltaT) * childPoses);
-				Eigen::VectorXf f_t1 = transformRepresentation(parentPoses * node->getLocalPoseAt(theta) * childPoses);
-				return f_t2 - f_t1;
             };
 
 			//Loop through all dof of this node and get the jacobian (w,p) entries for each dof
 			int dof = node->getDimension();
 
 			//Watch out for block assignments - they cause horrible hard to trace memory errors if not sized properly
-			std::function<Eigen::VectorXf(const Eigen::VectorXf&)> funcToDifferentiate;
-			if (differential) {
-				J.block(0, block, m_dim, dof) = utility::numericalVectorDerivative<float>(mapToDifferentialGlobalPose, node->getState().expectation, h);
-			} else {
-				J.block(0, block, m_dim, dof) = utility::numericalVectorDerivative<float>(mapToGlobalPose, node->getState().expectation, h);
-			}
+
+			J.block(0, block, m_dim, dof) = utility::numericalVectorDerivative<float>(mapToGlobalPose, node->getState().expectation, h);
 
 			block += dof;
 

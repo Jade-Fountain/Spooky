@@ -189,9 +189,7 @@ namespace spooky {
 		static Eigen::MatrixXf getPoseChainJacobian(const std::vector<Node::Ptr>& fusion_chain,
 													const bool& globalSpace,
 													const Transform3D& globalToRootNode,
-													const std::function<Eigen::VectorXf(const Transform3D&)>& transformRepresentation,
-													const bool& differential = false,
-                                                    const float& deltaT = 0);
+													const std::function<Eigen::VectorXf(const Transform3D&)>& transformRepresentation);
 		
 		//---------------------------------------
 
