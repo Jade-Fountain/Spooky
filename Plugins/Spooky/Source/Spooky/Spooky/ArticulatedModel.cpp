@@ -433,7 +433,7 @@ namespace spooky {
 		if (parent == NULL) {
 			return getLocalPosePredicted(deltaT);
 		}
-		return parent->getGlobalPose() * getLocalPosePredicted(deltaT);
+		return parent->getGlobalPosePredicted(deltaT) * getLocalPosePredicted(deltaT);
 	}
 	
 	Transform3D Node::getCachedPose() {
