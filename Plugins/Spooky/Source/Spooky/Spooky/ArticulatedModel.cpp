@@ -58,6 +58,18 @@ namespace spooky {
 		return pose;
 	}
 	
+	Transform3D Node::getLocalPosePredicted(const float& deltaT){
+		return getLocalPosePredictedAt(getState().expectation,deltaT);
+	}
+
+	Transform3D Node::getLocalPosePredictedAt(const Eigen::VectorXf& theta, const float& deltaT){
+		Transform3D pose = Transform3D::Identity();
+		int dim = getDimension();
+		Eigen::MatrixXf velocityMatrix = deltaT * getVelocityMatrix().variance;
+		Eigen::MatrixXf updateMatrix = velocityMatrix + Eigen::MatrixXf::Identity(dim, dim);
+		return getLocalPoseAt(updateMatrix * theta);
+	}
+
 	Eigen::Matrix<float,6,6> Node::getLocalPoseVariance(){
 		Eigen::Matrix<float,6,6> var = Eigen::Matrix<float,6,6>::Zero();
 		for (int i = 0; i < articulations.size(); i++) {
@@ -332,12 +344,17 @@ namespace spooky {
 			//TODO: Make sure the root node is fused and avoid loops
 			//rootNode->fuse(calib,referenceSystem,nodes);
 
-			switch(m->type){
-				case(Measurement::Type::POSITION):
-					fusePositionMeasurement(m,toFusionSpace,rootNode);
-					break;
-				case(Measurement::Type::ROTATION):
-					fuseRotationMeasurement(m,toFusionSpace,rootNode);
+			switch (m->type) {
+			case(Measurement::Type::POSITION):
+				fusePositionMeasurement(m, toFusionSpace, rootNode);
+				break;
+			case(Measurement::Type::ROTATION):
+					if (m->sensorDrifts && measurementBuffer.count(m->getSensor()) > 0) {
+						fuseDeltaRotationMeasurement(m, toFusionSpace, rootNode);
+					}
+					else {
+						fuseRotationMeasurement(m, toFusionSpace, rootNode);
+					}
 					break;
 				case(Measurement::Type::RIGID_BODY):
 					fuseRigidMeasurement(m,toFusionSpace,rootNode);
@@ -412,6 +429,13 @@ namespace spooky {
 		return cachedPose;
 	}
 
+	Transform3D Node::getGlobalPosePredicted(const float& deltaT) {
+		if (parent == NULL) {
+			return getLocalPosePredicted(deltaT);
+		}
+		return parent->getGlobalPosePredicted(deltaT) * getLocalPosePredicted(deltaT);
+	}
+	
 	Transform3D Node::getCachedPose() {
 		return cachedPose;
 	}

@@ -256,6 +256,76 @@ namespace spooky{
 		//TODO: fix this hack: compute quaternion to vecMat Jacobian
 		measurement.variance = m->getRotationVar()(0,0)* Eigen::MatrixXf::Identity(vecTmeas.size(), vecTmeas.size()) / m->confidence;
 		
+		if (measurementBuffer.count(m->getSensor()) == 0) {
+			//TODO: generalize this
+			measurementBuffer[m->getSensor()] = TimestampedData(utility::toAxisAngle(Tmeas.rotation()), m->getTimestamp());
+		}
+                
+        //Perform computation
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+    }
+
+    void Node::fuseDeltaRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
+        //Transform measurement to fusion space
+        //TODO: optimise: dont transform when possible
+        Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
+		float deltaT = m->getTimestamp() - measurementBuffer[m->getSensor()].t;
+
+        //Fuse by modifying some parents if necessary
+        std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode,m);
+
+        //------------------------------------------------------------------
+        //Models for Prediction, Measurement and Measurement Jacobian:
+        //------------------------------------------------------------------
+        auto getPredState = [&m](const std::vector<Node::Ptr>& fusion_chain){
+            return getChainPredictedState(fusion_chain, m->getTimestamp());
+        };
+
+        std::function<Eigen::VectorXf(const Transform3D&)> transformRepresentation = [](const Transform3D& T) {
+            /*Eigen::Matrix3f R = T.rotation();
+            Eigen::Map<Eigen::VectorXf> vec(R.data(), R.size());*/
+            return utility::toAxisAngle(T.rotation());
+        };
+
+        auto getMeasJac = [&rootNode, &m, &transformRepresentation, &deltaT](const std::vector<Node::Ptr>& fusion_chain) {
+            //JACOBIAN:state -> measurement
+			if (!fusion_chain[0]->local_state.modelVelocity 
+				|| fusion_chain[0]->articulations[0].getType() != Articulation::Type::BONE) 
+				return Eigen::MatrixXf(Eigen::MatrixXf::Zero(3, fusion_chain[0]->getDimension()));
+
+			Eigen::MatrixXf velocityMatrix = deltaT * fusion_chain[0]->getVelocityMatrix().variance;
+			//Half of the velocity matrix is zeros
+			Eigen::MatrixXf measurementJacobian = velocityMatrix.topLeftCorner(3, 6);
+            
+            return measurementJacobian;
+        };
+
+        auto getMeas = [&rootNode, &m, &transformRepresentation, &deltaT](const std::vector<Node::Ptr>& fusion_chain){
+
+            Transform3D globalToRootNode = rootNode->getGlobalPose().inverse();
+			int dim = fusion_chain[0]->getDimension();
+			Eigen::MatrixXf velocityMatrix = deltaT * fusion_chain[0]->getVelocityMatrix().variance;
+			Eigen::MatrixXf updateMatrix = velocityMatrix + Eigen::MatrixXf::Identity(dim, dim);
+            Eigen::VectorXf deltaRot = updateMatrix * fusion_chain[0]->getState().expectation - fusion_chain[0]->getState().expectation;
+            //TODO: generalize
+            return deltaRot.head(3);
+
+        };
+
+        //JOINT CONSTRAINTS
+        //Read quadratic constraints from joints in chain
+        State::Parameters constraints = getChainConstraints(fusion_chain);
+
+        Transform3D Tmeas = Transform3D::Identity();
+        Tmeas.rotate(m->getRotation());
+        Eigen::VectorXf vecTmeas = transformRepresentation(Tmeas);
+        State::Parameters measurement(vecTmeas.size());
+
+		//m = p2 - p1
+        measurement.expectation = utility::twistClosestRepresentation(vecTmeas, measurementBuffer[m->getSensor()].data) - measurementBuffer[m->getSensor()].data;
+		measurementBuffer[m->getSensor()] = TimestampedData(vecTmeas, m->getTimestamp());
+		//TODO: fix this hack: compute quaternion to vecMat Jacobian
+        measurement.variance = m->getRotationVar()(0,0) * Eigen::MatrixXf::Identity(vecTmeas.size(), vecTmeas.size()) / m->confidence;
                 
         //Perform computation
         computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);
@@ -577,6 +647,7 @@ namespace spooky{
 		//3DOF for each rot, pos, scale
 		int m_dim = transformRepresentation(Transform3D::Identity()).size();
 		Eigen::MatrixXf J(m_dim, inputDimension);
+		J.setZero();
 		Transform3D childPoses = Transform3D::Identity();
 
 		int block = 0;
@@ -584,15 +655,16 @@ namespace spooky{
 			Transform3D parentPoses = (node->parent != NULL && globalSpace) ? globalToRootNode * node->parent->getGlobalPose() : Transform3D::Identity();
 		
 			//Lambda to be differentiated
-			auto mapToGlobalPose = [&childPoses, &parentPoses, &node, &transformRepresentation](const Eigen::VectorXf& theta) {
-				//return utility::toAxisAnglePosScale(parentPoses * node->getLocalPoseAt(theta) * childPoses);
-				return transformRepresentation(parentPoses * node->getLocalPoseAt(theta) * childPoses);
-			};
+            auto mapToGlobalPose = [&childPoses, &parentPoses, &node, &transformRepresentation](const Eigen::VectorXf& theta) {
+                //return utility::toAxisAnglePosScale(parentPoses * node->getLocalPoseAt(theta) * childPoses);
+                return  transformRepresentation(parentPoses * node->getLocalPoseAt(theta) * childPoses);
+            };
 
 			//Loop through all dof of this node and get the jacobian (w,p) entries for each dof
 			int dof = node->getDimension();
 
 			//Watch out for block assignments - they cause horrible hard to trace memory errors if not sized properly
+
 			J.block(0, block, m_dim, dof) = utility::numericalVectorDerivative<float>(mapToGlobalPose, node->getState().expectation, h);
 
 			block += dof;

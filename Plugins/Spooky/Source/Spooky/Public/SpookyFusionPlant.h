@@ -121,19 +121,19 @@ public:
 //===========================
 	//Add vec3 measurement
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddPositionMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, bool globalSpace = true, float confidence = 1, bool relaxConstraints = false);
+	void AddPositionMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance,  FSpookyMeasurementFlags flags, float confidence = 1);
 	
 	//Add rotation quaternion method
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddRotationMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FRotator measurement, FVector4 covariance, bool globalSpace = true, float confidence = 1, bool relaxConstraints = false);
+	void AddRotationMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FRotator measurement, FVector4 covariance,  FSpookyMeasurementFlags flags, float confidence = 1);
 
 	//Add transform measurement
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddPoseMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FTransform measurement, FVector position_var, FVector4 quaternion_var, bool globalSpace = true, float confidence = 1, bool relaxConstraints = false);
+	void AddPoseMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FTransform measurement, FVector position_var, FVector4 quaternion_var,  FSpookyMeasurementFlags flags, float confidence = 1);
 	
 	//Add scale measurement in local space
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, float confidence = 1, bool relaxConstraints = false);
+	void AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance,  FSpookyMeasurementFlags flags, float confidence = 1);
 
 	//Adds measurements for whole skeleton
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
@@ -212,6 +212,10 @@ public:
 
 	//Hashing for change checking
 	static size_t hashFTransform(const FTransform& T);
+
+	//Sets flags for measurement m
+	static void setFlags(spooky::Measurement::Ptr m, const FSpookyMeasurementFlags& flags);
+
 
 //===========================
 //DEBUG
