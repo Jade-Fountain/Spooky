@@ -10,11 +10,10 @@
  
  }
  
- bool UWriteToFile::FileIO__SaveStringTextToFile(FString SaveDirectory, FString fileName, FString SaveText, bool AllowOverWriting)
+ bool UWriteToFile::FileIO__AppendStringTextToFile(FString SaveDirectory, FString fileName, FString SaveText, bool AllowOverWriting)
  {
-     FString path;
-     path = FPaths::GameDir();
-     path += "/my_data";
+     FString path = FPaths::GameDir();
+     path += SaveDirectory;
  
      if (!FPlatformFileManager::Get().GetPlatformFile().DirectoryExists(*path))
      {
@@ -36,5 +35,5 @@
          }
      }
      
-     return FFileHelper::SaveStringToFile(SaveText, *path);
+     return FFileHelper::SaveStringToFile(SaveText, *path,FFileHelper::EEncodingOptions::AutoDetect,&IFileManager::Get(),EFileWrite::FILEWRITE_Append);
  }
