@@ -120,7 +120,14 @@ namespace spooky {
 		int pos = 0;
 		for(int i = 0; i < articulations.size(); i++){
 			int dim = local_state.articulation[i].expectation.size();
-			local_state.articulation[i] = new_state.getSubstate(pos,dim);
+			State::Parameters state = new_state.getSubstate(pos, dim);
+			//TODO: make this less gross - call articulation.constrain(...);
+			if (articulations[i].getType() == Articulation::Type::BONE || 
+				articulations[i].getType() == Articulation::Type::POSE) {
+				//If there is a rotation component, restrict state to less than pi magnitude
+				state.expectation.head(3) = utility::twistClosestRepresentation(state.expectation.head(3), Eigen::Vector3f::Zero());
+			}
+			local_state.articulation[i] = state;
 			pos += dim;
 		}
 		//Indicate that this node needs its local pose to be recomputed
