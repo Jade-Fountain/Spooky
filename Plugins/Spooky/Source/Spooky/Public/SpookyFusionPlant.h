@@ -57,7 +57,6 @@ class USpookyFusionPlant : public UActorComponent
 	//Input Skeletons
 	std::vector<USpookySkeletalMeshComponent*> skeletal_spirits;
 
-	std::map<spooky::NodeDescriptor, size_t> lastHash;
 
 public:	
 

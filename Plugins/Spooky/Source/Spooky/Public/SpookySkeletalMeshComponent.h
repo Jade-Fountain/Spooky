@@ -209,7 +209,9 @@ public:
 	FString root_node;
 	//The transform of the sensor system relative to the root node
 	FTransform root_node_offset;
-	
+	//Bone hashes
+	std::map<spooky::NodeDescriptor, size_t> lastHash;
+
 	//--------------------------------
 	//		INITIALISATION
 	//--------------------------------
