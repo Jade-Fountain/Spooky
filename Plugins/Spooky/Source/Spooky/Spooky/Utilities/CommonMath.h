@@ -623,6 +623,10 @@ namespace spooky{
 			}
 		}
 
+		static inline Eigen::Vector3f composeTwists(const Eigen::Vector3f& w1, const Eigen::Vector3f& w2) {
+			return toAxisAngle<float>(rodriguezFormula(w1) * rodriguezFormula(w2));
+		}
+
 		static inline Eigen::Vector4f quatClosestRepresentation(const Eigen::Vector4f& q, const Eigen::Vector4f& target) {
 			Eigen::Vector4f neg_q = -q;
 			if ((q - target).norm() < (neg_q - target).norm()) {

@@ -135,42 +135,47 @@ namespace spooky {
 		//Returns the final pose of this node in global space based on pose of all parents
 		Transform3D getFinalGlobalPose();
 		//Returns final local transform relative to parent transform
-		Transform3D getLocalPose();
+		Transform3D getLocalPose() const;
 		//Allows for speculative evaluation of pose based on expectation vector
-		Transform3D getLocalPoseAt(const Eigen::VectorXf& theta);
-		//Get the local pose deltaT seconds into the future based on velocity
-		Transform3D getLocalPosePredicted(const float& deltaT);
-		//Get the local pose deltaT seconds into the future based on velocity, at speculative state theta
-		Transform3D getLocalPosePredictedAt(const Eigen::VectorXf& theta, const float& deltaT);
+		Transform3D getLocalPoseAt(const Eigen::VectorXf& theta) const;
+		//TODO: reimplement:
+		////Get the local pose deltaT seconds into the future based on velocity
+		//Transform3D getLocalPosePredicted(const float& deltaT) const;
+		////Get the local pose deltaT seconds into the future based on velocity, at speculative state theta
+		//Transform3D getLocalPosePredictedAt(const Eigen::VectorXf& theta, const float& deltaT) const;
+		////Gets the global pose deltaT seconds into the future
+		//Transform3D getGlobalPosePredicted(const float& deltaT);
 
 
 		//Returns variance associated with pose
-		Eigen::Matrix<float,6,6> getLocalPoseVariance();
+		Eigen::Matrix<float,6,6> getLocalPoseVariance() const;
 
 		//Get rotational and translational degrees of freedom
-		int getPDoF(bool hasLeverChild);
-		int getRDoF();
-		int getSDoF();
+		int getPDoF(bool hasLeverChild) const;
+		int getRDoF() const;
+		int getSDoF() const;
 
 		//Get the total number of variables describing this node
-		int getDimension();
+		int getDimension() const;
 
 		//Split and merging of state parameters:
 		//---------------------------------------
 		//Set state parameters
 		void setState(const State::Parameters& new_state, const float& t);
 
-		State::Parameters getState();
+		State::Parameters getState() const;
 		//Get combined articulation constraints
-		State::Parameters getConstraints();
+		State::Parameters getConstraints() const;
 		//Get process noise for node
-		State::Parameters getProcessNoise();
+		State::Parameters getProcessNoise() const;
 		//Get time since the data was updated
 		//Note: returns undefined variance
-		State::Parameters getTimeSinceUpdated();
+		State::Parameters getTimeSinceUpdated() const;
+		//Get the predicted state at timestamp based on internal models
+		State::Parameters getPredictedState(const float& timestamp) const;
 		//Get which entries in state are velocities
 		//Note: returns undefined expectation
-		State::Parameters getVelocityMatrix();
+		State::Parameters getVelocityMatrix() const;
 
 		//Generic grouped parameter methods
 		static State::Parameters getChainParameters(std::function<Node::State::Parameters(Node&)> getParams, const std::vector<Node::Ptr>& node_chain);
@@ -182,6 +187,7 @@ namespace spooky {
 		static State::Parameters getChainProcessNoise(const std::vector<Node::Ptr>& node_chain);
 		static Eigen::VectorXf getChainTimeSinceUpdated(const std::vector<Node::Ptr>& node_chain);
 		static Eigen::MatrixXf getChainVelocityMatrix(const std::vector<Node::Ptr>& node_chain);
+		static State::Parameters getPredictionForArticulation(const Articulation& art, const State::Parameters& state, const float& t);
 
     	//Get prediction
     	static State::Parameters getChainPredictedState(const std::vector<Node::Ptr>& fusion_chain, const float& timestamp);
@@ -193,8 +199,6 @@ namespace spooky {
 		
 		//---------------------------------------
 
-		//Updates the state of this node (e.g. angle, quaternion, etc.)
-		void updateState(const State& new_state, const float& timestamp, const float& latency);
 		//Sets the model for the articulations associated with this node
 		void setModel(std::vector<Articulation> art, const bool& modelVelocity);
 
@@ -242,9 +246,7 @@ namespace spooky {
 
 	private:
 		Transform3D getGlobalPose();
-		//Gets the global pose deltaT seconds into the future
-		Transform3D getGlobalPosePredicted(const float& deltaT);
-
+	
 		//Merges measurement m into state at slot i
 		void insertMeasurement(const int& i, const Measurement::Ptr& m, const Transform3D& parent_pose, State* state);
 

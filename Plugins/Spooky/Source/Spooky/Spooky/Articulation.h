@@ -48,7 +48,7 @@ namespace spooky{
 
 		//Get the transform associated with this articulation
 		template <typename Scalar>
-		Eigen::Transform<Scalar, 3, Eigen::Affine> Articulation::getTransform(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& theta) {
+		Eigen::Transform<Scalar, 3, Eigen::Affine> Articulation::getTransform(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& theta) const{
 			//Theta can include velocity in the second half, so get transform references only from head
 			//TODO: make these cases into methods
 			Eigen::Transform<Scalar, 3, Eigen::Affine> T = Eigen::Transform<Scalar, 3, Eigen::Affine>::Identity();
@@ -113,9 +113,9 @@ namespace spooky{
 		static Articulation createScale();
 
 		//Get rotational and translational degrees of freedom
-		int getPDoF(bool hasLeverChild);
-		int getRDoF();
-		int getSDoF();
+		int getPDoF(bool hasLeverChild) const;
+		int getRDoF() const;
+		int getSDoF() const;
 
 		//Get pose variance
 		//Eigen::Matrix<float, 6, 6> getPoseVariance(const Eigen::VectorXf& expectation, const Eigen::MatrixXf& variance);
@@ -125,6 +125,9 @@ namespace spooky{
 
 		//Returns the initial state vector to operate this articulation
 		static Eigen::VectorXf getInitialState(const Articulation::Type & type);
+
+		//Get predicted state
+		Eigen::VectorXf getPredictedExpectation(const Eigen::VectorXf& state, const float& t) const;
 
 		//Accessors
 		const Type& getType() const{

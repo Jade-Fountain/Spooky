@@ -62,7 +62,7 @@ namespace spooky{
         return result;
     }
 
-    std::vector<Node::Ptr> Node::getRequiredChain(const Node::Ptr& destNode, const Measurement::Ptr& m){
+    std::vector<Node::Ptr> Node::getRequiredChain(const Node::Ptr& destNode, const Measurement::Ptr& m) {
         //TODO: support ignoring irrelevant nodes!!!
 		Node::Ptr srcNode = shared_from_this();
 
@@ -611,12 +611,7 @@ namespace spooky{
 		Eigen::MatrixXf time_matrix = Eigen::MatrixXf::Zero(chainState.expectation.size(), chainState.expectation.size());
 		time_matrix.diagonal() = (timestamp * Eigen::VectorXf::Ones(chainState.expectation.size()) - getChainTimeSinceUpdated(fusion_chain));
         Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance * time_matrix;
-        //Add process noise
-		//Use arrays for componentwise multiplication
-		int dim = chainState.expectation.size();
-        Eigen::MatrixXf velocityMatrix = time_matrix * getChainVelocityMatrix(fusion_chain);
-		Eigen::MatrixXf updateMatrix = velocityMatrix + Eigen::MatrixXf::Identity(dim, dim);
-        
+
         //DEBUG
   //      std::stringstream ss;
   //      ss << "chainState.expectation before = " << std::endl << chainState.expectation.transpose() << std::endl;
@@ -627,8 +622,12 @@ namespace spooky{
 		//SPOOKY_LOG(ss.str());
         //DEBUG END
 
-		chainState.variance = updateMatrix * chainState.variance * updateMatrix.transpose() + process_noise;
-		chainState.expectation = updateMatrix * chainState.expectation;
+		auto getPred = [&timestamp](const Node& node) {
+			return node.getPredictedState(timestamp);
+		};
+		chainState = getChainParameters(getPred, fusion_chain);
+
+		chainState.variance += process_noise;
         return chainState;
     }
 

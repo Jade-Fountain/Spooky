@@ -37,7 +37,7 @@ namespace spooky {
 		return getGlobalPose() * homePose;
 	}
 
-	Transform3D Node::getLocalPose(){
+	Transform3D Node::getLocalPose() const{
 		Transform3D pose = Transform3D::Identity();
 		for (int i = 0; i < articulations.size(); i++) {
 			pose = pose * articulations[i].getTransform(local_state.articulation[i].expectation);
@@ -45,7 +45,7 @@ namespace spooky {
 		return pose;
 	}
 
-	Transform3D Node::getLocalPoseAt(const Eigen::VectorXf & theta)
+	Transform3D Node::getLocalPoseAt(const Eigen::VectorXf & theta) const
 	{
 		Transform3D pose = Transform3D::Identity();
 		assert(theta.size() == getDimension());
@@ -57,20 +57,26 @@ namespace spooky {
 		}
 		return pose;
 	}
-	
-	Transform3D Node::getLocalPosePredicted(const float& deltaT){
-		return getLocalPosePredictedAt(getState().expectation,deltaT);
-	}
+	//TODO:reimplement
+	//
+	//Transform3D Node::getLocalPosePredicted(const float& deltaT){
+	//	return getLocalPosePredictedAt(getState().expectation,deltaT);
+	//}
 
-	Transform3D Node::getLocalPosePredictedAt(const Eigen::VectorXf& theta, const float& deltaT){
-		Transform3D pose = Transform3D::Identity();
-		int dim = getDimension();
-		Eigen::MatrixXf velocityMatrix = deltaT * getVelocityMatrix().variance;
-		Eigen::MatrixXf updateMatrix = velocityMatrix + Eigen::MatrixXf::Identity(dim, dim);
-		return getLocalPoseAt(updateMatrix * theta);
-	}
-
-	Eigen::Matrix<float,6,6> Node::getLocalPoseVariance(){
+	//Transform3D Node::getLocalPosePredictedAt(const Eigen::VectorXf& theta, const float& deltaT){
+	//	Transform3D pose = Transform3D::Identity();
+	//	int dim = getDimension();
+	//	getPredictedState(deltaT)
+	//	return getLocalPoseAt();
+	//}
+	//
+	//Transform3D Node::getGlobalPosePredicted(const float& deltaT) {
+	//if (parent == NULL) {
+	//return getLocalPosePredicted(deltaT);
+	//}
+	//return parent->getGlobalPosePredicted(deltaT) * getLocalPosePredicted(deltaT);
+	//}
+	Eigen::Matrix<float,6,6> Node::getLocalPoseVariance() const {
 		Eigen::Matrix<float,6,6> var = Eigen::Matrix<float,6,6>::Zero();
 		for (int i = 0; i < articulations.size(); i++) {
 			//Assume decoupling of variances between articulations - only true for linear cases (position only)
@@ -82,15 +88,15 @@ namespace spooky {
 	}
 
 	
-	int Node::getPDoF(bool hasLeverChild){
+	int Node::getPDoF(bool hasLeverChild) const {
 		int pdof = 0;
-		for (int i = 0; i < articulations.size(); i++) {
+		for (int i = 0; i < articulations.size(); i++)  {
 			pdof += articulations[i].getPDoF(hasLeverChild);
 		}
 		return pdof;
 	}
 	
-	int Node::getRDoF(){
+	int Node::getRDoF() const {
 		int rdof = 0;
 		for (int i = 0; i < articulations.size(); i++) {
 			rdof += articulations[i].getRDoF();
@@ -98,7 +104,7 @@ namespace spooky {
 		return rdof;
 	}
 
-	int Node::getSDoF(){
+	int Node::getSDoF() const {
 		int sdof = 0;
 		for (int i = 0; i < articulations.size(); i++) {
 			sdof += articulations[i].getSDoF();
@@ -106,7 +112,7 @@ namespace spooky {
 		return sdof;
 	}
 
-	int Node::getDimension() {
+	int Node::getDimension()  const {
 		int dim = 0;
 		for (int i = 0; i < articulations.size(); i++) {
 			dim += local_state.articulation[i].expectation.size();
@@ -135,7 +141,7 @@ namespace spooky {
 		local_state.last_update_time = t;
 	}
 
-	Node::State::Parameters Node::getState(){
+	Node::State::Parameters Node::getState() const {
 		//Construct new parameters set for combined articulations
 		State::Parameters p(getDimension());
 		int pos = 0;
@@ -147,7 +153,7 @@ namespace spooky {
 		return p;
 	}
 
-	Node::State::Parameters Node::getConstraints(){
+	Node::State::Parameters Node::getConstraints() const {
 		//Construct new parameters set for combined articulations
 		State::Parameters p(getDimension());
 		int pos = 0;
@@ -159,7 +165,7 @@ namespace spooky {
 		return p;
 	}
 
-	Node::State::Parameters Node::getProcessNoise(){
+	Node::State::Parameters Node::getProcessNoise() const {
 		//Construct new parameters set for combined articulations
 		State::Parameters p(getDimension());
 		int pos = 0;
@@ -171,7 +177,7 @@ namespace spooky {
 		return p;
 	}
 
-	Node::State::Parameters Node::getTimeSinceUpdated() {
+	Node::State::Parameters Node::getTimeSinceUpdated() const {
 		//Construct new parameters set for combined articulations
 		State::Parameters p(getDimension());
 		int pos = 0;
@@ -182,9 +188,21 @@ namespace spooky {
 		}
 		return p;
 	}
+	
 
+	Node::State::Parameters Node::getPredictedState(const float& timestamp) const {
+		State::Parameters pstate(getDimension());
+		int pos = 0;
+		for (int i = 0; i < articulations.size(); i++) {
+			int dim = local_state.articulation[i].expectation.size();
+			float t = timestamp - local_state.last_update_time;
+			pstate.insertSubstate(pos, getPredictionForArticulation(articulations[i],local_state.articulation[i],t));
+			pos += dim;
+		}
+		return pstate;
+	}
 
-	Node::State::Parameters Node::getVelocityMatrix() {
+	Node::State::Parameters Node::getVelocityMatrix() const {
 		//Construct new parameters set for combined articulations
 		State::Parameters p(getDimension());
 		//Zero
@@ -253,6 +271,16 @@ namespace spooky {
 			, node_chain).variance;
 	}
 
+	Node::State::Parameters Node::getPredictionForArticulation(const Articulation& art, const State::Parameters& state, const float& t) {
+		State::Parameters new_state(state.expectation.size());
+		auto updateFunc = [&t,&art](const Eigen::VectorXf& x) {
+			return art.getPredictedExpectation(x, t);
+		};
+		new_state.expectation = updateFunc(state.expectation);
+		Eigen::MatrixXf Ju = utility::numericalVectorDerivative<float>(updateFunc, state.expectation);
+		new_state.variance = Ju * state.variance * Ju.transpose();
+		return new_state;
+	}
 
 	void Node::setChainState(const std::vector<Node::Ptr>& node_chain, const State::Parameters& state_params, const float& t) {
 		int last_block_end = 0;
@@ -261,15 +289,6 @@ namespace spooky {
 			node->setState(state_params.getSubstate(last_block_end,dim),t);
 			last_block_end += dim;
 		}
-	}
-
-
-		//TODO: clean up old functions
-	void Node::updateState(const State& new_state, const float& timestamp, const float& latency) {
-		recacheRequired = true;
-		//TODO: add latency prediction
-		local_state = new_state;
-		local_state.last_update_time = timestamp;
 	}
 
 	void Node::setModel(std::vector<Articulation> art, const bool& modelVelocity){
@@ -434,13 +453,6 @@ namespace spooky {
 			lastParentHash =  parent->getCachedPoseHash();
 		}
 		return cachedPose;
-	}
-
-	Transform3D Node::getGlobalPosePredicted(const float& deltaT) {
-		if (parent == NULL) {
-			return getLocalPosePredicted(deltaT);
-		}
-		return parent->getGlobalPosePredicted(deltaT) * getLocalPosePredicted(deltaT);
 	}
 	
 	Transform3D Node::getCachedPose() {
