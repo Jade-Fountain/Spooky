@@ -302,13 +302,7 @@ namespace spooky{
 
         auto getMeas = [&rootNode, &m, &transformRepresentation, &deltaT](const std::vector<Node::Ptr>& fusion_chain){
 
-            Transform3D globalToRootNode = rootNode->getGlobalPose().inverse();
-			int dim = fusion_chain[0]->getDimension();
-			Eigen::MatrixXf velocityMatrix = deltaT * fusion_chain[0]->getVelocityMatrix().variance;
-			Eigen::MatrixXf updateMatrix = velocityMatrix + Eigen::MatrixXf::Identity(dim, dim);
-            Eigen::VectorXf deltaRot = updateMatrix * fusion_chain[0]->getState().expectation - fusion_chain[0]->getState().expectation;
-            //TODO: generalize
-            return deltaRot.head(3);
+            return fusion_chain[0]->getState().expectation.tail(3) * deltaT;
 
         };
 
@@ -321,8 +315,8 @@ namespace spooky{
         Eigen::VectorXf vecTmeas = transformRepresentation(Tmeas);
         State::Parameters measurement(vecTmeas.size());
 
-		//m = p2 - p1
-        measurement.expectation = utility::twistClosestRepresentation(vecTmeas, measurementBuffer[m->getSensor()].data) - measurementBuffer[m->getSensor()].data;
+		//m = p2 * -p1
+        measurement.expectation = utility::composeTwists(vecTmeas, -measurementBuffer[m->getSensor()].data);
 		measurementBuffer[m->getSensor()] = TimestampedData(vecTmeas, m->getTimestamp());
 		//TODO: fix this hack: compute quaternion to vecMat Jacobian
         measurement.variance = m->getRotationVar()(0,0) * Eigen::MatrixXf::Identity(vecTmeas.size(), vecTmeas.size()) / m->confidence;
