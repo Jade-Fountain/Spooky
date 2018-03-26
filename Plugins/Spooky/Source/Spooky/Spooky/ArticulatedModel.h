@@ -228,6 +228,7 @@ namespace spooky {
 			const std::vector<Node::Ptr>& fusion_chain,
 			const State::Parameters& measurement, 
 			const State::Parameters& constraints, 
+			const float& stiffness,
 			const std::function<State::Parameters(const std::vector<Node::Ptr>&)> getPredictedState,
 			const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
 			const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian,
@@ -235,11 +236,12 @@ namespace spooky {
 	    );
 	       
 		//Basic math for performing EKF with prior, constraints and measurement
-	    Node::State::Parameters 
-	    customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,
+	    static Node::State::Parameters 
+	    customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, 
+	    					const float& stiffness, const State::Parameters& measurement,
                             const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement);
   		//Basic math for performing EKF with prior, constraints and measurement
-	    Node::State::Parameters 
+	    static Node::State::Parameters 
 	    EKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& measurement,
                             const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement);
   

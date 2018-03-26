@@ -197,7 +197,7 @@ namespace spooky{
         //------------------------------------------------------------------
 
 
-        computeEKFUpdate(m->getTimestamp(),fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints);
     }
 
     void Node::fuseRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
@@ -262,7 +262,7 @@ namespace spooky{
 		}
                 
         //Perform computation
-        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints);
     }
 
     void Node::fuseDeltaRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
@@ -322,7 +322,7 @@ namespace spooky{
         measurement.variance = m->getRotationVar()(0,0) * Eigen::MatrixXf::Identity(vecTmeas.size(), vecTmeas.size()) / m->confidence;
                 
         //Perform computation
-        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, 0, getPredState, getMeas, getMeasJac, m->relaxConstraints);
     }
 
     void Node::fuseRigidMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
@@ -394,7 +394,7 @@ namespace spooky{
         //------------------------------------------------------------------
 
 
-        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints);
         //DEBUG
   //       std::stringstream ss;
 		// ss << std::endl << "wpstate = " << wpstate.transpose() << std::endl;
@@ -456,7 +456,7 @@ namespace spooky{
         measurement.variance = m->getScaleVar() / m->confidence;
         
         //Perform computation
-        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints);
 
     }
 
@@ -465,6 +465,7 @@ namespace spooky{
        const std::vector<Node::Ptr>& fusion_chain,
        const State::Parameters& measurement, 
        const State::Parameters& constraints, 
+       const float& stiffness,
        const std::function<State::Parameters(const std::vector<Node::Ptr>&)> getPredictedState,
        const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
        const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian,
@@ -489,7 +490,7 @@ namespace spooky{
 		for (int i = 0; i < 5; i++) {
 			iterations++;
             //TODO optimise ekf by using information matrices and inverting covariance per node
-            newChainState = customEKFMeasurementUpdate(chainState, constraints, measurement, measurementJacobian, predictedMeasurement);
+            newChainState = customEKFMeasurementUpdate(chainState, constraints, stiffness, measurement, measurementJacobian, predictedMeasurement);
             //newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, wpstate);
 
             chainState.expectation = newChainState.expectation;
@@ -504,7 +505,7 @@ namespace spooky{
 			//Eigen::VectorXf error_vec =
 			//			measurementJacobian.transpose() * measurement.variance.inverse() * (predictedMeasurement - measurement.expectation)
 			//			+ originalChainState.variance.inverse() * (chainState.expectation - originalChainState.expectation)
-			//			+ joint_stiffness * constraints.variance.inverse() * (chainState.expectation - constraints.expectation);
+			//			+ stiffness * constraints.variance.inverse() * (chainState.expectation - constraints.expectation);
 			//float error = error_vec.norm();
 
 			
@@ -513,7 +514,7 @@ namespace spooky{
 			//Prior error
 			float p_error = ((chainState.expectation - originalChainState.expectation).transpose() * originalChainState.variance.inverse() * (chainState.expectation - originalChainState.expectation))(0, 0);
 			//Constraint Error
-			float c_error = (joint_stiffness *(chainState.expectation - constraints.expectation).transpose() * constraints.variance.inverse() * (chainState.expectation - constraints.expectation))(0, 0);
+			float c_error = (stiffness *(chainState.expectation - constraints.expectation).transpose() * constraints.variance.inverse() * (chainState.expectation - constraints.expectation))(0, 0);
 			//Energy:
             //TODO: why does this relaxation work?
 			float error = relaxConstraints ? m_error : p_error + c_error + m_error;
@@ -545,7 +546,8 @@ namespace spooky{
 		//SPOOKY_LOG(ss.str());
 	};
 
-    Node::State::Parameters Node::customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, const State::Parameters& measurement,
+    Node::State::Parameters Node::customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, 
+                                                        const float& stiffness, const State::Parameters& measurement,
                                                         const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement)
     {
 		//TODO optimise custom ekf by using information matrices and inverting covariance per node
@@ -561,7 +563,7 @@ namespace spooky{
 
         //New variance (extended kalman filter measurement update)
         Eigen::MatrixXf sigmaM_info = measurement.variance.inverse();
-        posterior.variance = (measurementJacobian.transpose() * sigmaM_info * measurementJacobian + sigmaP_info + joint_stiffness * sigmaC_info).inverse();
+        posterior.variance = (measurementJacobian.transpose() * sigmaM_info * measurementJacobian + sigmaP_info + stiffness * sigmaC_info).inverse();
         
         //Expectation update components
         Eigen::VectorXf mVector = measurement.expectation - state_measurement + measurementJacobian * prior.expectation;
@@ -570,7 +572,7 @@ namespace spooky{
         Eigen::VectorXf constraintUpdate = sigmaC_info * constraints.expectation;
 
         //New state
-        posterior.expectation = posterior.variance * (priorUpdate + joint_stiffness * constraintUpdate + measurementUpdate);
+        posterior.expectation = posterior.variance * (priorUpdate + stiffness * constraintUpdate + measurementUpdate);
 
         return posterior;
     };
