@@ -250,6 +250,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void UpdateOutputConfidence(const FName& bone,const float& confidence);
 
+	UFUNCTION(BlueprintCallable, Category = "Spooky")
+	void SetAllFlags (const FSpookyMeasurementFlags& flags);
 
 	//--------------------------------
 	//		OUTPUT

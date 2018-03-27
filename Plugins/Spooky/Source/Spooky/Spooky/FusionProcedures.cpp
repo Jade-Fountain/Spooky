@@ -301,9 +301,7 @@ namespace spooky{
         };
 
         auto getMeas = [&rootNode, &m, &transformRepresentation, &deltaT](const std::vector<Node::Ptr>& fusion_chain){
-
             return fusion_chain[0]->getState().expectation.tail(3) * deltaT;
-
         };
 
         //JOINT CONSTRAINTS
@@ -312,17 +310,19 @@ namespace spooky{
 
         Transform3D Tmeas = Transform3D::Identity();
         Tmeas.rotate(m->getRotation());
-        Eigen::VectorXf vecTmeas = transformRepresentation(Tmeas);
-        State::Parameters measurement(vecTmeas.size());
+        Eigen::VectorXf exp_omega = transformRepresentation(Tmeas);
+        State::Parameters measurement(exp_omega.size());
 
-		//m = p2 * -p1
-        measurement.expectation = utility::composeTwists(vecTmeas, -measurementBuffer[m->getSensor()].data);
-		measurementBuffer[m->getSensor()] = TimestampedData(vecTmeas, m->getTimestamp());
+		//angular update
+        Eigen::Vector3f domega_1 = /*utility::rodriguezFormula<float>(measurementBuffer[m->getSensor()].data) **/ utility::composeTwists(-measurementBuffer[m->getSensor()].data, exp_omega);
+		measurement.expectation = domega_1;
 		//TODO: fix this hack: compute quaternion to vecMat Jacobian
-        measurement.variance = m->getRotationVar()(0,0) * Eigen::MatrixXf::Identity(vecTmeas.size(), vecTmeas.size()) / m->confidence;
+        measurement.variance = m->getRotationVar()(0,0) * Eigen::MatrixXf::Identity(exp_omega.size(), exp_omega.size()) / m->confidence;
                 
-        //Perform computation
+		//Perform computation
         computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, 0, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+
+		measurementBuffer[m->getSensor()] = TimestampedData(exp_omega, m->getTimestamp());
     }
 
     void Node::fuseRigidMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){

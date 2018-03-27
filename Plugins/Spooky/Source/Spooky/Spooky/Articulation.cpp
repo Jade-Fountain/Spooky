@@ -265,14 +265,16 @@ namespace spooky{
 			{
 				//quaternion representation
 				if(state.size() == 6) {
-					new_state.head(3) = utility::composeTwists(state.tail(3) * t, state.head(3));
+					//exp(w') = exp(w)exp(dw_dt *t)
+					new_state.head(3) = utility::composeTwists(state.head(3), state.tail(3) * t);
 				}
 			}
 			break;
 			case(POSE):
 			{
 				if (state.size() == 12) {
-					new_state.head(3) = utility::composeTwists(state.tail(3) * t, state.head(3));
+					//exp(w') = exp(w)exp(dw_dt *t)
+					new_state.head(3) = utility::composeTwists(state.head(3), state.tail(3) * t);
 					new_state.segment(6, 3) += new_state.segment(9, 3) * t;
 				}
 				//pos_quat representation

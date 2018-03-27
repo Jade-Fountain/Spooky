@@ -142,6 +142,13 @@ void USpookySkeletalMeshComponent::UpdateOutputConfidence(const FName& bone,cons
 	if(!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
 	outputBones[bone].confidence = confidence;
 }
+void USpookySkeletalMeshComponent::SetAllFlags(const FSpookyMeasurementFlags& flags) {
+	if (!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
+	for (auto& bone : outputBones) {
+		bone.second.flags = flags;
+	}
+}
+
 
 
 spooky::NodeDescriptor USpookySkeletalMeshComponent::getOutputTargetNode(const FName& bone) {
