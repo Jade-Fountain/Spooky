@@ -28,13 +28,12 @@ namespace spooky {
 	//									Public
 	//-------------------------------------------------------------------------------------------------------
 	Node::Node() {
-		homePose = Transform3D::Identity();
 		cachedPose = Transform3D::Identity();
 		parent_desc = NodeDescriptor("");
 	}
 
 	Transform3D Node::getFinalGlobalPose(){
-		return getGlobalPose() * homePose;
+		return getGlobalPose();
 	}
 
 	Transform3D Node::getLocalPose() const{
@@ -57,6 +56,11 @@ namespace spooky {
 		}
 		return pose;
 	}
+
+	float Node::getNodeLastFusionTime(){
+		return local_state.last_update_time - local_state.smallest_latency;
+	}
+
 	//TODO:reimplement
 	//
 	//Transform3D Node::getLocalPosePredicted(const float& deltaT){
@@ -348,7 +352,7 @@ namespace spooky {
 		if (parent != NULL) {
 			parent->fuse(calib, referenceSystem, nodes);
 		}
-
+		float smallest_latency = 100000;
 		for(auto& m : measurements){
 			//Throwout bad measurements
 			//TODO: use confidence better
@@ -371,10 +375,10 @@ namespace spooky {
 			//rootNode->fuse(calib,referenceSystem,nodes);
 
 			switch (m->type) {
-			case(Measurement::Type::POSITION):
-				fusePositionMeasurement(m, toFusionSpace, rootNode);
-				break;
-			case(Measurement::Type::ROTATION):
+				case(Measurement::Type::POSITION):
+					fusePositionMeasurement(m, toFusionSpace, rootNode);
+					break;
+				case(Measurement::Type::ROTATION):
 					if (m->sensorDrifts && measurementBuffer.count(m->getSensor()) > 0) {
 						fuseDeltaRotationMeasurement(m, toFusionSpace, rootNode);
 					}
@@ -389,7 +393,9 @@ namespace spooky {
 					fuseScaleMeasurement(m,toFusionSpace,rootNode);
 					break;
 			}
+			smallest_latency = std::fmin(smallest_latency,m->getLatency());
 		}
+		local_state.smallest_latency = smallest_latency;
 		//Dont use data twice
 		measurements.clear();
 	}
@@ -734,6 +740,16 @@ namespace spooky {
 			return nodes[node]->getLocalPose();
 		}
 	}
+
+	float ArticulatedModel::getNodeLastFusionTime(const NodeDescriptor& node){
+		if(nodes.count(node) == 0){
+			SPOOKY_LOG("WARNING - Transform3D ArticulatedModel::getNodeLocalPose(" + node.name + ") - node does not exist");
+			return Transform3D::Identity();
+		} else {
+			return nodes[node]->getNodeLastFusionTime();
+		}
+	}
+
 	//-------------------------------------------------------------------------------------------------------
 	//									Private
 	//-------------------------------------------------------------------------------------------------------

@@ -58,6 +58,9 @@ namespace spooky {
 		//Debug/Stats
 		float last_time = 0;
 		long int frame_count = 0;
+
+		//Root node poses:
+		std::map<NodeDescriptor,DataBuffer<Transform3D>> rootPoses;
 		
 	public:
 

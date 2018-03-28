@@ -86,6 +86,8 @@ namespace spooky {
 									   
 			//Last update time
 			float last_update_time = 0;
+			//Lowest latency from latest set of measurements
+			float smallest_latency = 0;
 			//State is valid - false if state poorly initialised, etc...
 			bool valid = true;
 		};
@@ -94,10 +96,6 @@ namespace spooky {
 		State local_state;
 		//Constant internal structure of the node
 		std::vector<Articulation> articulations;
-
-		//Homepose is the default node pose (when theta = 0)
-		//If the articulations are not twists, then the home pose is the identity
-		Transform3D homePose;
 
 		struct TimestampedData {
 			Eigen::VectorXf data;
@@ -138,6 +136,10 @@ namespace spooky {
 		Transform3D getLocalPose() const;
 		//Allows for speculative evaluation of pose based on expectation vector
 		Transform3D getLocalPoseAt(const Eigen::VectorXf& theta) const;
+
+		//Gets timestamp associated with latest data fusion, including accounting for latency
+		float getNodeLastFusionTime();
+
 		//TODO: reimplement:
 		////Get the local pose deltaT seconds into the future based on velocity
 		//Transform3D getLocalPosePredicted(const float& deltaT) const;
@@ -314,6 +316,8 @@ namespace spooky {
 			//Returns local orientation of node
 			Transform3D getNodeLocalPose(const NodeDescriptor& node);
 			
+			//Gets the time last fusion occured
+			float getNodeLastFusionTime(const NodeDescriptor& node);
 
 		/*//////////////////////////////////////////////////////////////////
 		*				Private Data

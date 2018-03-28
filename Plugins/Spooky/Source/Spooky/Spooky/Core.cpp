@@ -172,6 +172,11 @@ namespace spooky {
 		last_time = time;
 		//TODO: add ifdefs for profiling
 
+		//Get measurements offset by the largest latency so all measurements are valid
+		utility::profiler.startTimer("Sync (Offset)");
+		std::vector<Measurement::Ptr> sync_measurements = measurement_buffer.getOffsetSynchronizedMeasurements(time);
+		utility::profiler.endTimer("Sync (Offset)");
+
 		///////////////////////
 		// FUSE
 		///////////////////////
@@ -184,21 +189,26 @@ namespace spooky {
 		skeleton.fuse(calibrator);
 		utility::profiler.endTimer("Fuse");
 		///////////////////////
-	
+		
+
+		for(auto& m : sync_measurements){
+			if(m->getRootNode() != ""){
+				if(rootPoses.count(m->getRootNode())){
+					rootPoses[m->getRootNode()] = DataBuffer<Transform3D>();
+				}
+				rootPoses[m->getRootNode()].time_width = std::fmax(m->getLatency(),rootPoses[m->getRootNode()].time_width);
+				//Insert current pose of root node based on 
+				rootPoses[m->getRootNode()].insert(skeleton.getNodeLastFusionTime(m->getRootNode()), getNodeGlobalPose(m->getRootNode()), time);
+			}
+		}
+		
 
 		///////////////////////
 		// CORRELATE
 		///////////////////////
 		utility::profiler.startTimer("Correlator");
-
-		//Get measurements offset by the largest latency so all measurements are valid
-		utility::profiler.startTimer("Sync (Offset)");
-		std::vector<Measurement::Ptr> sync_measurements = measurement_buffer.getOffsetSynchronizedMeasurements(time);
-		utility::profiler.endTimer("Sync (Offset)");
-
 		correlator.addMeasurementGroup(sync_measurements);
 		correlator.identify();
-		
 		utility::profiler.endTimer("Correlator");
 		///////////////////////
 		
