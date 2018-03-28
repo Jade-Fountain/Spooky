@@ -161,41 +161,57 @@ namespace spooky {
 
 	//Computes data added since last fuse() call. Should be called repeatedly	
 	void Core::fuse(const float& time) {
+		utility::profiler.startTimer("CoreMainLoop");
+
 		frame_count++;
 		last_time = time;
 		//TODO: add ifdefs for profiling
-		//Add new data to calibration, with checking for usefulness
+
+		///////////////////////
+		// FUSE
+		///////////////////////
+		utility::profiler.startTimer("Fuse");
+		auto lastMeasurements = measurement_buffer.getLatestMeasurements();
+		skeleton.addMeasurementGroup(lastMeasurements);
+
+		//DEBUG FOR LATENCY TESTING:
+		//skeleton.addMeasurementGroup(sync_measurements);
+		skeleton.fuse(calibrator);
+		utility::profiler.endTimer("Fuse");
+		///////////////////////
+	
+
+		///////////////////////
+		// CORRELATE
+		///////////////////////
 		utility::profiler.startTimer("Correlator");
-		utility::profiler.startTimer("All");
-		//SPOOKY_LOG("Fusing: " + std::to_string(measurement_buffer.size()) + "measurements");
 
 		//Get measurements offset by the largest latency so all measurements are valid
 		utility::profiler.startTimer("Sync (Offset)");
 		std::vector<Measurement::Ptr> sync_measurements = measurement_buffer.getOffsetSynchronizedMeasurements(time);
 		utility::profiler.endTimer("Sync (Offset)");
+
 		correlator.addMeasurementGroup(sync_measurements);
 		correlator.identify();
+		
 		utility::profiler.endTimer("Correlator");
-		if(correlator.isStable() || true){
-			utility::profiler.startTimer("Calibrator add");
-			calibrator.addMeasurementGroup(sync_measurements);
-			utility::profiler.endTimer("Calibrator add");
-			utility::profiler.startTimer("Calibrate");
-			calibrator.calibrate();
-			utility::profiler.endTimer("Calibrate");
-			if(calibrator.isStable() || true){
-				utility::profiler.startTimer("Fuse");
-				auto lastMeasurements = measurement_buffer.getLatestMeasurements();
-				skeleton.addMeasurementGroup(lastMeasurements);
+		///////////////////////
+		
 
-				//FOR LATENCY TESTING:
-				//skeleton.addMeasurementGroup(sync_measurements);
-				skeleton.fuse(calibrator);
-				utility::profiler.endTimer("Fuse");
-			}
-		}	
-		//TODO: do this less often
-		utility::profiler.endTimer("All");
+		///////////////////////
+		// CALIBRATE
+		///////////////////////
+		utility::profiler.startTimer("Calibrator add");
+		calibrator.addMeasurementGroup(sync_measurements);
+		utility::profiler.endTimer("Calibrator add");
+		
+		utility::profiler.startTimer("Calibrate");
+		calibrator.calibrate();
+		utility::profiler.endTimer("Calibrate");
+		///////////////////////
+
+	
+		utility::profiler.endTimer("CoreMainLoop");
 	}
 
 	CalibrationResult Core::getCalibrationResult(SystemDescriptor s1, SystemDescriptor s2) {
