@@ -553,7 +553,6 @@ namespace spooky {
 		float expiry = 0.1; 
 		
 
-		//TODO: support multiple measurements per sensor OR add another sensor for hip scale... wait it already has its own sensor id. WTF
 		struct MeasurementsWithCounter {
 			Measurement::Ptr meas;
 			int count = 0;
@@ -667,4 +666,72 @@ namespace spooky {
 			return getSynchronizedMeasurements(t-maximum_latency);
 		}
 	};
+
+	//Simpler buffer class for generic data objects
+	template <class Data>
+	class DataBuffer {
+	private:
+		//Timestamped data
+		std::map<float,Data> buffer;
+		float expiry = 0.1;
+
+	public:
+		//How far back in time to store data
+		float time_width = 0;
+
+		void insert(const float& timestamp, const Data& d, const float& time_now){
+			if(time_now - timestamp <= time_width + expiry){
+				buffer[timestamp] = d;				
+			}
+		}
+		
+
+		Data get(const float& t, bool* valid){
+			//Binary search for closest values to the requested time t
+			//WARNING: cpp lower_bound(t) gets "container whose key is not considered to go before t" aka lower bound of set bounded by t
+			//I would call that the upper bound if you ask me (ub)
+			auto ub = buffer.lower_bound(t);
+			auto lb = std::prev(ub);
+			*valid = true;
+
+			if (lb == buffer.end() && ub == buffer.end()) {
+				*valid = false;
+				return Data();
+			} else if(ub == buffer.end()){
+				//Dont include old data
+				if (std::abs(lb->first - t) > expiry) return;
+				//If lb is the last measurement, return it
+				return lb->second;
+			}
+			else if (lb == buffer.end()) {
+				//Dont include data from too far in the future
+				if (std::abs(ub->first - t) > expiry) return;
+				//If ub is the next measurement, return it
+				return ub->second;
+			}
+			else {
+				//TODO: interpolate
+				float alpha = (t - lb->first) / (ub->first - lb->first);
+				if(alpha > 0.5){
+					return ub->second;
+				} else {
+					return lb->second;
+				}
+			}
+		}
+
+		void clearOld(const float& time_now){
+			auto iter = buffer.begin();
+			while (iter != buffer.end()) {
+				thisiter = iter;
+				iter = std::next(iter);
+				if (time_now - thisiter->first > time_width + expiry)
+				{
+					buffer.erase(thisiter);
+				}
+			}
+		}
+
+	};
+
 }
