@@ -717,16 +717,16 @@ namespace spooky {
 			} else if(ub == buffer.end()){
 				//Dont include old data
 				if (std::abs(lb->first - t) > expiry) {
-					*valid = false
-				};
+					*valid = false;
+				}
 				//If lb is the last measurement, return it
 				return lb->second;
 			}
 			else if (lb == buffer.end()) {
 				//Dont include data from too far in the future
 				if (std::abs(ub->first - t) > expiry) {
-					valid = false
-				};
+					valid = false;
+				}
 				//If ub is the next measurement, return it
 				return ub->second;
 			}
