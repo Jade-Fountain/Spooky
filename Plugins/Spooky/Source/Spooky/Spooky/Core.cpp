@@ -21,8 +21,8 @@
 namespace spooky {
 	
 	Core::Core(){
-		calibrator.getNodeGlobalPose = std::bind(&core::getNodeGlobalPose,_1);
-		calibrator.getNodeLocalPose = std::bind(&core::getNodeLocalPose,_1);
+		calibrator.getNodeGlobalPose = std::bind(&Core::getNodeGlobalPose, this, std::placeholders::_1);
+		calibrator.getNodeLocalPose = std::bind(&Core::getNodeLocalPose, this, std::placeholders::_1);
 	}
 	
 	void Core::addFixedNode(const NodeDescriptor & node, const NodeDescriptor & parent,
@@ -192,8 +192,8 @@ namespace spooky {
 		
 
 		for(auto& m : sync_measurements){
-			NodeDescriptor rootNode = m->getSensor()->getRoodNode();
-			if(rootNode != ""){
+			NodeDescriptor rootNode = m->getSensor()->getRootNode();
+			if(rootNode.name.size() != 0){
 				if(rootPoses.count(rootNode) == 0){
 					rootPoses[rootNode] = DataBuffer<Transform3D>();
 				}
