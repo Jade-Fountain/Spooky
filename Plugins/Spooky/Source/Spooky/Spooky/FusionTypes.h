@@ -316,6 +316,11 @@ namespace spooky {
 		//Timestamp (sec; from device)
 		//TODO: ensure double precision input
 		double timestamp = -1;
+
+		//Root node transform 
+		bool rootNodeTransformSet = false;
+		Transform3D rootNodeTransform;
+
 	public:
 
 		//Confidence in T in [0,1]
@@ -336,6 +341,8 @@ namespace spooky {
 		//Should the measurements 
 		bool sensorDrifts = false;
 		//--------------------
+
+
 
 		//=========================
 		//			Methods
@@ -488,6 +495,16 @@ namespace spooky {
 		//Returns the global global latency
 		float getLatency() {
 			return sensor->getLatency();
+		}
+
+		void setRootNodePose(const Transform3D& T){
+			rootNodeTransform = T;
+			rootNodeTransformSet = true;
+		}
+
+		Transform3D getRootNodePose(bool* valid){
+			*valid = rootNodeTransformSet;
+			return rootNodeTransform;
 		}
 
 		int getRequiredPDoF(){

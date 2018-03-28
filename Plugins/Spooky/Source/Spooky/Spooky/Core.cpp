@@ -21,8 +21,8 @@
 namespace spooky {
 	
 	Core::Core(){
-		calibrator.getNodeGlobalPose = std::bind(&Core::getNodeGlobalPose, this, std::placeholders::_1);
-		calibrator.getNodeLocalPose = std::bind(&Core::getNodeLocalPose, this, std::placeholders::_1);
+		calibrator.getNodeGlobalPose = std::bind(&core::getNodeGlobalPose,_1);
+		calibrator.getNodeLocalPose = std::bind(&core::getNodeLocalPose,_1);
 	}
 	
 	void Core::addFixedNode(const NodeDescriptor & node, const NodeDescriptor & parent,
@@ -192,16 +192,23 @@ namespace spooky {
 		
 
 		for(auto& m : sync_measurements){
-			if(m->getRootNode() != ""){
-				if(rootPoses.count(m->getRootNode())){
-					rootPoses[m->getRootNode()] = DataBuffer<Transform3D>();
+			NodeDescriptor rootNode = m->getSensor()->getRoodNode();
+			if(rootNode != ""){
+				if(rootPoses.count(rootNode) == 0){
+					rootPoses[rootNode] = DataBuffer<Transform3D>();
 				}
-				rootPoses[m->getRootNode()].time_width = std::fmax(m->getLatency(),rootPoses[m->getRootNode()].time_width);
+				rootPoses[rootNode].time_width = std::fmax(m->getLatency(),rootPoses[rootNode].time_width);
 				//Insert current pose of root node based on 
-				rootPoses[m->getRootNode()].insert(skeleton.getNodeLastFusionTime(m->getRootNode()), getNodeGlobalPose(m->getRootNode()), time);
+				rootPoses[rootNode].insert(skeleton.getNodeLastFusionTime(rootNode), getNodeGlobalPose(rootNode), time);
+				//Search back in time for 
+				bool valid = false;
+				Transform3D p = rootPoses[rootNode].get(m->getTimestamp() - m->getLatency(), &valid);
+				if(valid){
+					m->setRootNodePose(p);
+				}
 			}
 		}
-		
+
 
 		///////////////////////
 		// CORRELATE
