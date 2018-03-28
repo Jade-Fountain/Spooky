@@ -78,6 +78,7 @@ namespace spooky {
 
 	class Calibrator {
 	private:
+
 		//----------------
 		//PRIVATE MEMBERS
 		//----------------
@@ -90,6 +91,7 @@ namespace spooky {
 		//Data for resulting calibrations
 		std::map<SystemPair, CalibrationResult> calibrationResults;
 		
+
 		//----------------
 		//PRIVATE METHODS
 		//----------------
@@ -147,6 +149,7 @@ namespace spooky {
 		//Returns the estimated latency l between two streams: m2[t] <-> m1[t+l]
 		//Aka, m2 lags begind by l
 		float estimateLatency(const std::vector<Measurement::Ptr>& m1, const std::vector<Measurement::Ptr>& m2);
+
 
 	public:
 		//Config		
@@ -206,6 +209,10 @@ namespace spooky {
 
 		//Gets string summarising state of calibrator
 		std::string getStateSummary();
+
+		//bound functions
+		std::function<Transform3D (const NodeDescriptor&)> getNodeGlobalPose;
+		std::function<Transform3D (const NodeDescriptor&)> getNodeLocalPose;
 
 	};
 

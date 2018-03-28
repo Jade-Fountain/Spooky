@@ -20,6 +20,11 @@
 
 namespace spooky {
 	
+	Core::Core(){
+		calibrator.getNodeGlobalPose = std::bind(&Core::getNodeGlobalPose, this, std::placeholders::_1);
+		calibrator.getNodeLocalPose = std::bind(&Core::getNodeLocalPose, this, std::placeholders::_1);
+	}
+	
 	void Core::addFixedNode(const NodeDescriptor & node, const NodeDescriptor & parent,
 							 const Transform3D& pose)
 	{
@@ -204,7 +209,7 @@ namespace spooky {
 		utility::profiler.startTimer("Calibrator add");
 		calibrator.addMeasurementGroup(sync_measurements);
 		utility::profiler.endTimer("Calibrator add");
-		
+
 		utility::profiler.startTimer("Calibrate");
 		calibrator.calibrate();
 		utility::profiler.endTimer("Calibrate");

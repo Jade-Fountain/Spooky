@@ -61,6 +61,8 @@ namespace spooky {
 		
 	public:
 
+		Core();
+
 		struct SpookyConfig{
 			//Units config
 			struct {
