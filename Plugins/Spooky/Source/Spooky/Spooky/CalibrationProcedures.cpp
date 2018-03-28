@@ -144,11 +144,6 @@ namespace spooky {
 			inverse_variances[i] = (m1[i]->getPositionVar() + m2[i]->getPositionVar()).inverse();
 		}
 
-		//Build chunked lists for later:
-		//Groups the measurement data by node
-		std::vector<std::vector<Eigen::Vector3f>> chunked_pos1;
-		std::vector<std::vector<Eigen::Vector3f>> chunked_pos2;
-		Measurement::chunkMeasurements<Eigen::Vector3f, &Measurement::getPosition>(m1,m2,&chunked_pos1,&chunked_pos2);
 
 		//Initialise current results
 		CalibrationResult result;
@@ -166,9 +161,20 @@ namespace spooky {
 		//Compute point cloud results
 		//result.transform = utility::calibration::Position::calibrateWeightedIdenticalPair(pos1, pos2, inverse_variances, &result.error);
 		result.transform = utility::calibration::Position::calibrateIdenticalPairTransform_Arun(pos1, pos2, &result.error);
+		result.quality = utility::qualityFromError(result.error, qualityScaleFactor);
+		result.relevance = Transform3D::Identity();
+		result.weight = m1.size();
 
+		//------------------------------------------------------------------
+		//TODO:clean this up:
 		//TODO: check if error is high enough and correct for rigid link
 		//TODO: This doesnt even help Arun is too good already
+		
+		//Build chunked lists for later:
+		//Groups the measurement data by node
+		// std::vector<std::vector<Eigen::Vector3f>> chunked_pos1;
+		// std::vector<std::vector<Eigen::Vector3f>> chunked_pos2;
+		// Measurement::chunkMeasurements<Eigen::Vector3f, &Measurement::getPosition>(m1,m2,&chunked_pos1,&chunked_pos2);
 
 		//Refine with rigid link model
 		//for (int i = 0; i < 1; i++) {
@@ -194,11 +200,7 @@ namespace spooky {
 		//	}
 		//	result.transform = utility::getMeanTransform(transforms, weights);
 
-		//	//TODO:clean up
-		//}
-		result.quality = utility::qualityFromError(result.error, qualityScaleFactor);
-		result.relevance = Transform3D::Identity();
-		result.weight = m1.size();
+		//------------------------------------------------------------------
 
 		SPOOKY_LOG("Performed calibration on new data. error: " + std::to_string(result.error) + ", quality = " + std::to_string(result.quality) + " result.weight = " + std::to_string(result.weight));
 

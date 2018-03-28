@@ -391,10 +391,7 @@ namespace spooky {
 
 		//Store the (refs to) the relevant measurements
 		for (auto& m : measurements) {
-			//Calibration only handles static root nodes (attached to SPOOKY_ROOT) for now
-			if (m->getSensor()->getRootNode().name == "") {
-				addMeasurement(m);
-			}
+			addMeasurement(m);
 		}
 	}
 

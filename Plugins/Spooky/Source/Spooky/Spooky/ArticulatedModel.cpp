@@ -719,6 +719,7 @@ namespace spooky {
 
 	Transform3D ArticulatedModel::getNodeGlobalPose(const NodeDescriptor& node){
 		if(nodes.count(node) == 0){
+			SPOOKY_LOG("WARNING - Transform3D ArticulatedModel::getNodeGlobalPose(" + node.name + ") - node does not exist");
 			return Transform3D::Identity();
 		} else {
 			return nodes[node]->getFinalGlobalPose();
@@ -727,6 +728,7 @@ namespace spooky {
 
 	Transform3D ArticulatedModel::getNodeLocalPose(const NodeDescriptor& node){
 		if(nodes.count(node) == 0){
+			SPOOKY_LOG("WARNING - Transform3D ArticulatedModel::getNodeLocalPose(" + node.name + ") - node does not exist");
 			return Transform3D::Identity();
 		} else {
 			return nodes[node]->getLocalPose();
