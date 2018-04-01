@@ -160,11 +160,13 @@ spooky::NodeDescriptor USpookySkeletalMeshComponent::getOutputTargetNode(const F
 	}
 }
 
-FRotator USpookySkeletalMeshComponent::getOutputRetargetRotator(const FName& bone) {
+FRotator USpookySkeletalMeshComponent::getOutputRetargetRotator(const FName& bone, bool* found) {
 	if (retargetRotators.count(bone) > 0) {
+		*found = true;
 		return retargetRotators[bone];
 	}
 	else {
+		*found = false;
 		return FRotator(0,0,0);
 	}
 }

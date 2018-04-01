@@ -243,12 +243,34 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 
 			//Create measurement
 			Measurement::Ptr m;
+			bool dontcare;
+			FRotator retargetRotationOffset = skeleton->getOutputRetargetRotator(bone.Name, &dontcare);
+			//Retarget either globally or locally
 			if(spookyBoneInfo.flags.globalSpace){
 				T = componentSpaceTransforms[i];
+				T.SetRotation(T.GetRotation() * retargetRotationOffset.Quaternion());
 			}
-			//Retarget to new skeleton
-			FRotator retargetRotationOffset = skeleton->getOutputRetargetRotator(bone.Name);
-			T.SetRotation(T.GetRotation() * retargetRotationOffset.Quaternion());
+			else {
+				//Retarget to new skeleton
+				//Requires knowledge of parent rotator relationship
+				bool parent_rotator_set = false;
+				int current_bone = i;
+				FTransform parentRetargetRotator = skeleton->BoneSpaceTransforms[i];
+				while (!parent_rotator_set && current_bone >= 0) {
+					//Get next bone
+					current_bone = boneInfo[current_bone].ParentIndex;
+					//Find parent retargetor
+					FRotator A = current_bone < 0 ? FRotator::ZeroRotator : skeleton->getOutputRetargetRotator(boneInfo[current_bone].Name, &parent_rotator_set);
+					if (parent_rotator_set) {
+						parentRetargetRotator = FTransform(A) * parentRetargetRotator;
+					}
+					else {
+						parentRetargetRotator = skeleton->BoneSpaceTransforms[current_bone] * parentRetargetRotator;
+					}
+				}
+				T = parentRetargetRotator * T * FTransform(retargetRotationOffset);
+			}
+
 			if (spookyBoneInfo.flags.filterUnchanged) {
 				if (skeleton->lastHash.count(bone_name) == 0) {
 					skeleton->lastHash[bone_name] = hashFTransform(skeleton->BoneSpaceTransforms[i]);

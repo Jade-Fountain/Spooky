@@ -225,6 +225,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void SetDefaultBoneInputParams(const FSpookyBoneInputParams& params);
 
+	/*
+	@param boneRetargetRotators are rotators that map from this skeleton to the target skeleton. For 3x3 matrix: bone coordinate vectors written in target bone coords
+	*/
 	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
 	void AddOutputBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, const TArray<FRotator>& boneRetargetRotators,ESpookyReturnStatus& branch);
 	
@@ -274,7 +277,7 @@ public:
 	//Retrieve the spooky skeleton node being targeted by the given bone
 	//Defaults to bone.string if not specified otherwise
 	spooky::NodeDescriptor getOutputTargetNode(const FName& bone);
-	FRotator getOutputRetargetRotator(const FName& bone);
+	FRotator getOutputRetargetRotator(const FName& bone, bool* found);
 
 };
 
