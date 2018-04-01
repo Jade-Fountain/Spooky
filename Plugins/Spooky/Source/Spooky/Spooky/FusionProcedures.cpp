@@ -136,7 +136,7 @@ namespace spooky{
         //Transform measurement to fusion space
         //------------------------------------------------------------------
         //TODO: optimise: dont transform when possible
-        Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
+        Measurement::Ptr m = m_local->globalSpace ? std::make_unique<Measurement>(m_local->transform(toFusionSpace)) : m_local;
         //------------------------------------------------------------------
 
         //------------------------------------------------------------------
@@ -204,7 +204,7 @@ namespace spooky{
 
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
-        Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
+        Measurement::Ptr m = m_local->globalSpace ? std::make_unique<Measurement>(m_local->transform(toFusionSpace)) : m_local;
 
         //Fuse by modifying some parents if necessary
         std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode,m);
@@ -268,7 +268,7 @@ namespace spooky{
     void Node::fuseDeltaRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
-        Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
+        Measurement::Ptr m = m_local->globalSpace ? std::make_unique<Measurement>(m_local->transform(toFusionSpace)) : m_local;
 		float deltaT = m->getTimestamp() - measurementBuffer[m->getSensor()].t;
 
         //Fuse by modifying some parents if necessary
@@ -331,7 +331,7 @@ namespace spooky{
         //Transform measurement to fusion space
         //------------------------------------------------------------------
         //TODO: optimise: dont transform when possible
-        Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
+        Measurement::Ptr m = m_local->globalSpace ? std::make_unique<Measurement>(m_local->transform(toFusionSpace)) : m_local;
         //------------------------------------------------------------------
 
         //------------------------------------------------------------------
@@ -409,7 +409,7 @@ namespace spooky{
 
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
-        Measurement::Ptr m = std::make_unique<Measurement>(m_local->transform(toFusionSpace));
+        Measurement::Ptr m = m_local->globalSpace ? std::make_unique<Measurement>(m_local->transform(toFusionSpace)) : m_local;
 
         //Fuse by modifying some parents if necessary
         std::vector<Node::Ptr> fusion_chain = getRequiredChain(rootNode,m);
