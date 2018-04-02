@@ -248,6 +248,11 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 			//Retarget either globally or locally
 			if(spookyBoneInfo.flags.globalSpace){
 				T = componentSpaceTransforms[i];
+				/////WARNING////
+				//For some fucking reason UE4 FTransforms multiply backwards!!!
+				//That is, A*B applies A first and then B. 
+				//HOWEVER, FQuats rotate in the expected order
+				/////WARNING////
 				T.SetRotation(T.GetRotation() * retargetRotationOffset.Quaternion());
 			}
 			else {
@@ -255,20 +260,37 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 				//Requires knowledge of parent rotator relationship
 				bool parent_rotator_set = false;
 				int current_bone = i;
+				/////WARNING////
+				//For some fucking reason UE4 FTransforms multiply backwards!!!
+				//That is, A*B applies A first and then B. 
+				/////WARNING////
 				FTransform parentRetargetRotator = skeleton->BoneSpaceTransforms[i];
 				while (!parent_rotator_set && current_bone >= 0) {
 					//Get next bone
 					current_bone = boneInfo[current_bone].ParentIndex;
+					if (current_bone < 0) {
+						break;
+					}
 					//Find parent retargetor
-					FRotator A = current_bone < 0 ? FRotator::ZeroRotator : skeleton->getOutputRetargetRotator(boneInfo[current_bone].Name, &parent_rotator_set);
+					FRotator A = skeleton->getOutputRetargetRotator(boneInfo[current_bone].Name, &parent_rotator_set);
 					if (parent_rotator_set) {
-						parentRetargetRotator = FTransform(A) * parentRetargetRotator;
+						parentRetargetRotator = parentRetargetRotator * FTransform(A.GetInverse());
 					}
 					else {
-						parentRetargetRotator = skeleton->BoneSpaceTransforms[current_bone] * parentRetargetRotator;
+						parentRetargetRotator = parentRetargetRotator * skeleton->BoneSpaceTransforms[current_bone];
 					}
 				}
-				T = parentRetargetRotator * T * FTransform(retargetRotationOffset);
+				/////WARNING////
+				//For some fucking reason UE4 FTransforms multiply backwards!!!
+				//That is, A*B applies A first and then B. 
+				/////WARNING////
+				T = FTransform(retargetRotationOffset) * parentRetargetRotator;
+				if (bone_name == spooky::NodeDescriptor("LeftShoulder")) {
+					std::stringstream ss;
+					ss << std::endl;
+					ss << "LeftShoulder  " << std::endl;
+					SPOOKY_LOG(ss.str());
+				}
 			}
 
 			if (spookyBoneInfo.flags.filterUnchanged) {
