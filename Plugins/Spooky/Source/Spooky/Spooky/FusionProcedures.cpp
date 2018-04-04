@@ -311,11 +311,15 @@ namespace spooky{
         Transform3D Tmeas = Transform3D::Identity();
         Tmeas.rotate(m->getRotation());
         Eigen::VectorXf exp_omega = transformRepresentation(Tmeas);
-        State::Parameters measurement(exp_omega.size());
+		if (m->globalSpace) {
+			//Transform to local space
+			Eigen::Vector3f parent_exp = transformRepresentation(parent->getGlobalPose());
+			exp_omega = utility::composeTwists(-parent_exp, exp_omega);
+		}
+		State::Parameters measurement(exp_omega.size());
 
 		//angular update
-		//Eigen::Vector3f domega_1 = /*utility::rodriguezFormula<float>(measurementBuffer[m->getSensor()].data) **/ utility::composeTwists(-measurementBuffer[m->getSensor()].data, exp_omega);
-		Eigen::Vector3f domega_1 = /*utility::rodriguezFormula<float>(measurementBuffer[m->getSensor()].data) **/ utility::composeTwists(exp_omega, -measurementBuffer[m->getSensor()].data);
+		Eigen::Vector3f domega_1 = utility::composeTwists(exp_omega, -measurementBuffer[m->getSensor()].data);
 		measurement.expectation = domega_1;
 		//TODO: fix this hack: compute quaternion to vecMat Jacobian
         measurement.variance = m->getRotationVar()(0,0) * Eigen::MatrixXf::Identity(exp_omega.size(), exp_omega.size()) / m->confidence;
