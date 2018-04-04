@@ -76,7 +76,8 @@ namespace spooky {
 			Correlator::Config correlator;
 			//Calibrator config
 			Calibrator::Config calibrator;
-		} config;
+		};
+		static SpookyConfig config;
 
 
 
@@ -157,8 +158,12 @@ namespace spooky {
 
 		//Returns a string summarising the state of calibration in the system
 		std::string getCalibratorStateSummary();
+		
 		//Returns info on compute time
 		std::string getTimingSummary();
+
+		//Return the fused skeleton
+		ArticulatedModel& getSkeleton();
 
 	};
 

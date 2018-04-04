@@ -28,7 +28,6 @@ using spooky::Measurement;
 //Setup and initialisation
 //===========================
 
-
 // Sets default values for this component's properties
 USpookyFusionPlant::USpookyFusionPlant()
 {
@@ -57,28 +56,28 @@ void USpookyFusionPlant::TickComponent( float DeltaTime, ELevelTick TickType, FA
 
 UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::Configure(float input_units_m, float output_units_m)
 {
-	spookyCore.config.units.input_m = input_units_m;
-	spookyCore.config.units.output_m = output_units_m;
+	spooky::Core::config.units.input_m = input_units_m;
+	spooky::Core::config.units.output_m = output_units_m;
 	/*
-	spookyCore.config.correlator.ambiguous_threshold = correlator_ambiguous_threshold;
-	spookyCore.config.correlator.elimination_threshold = correlator_elimination_threshold;
-	spookyCore.config.correlator.diff_threshold = correlator_diff_threshold;
+	spooky::Core::config.correlator.ambiguous_threshold = correlator_ambiguous_threshold;
+	spooky::Core::config.correlator.elimination_threshold = correlator_elimination_threshold;
+	spooky::Core::config.correlator.diff_threshold = correlator_diff_threshold;
 
-	spookyCore.config.calibrator.diff_threshold = calibration_diff_threshold;
-	spookyCore.config.calibrator.min_count_per_node = calibration_min_count_per_node;
-	spookyCore.config.calibrator.count_threshold = 
+	spooky::Core::config.calibrator.diff_threshold = calibration_diff_threshold;
+	spooky::Core::config.calibrator.min_count_per_node = calibration_min_count_per_node;
+	spooky::Core::config.calibrator.count_threshold = 
 		{	
 			{spooky::CalibrationResult::State::UNCALIBRATED,100},
 			{spooky::CalibrationResult::State::REFINING,100 },
 			{spooky::CalibrationResult::State::CALIBRATED,100}
 		};
-	spookyCore.config.calibrator.initial_quality_threshold = calibration_initial_quality_threshold;
-	spookyCore.config.calibrator.quality_convergence_threshold = calibration_quality_convergence_threshold;
-	spookyCore.config.calibrator.fault_hysteresis_rate = calibration_fault_hysteresis_rate;
-	spookyCore.config.calibrator.relevance_decay_rate = calibration_relevance_decay_rate;
-	spookyCore.config.calibrator.settle_threshold = calibration_settle_threshold;
-	spookyCore.config.calibrator.fault_angle_threshold = calibration_fault_angle_threshold;
-	spookyCore.config.calibrator.fault_distance_threshold = calibration_fault_distance_threshold;*/
+	spooky::Core::config.calibrator.initial_quality_threshold = calibration_initial_quality_threshold;
+	spooky::Core::config.calibrator.quality_convergence_threshold = calibration_quality_convergence_threshold;
+	spooky::Core::config.calibrator.fault_hysteresis_rate = calibration_fault_hysteresis_rate;
+	spooky::Core::config.calibrator.relevance_decay_rate = calibration_relevance_decay_rate;
+	spooky::Core::config.calibrator.settle_threshold = calibration_settle_threshold;
+	spooky::Core::config.calibrator.fault_angle_threshold = calibration_fault_angle_threshold;
+	spooky::Core::config.calibrator.fault_distance_threshold = calibration_fault_distance_threshold;*/
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::SetJointStiffness(float stiffness) {
@@ -337,7 +336,10 @@ void USpookyFusionPlant::Fuse(float current_time)
 	}
 	spookyCore.fuse(current_time);
 	spooky::utility::profiler.endTimer("AAA FUSION TIME");
-	//SPOOKY_LOG(spooky::utility::profiler.getReport());
+
+	for (auto& skel : skeletal_spirits) {
+		skel->AccumulateOffsets(spookyCore.getSkeleton());
+	}
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
@@ -357,7 +359,7 @@ FCalibrationResult USpookyFusionPlant::getCalibrationResult(FString s1, FString 
 {
 	spooky::CalibrationResult T = spookyCore.getCalibrationResult(spooky::SystemDescriptor(TCHAR_TO_UTF8(*s1)),spooky::SystemDescriptor(TCHAR_TO_UTF8(*s2)));
 	Eigen::Quaternionf q(T.transform.matrix().block<3,3>(0,0));
-	Eigen::Vector3f v(T.transform.matrix().block<3, 1>(0, 3) / spookyCore.config.units.output_m);
+	Eigen::Vector3f v(T.transform.matrix().block<3, 1>(0, 3) / spooky::Core::config.units.output_m);
 	FQuat fq(q.x(), q.y(), q.z(), q.w());
 	
 	FCalibrationResult result;
@@ -422,7 +424,7 @@ Measurement::Ptr USpookyFusionPlant::CreatePositionMeasurement(FString system_na
 {
 	//Create basic measurement
 	Eigen::Vector3f meas(position[0],position[1],position[2]);
-	meas = meas * spookyCore.config.units.input_m;
+	meas = meas * spooky::Core::config.units.input_m;
 
 	Eigen::Matrix<float, 3, 3> un = Eigen::Matrix<float,3,3>::Identity();
 	un.diagonal() = Eigen::Vector3f(uncertainty[0], uncertainty[1], uncertainty[2]);
@@ -467,7 +469,7 @@ Measurement::Ptr USpookyFusionPlant::CreatePoseMeasurement(FString system_name, 
 {
 	//Convert transform to state vector (v,q)
 	Eigen::Vector3f ev(&v[0]);
-	ev = ev * spookyCore.config.units.input_m;
+	ev = ev * spooky::Core::config.units.input_m;
 	//BEWARE: dumb format mismatch:
 	Eigen::Quaternionf eq(q.W,q.X,q.Y,q.Z);
 	//Create basic measurement
@@ -511,14 +513,14 @@ FTransform USpookyFusionPlant::convert(const spooky::Transform3D& T) {
 	FMatrix unrealMatrix;
 	memcpy(&(unrealMatrix.M[0][0]), T.data(), sizeof(float) * 16);
 	FTransform m(unrealMatrix);
-	m.SetTranslation(m.GetTranslation() / spookyCore.config.units.output_m);
+	m.SetTranslation(m.GetTranslation() / spooky::Core::config.units.output_m);
 	return m;
 }
 
 spooky::Transform3D USpookyFusionPlant::convert(const FMatrix& T) {
 	spooky::Transform3D matrix;
 	memcpy(matrix.data(), &(T.M[0][0]), sizeof(float) * 16);
-	matrix.translation() *= spookyCore.config.units.input_m;
+	matrix.translation() *= spooky::Core::config.units.input_m;
 	return matrix;
 }
 	

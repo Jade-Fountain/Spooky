@@ -19,7 +19,8 @@
 #include <chrono>
 
 namespace spooky {
-	
+	Core::SpookyConfig Core::config;
+
 	Core::Core(){
 		calibrator.getNodeGlobalPose = std::bind(&Core::getNodeGlobalPose, this, std::placeholders::_1);
 		calibrator.getNodeLocalPose = std::bind(&Core::getNodeLocalPose, this, std::placeholders::_1);
@@ -274,5 +275,9 @@ namespace spooky {
 
 	std::string Core::getTimingSummary() {
 		return utility::profiler.getReport() + "\n framerate = "  + std::to_string(frame_count / last_time);
+	}
+
+	ArticulatedModel& Core::getSkeleton() {
+		return skeleton;
 	}
 }

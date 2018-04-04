@@ -206,8 +206,8 @@ public:
 	std::vector<spooky::NodeDescriptor> convertToNodeDescriptors(const TArray<FString>& names);
 
 	//Convert Transform3D to FMatrix
-	FTransform convert(const spooky::Transform3D& T);
-	spooky::Transform3D convert(const FMatrix& T);
+	static FTransform convert(const spooky::Transform3D& T);
+	static spooky::Transform3D convert(const FMatrix& T);
 
 	//Hashing for change checking
 	static size_t hashFTransform(const FTransform& T);
