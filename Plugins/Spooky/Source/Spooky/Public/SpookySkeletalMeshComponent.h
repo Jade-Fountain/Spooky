@@ -20,6 +20,7 @@ limitations under the License.
 #include <../Classes/Components/SkeletalMeshComponent.h>
 #include <vector>
 #include "Spooky/FusionTypes.h"
+#include "Spooky/ArticulatedModel.h"
 #include "SpookySkeletalMeshComponent.generated.h"
 
 
@@ -56,6 +57,7 @@ struct FSpookyMeasurementFlags {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky") bool relaxConstraints = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky") bool sensorDrifts = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky") bool filterUnchanged = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky") bool accumulateOffsets = false;
 };
 
 USTRUCT(BlueprintType)
@@ -68,6 +70,9 @@ struct FSpookySkeletonBoneOutputParams{
 	//Name of the bone in the skeleton heirarchy
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
 	FName name;
+
+	//Skeleton index
+	int id = -1;
 
 	//The type of measurement provided by this bone.
 	//Effectively masks out bone information which is known from being fused during runtime
@@ -113,6 +118,10 @@ struct FSpookySkeletonBoneOutputParams{
 	//Whether to use a local or global route to fusion
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky")
 	FSpookyMeasurementFlags flags;
+
+	//Whether to use a local or global route to fusion
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky")
+	float offsetLearningRate;
 };
 
 //Fusion parameters describe how the skeleton behaves when targeted by spooky
@@ -188,6 +197,8 @@ private:
 
 	//List of bones which carry measurements of  with associated meta info
 	std::map<FName, FSpookySkeletonBoneOutputParams> outputBones;
+	std::map<FName, FTransform> outputOffsets;
+
 	//List of target nodes for each active bone
 	std::map<FName, spooky::NodeDescriptor> targetNodes;
 	std::map<FName, FRotator> retargetRotators;
@@ -255,6 +266,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void SetAllFlags (const FSpookyMeasurementFlags& flags);
+
+	void AccumulateOffsets(spooky::ArticulatedModel& skeleton);
 
 	//--------------------------------
 	//		OUTPUT

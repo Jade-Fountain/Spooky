@@ -19,6 +19,8 @@ limitations under the License.
 #include "Spooky.h"
 #include "Logging.h"
 #include "SpookySkeletalMeshComponent.h"
+#include "SpookyFusionPlant.h"
+#include "Classes/Kismet/KismetMathLibrary.h"
 
 USpookySkeletalMeshComponent::USpookySkeletalMeshComponent(class FObjectInitializer const &)
 {
@@ -52,6 +54,7 @@ void USpookySkeletalMeshComponent::AddOutputBones(const TArray<FName>& bones, co
 		bool thisBoneExists = this->SkeletalMesh->RefSkeleton.FindBoneIndex(bones[i]) != INDEX_NONE;
 		if (thisBoneExists) {
 			outputBones[bones[i]] = *defaultBoneOutputParams;
+			outputBones[bones[i]].id = i;
 			if (i < boneTargetNodes.Num() && boneTargetNodes[i].Compare("") != 0) {
 				targetNodes[bones[i]] = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(boneTargetNodes[i].ToString())));
 			}
@@ -149,6 +152,26 @@ void USpookySkeletalMeshComponent::SetAllFlags(const FSpookyMeasurementFlags& fl
 	}
 }
 
+void USpookySkeletalMeshComponent::AccumulateOffsets(spooky::ArticulatedModel& skeleton) {
+	TArray<FTransform> componentSpaceTransforms = GetComponentSpaceTransforms();
+	for (auto& bone : outputBones) {
+		if (bone.second.flags.accumulateOffsets) {
+			spooky::NodeDescriptor boneName = targetNodes.count(bone.first) == 0 ? 
+				spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.first.ToString()))):
+				targetNodes[bone.first];
+			spooky::Transform3D currentPose = bone.second.flags.globalSpace ? 
+				skeleton.getNodeGlobalPose(boneName):
+				skeleton.getNodeLocalPose(boneName);
+			spooky::Transform3D sensedPose = USpookyFusionPlant::convert(
+				bone.second.flags.globalSpace ?
+				componentSpaceTransforms[bone.second.id].ToMatrixWithScale() :
+				BoneSpaceTransforms[bone.second.id].ToMatrixWithScale()
+			);
+			FTransform newOffset = USpookyFusionPlant::convert(sensedPose.inverse() * currentPose);
+			outputOffsets[bone.first] = UKismetMathLibrary::TLerp(outputOffsets[bone.first], newOffset, bone.second.offsetLearningRate);
+		}
+	}
+}
 
 
 spooky::NodeDescriptor USpookySkeletalMeshComponent::getOutputTargetNode(const FName& bone) {
