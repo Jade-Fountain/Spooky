@@ -251,5 +251,13 @@ bool USpookySkeletalMeshComponent::DoesBoneInputModelVelocity(const FName& bone)
 		return inputBones[bone].model_velocity;
 	}
 }
+FTransform USpookySkeletalMeshComponent::GetAccumulatedOffset(const FName& bone) {
+	if (outputOffsets.count(bone) == 0) {
+		throw ("Bone " + bone.ToString() + " doesnt have outputOffsets! - tried to access fusion parameters!");
+	}
+	else {
+		return outputOffsets[bone];
+	}
+}
 
 

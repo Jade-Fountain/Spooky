@@ -279,6 +279,8 @@ public:
 	Eigen::MatrixXf GetInputProcessNoise(const FName& bone);
 	bool DoesBoneInputModelVelocity(const FName& bone);
 
+	FTransform GetAccumulatedOffset(const FName& bone);
+
 	bool isBoneOutputActive(const FName& name) {
 		return outputBones.count(name) > 0;
 	}

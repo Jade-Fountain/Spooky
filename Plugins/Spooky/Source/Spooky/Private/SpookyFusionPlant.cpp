@@ -302,6 +302,12 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 					skeleton->lastHash[bone_name] = hashFTransform(skeleton->BoneSpaceTransforms[i]);
 				}
 			}
+
+			if (spookyBoneInfo.flags.accumulateOffsets) {
+				//T = S(t) * X (so reverse, because unreal is dumb)
+				T = skeleton->GetAccumulatedOffset(bone.Name) * T;
+			}
+
 			switch (spookyBoneInfo.measurementType) {
 				//TODO: local vs global variance?
 				case(ESpookyMeasurementType::GENERIC):
