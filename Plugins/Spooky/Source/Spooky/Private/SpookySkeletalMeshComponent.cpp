@@ -152,23 +152,23 @@ void USpookySkeletalMeshComponent::SetAllFlags(const FSpookyMeasurementFlags& fl
 	}
 }
 
-void USpookySkeletalMeshComponent::AccumulateOffsets(spooky::ArticulatedModel& skeleton) {
+void USpookySkeletalMeshComponent::AccumulateOffsets(spooky::ArticulatedModel& skeleton, const float& t) {
 	TArray<FTransform> componentSpaceTransforms = GetComponentSpaceTransforms();
 	for (auto& bone : outputBones) {
 		if (bone.second.flags.accumulateOffsets) {
-			spooky::NodeDescriptor boneName = targetNodes.count(bone.first) == 0 ? 
+			spooky::NodeDescriptor boneDesc = targetNodes.count(bone.first) == 0 ? 
 				spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.first.ToString()))):
 				targetNodes[bone.first];
 			spooky::Transform3D currentPose = bone.second.flags.globalSpace ? 
-				skeleton.getNodeGlobalPose(boneName):
-				skeleton.getNodeLocalPose(boneName);
+				skeleton.getNodeGlobalPose(boneDesc):
+				skeleton.getNodeLocalPose(boneDesc);
 			spooky::Transform3D sensedPose = USpookyFusionPlant::convert(
 				bone.second.flags.globalSpace ?
 				componentSpaceTransforms[bone.second.id].ToMatrixWithScale() :
 				BoneSpaceTransforms[bone.second.id].ToMatrixWithScale()
 			);
 			FTransform newOffset = USpookyFusionPlant::convert(sensedPose.inverse() * currentPose);
-			outputOffsets[bone.first] = UKismetMathLibrary::TLerp(outputOffsets[bone.first], newOffset, bone.second.offsetLearningRate);
+			outputOffsets[bone.first] = UKismetMathLibrary::TLerp(outputOffsets[bone.first], newOffset, bone.second.offsetLearningRate * skeleton.getNodeNonOffsetConfidence(boneDesc,t));
 		}
 	}
 }

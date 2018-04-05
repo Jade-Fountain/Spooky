@@ -267,7 +267,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void SetAllFlags (const FSpookyMeasurementFlags& flags);
 
-	void AccumulateOffsets(spooky::ArticulatedModel& skeleton);
+	void AccumulateOffsets(spooky::ArticulatedModel& skeleton, const float& t);
 
 	//--------------------------------
 	//		OUTPUT
