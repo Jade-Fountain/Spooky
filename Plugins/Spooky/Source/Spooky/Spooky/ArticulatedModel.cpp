@@ -61,6 +61,12 @@ namespace spooky {
 		return local_state.last_update_time - local_state.smallest_latency;
 	}
 
+	float Node::getNonOffsetConfidence(const float& t){
+		//TODO: config
+		return local_state.non_offset_confidence * std::exp(-std::fabs(t - local_state.non_offset_last_update_time) / 0.01); 
+	}
+
+
 	//TODO:reimplement
 	//
 	//Transform3D Node::getLocalPosePredicted(const float& deltaT){
@@ -374,6 +380,7 @@ namespace spooky {
 			//TODO: Make sure the root node is fused and avoid loops
 			//rootNode->fuse(calib,referenceSystem,nodes);
 
+			bool didntFuse = false;
 			switch (m->type) {
 				case(Measurement::Type::POSITION):
 					fusePositionMeasurement(m, toFusionSpace, rootNode);
@@ -392,6 +399,13 @@ namespace spooky {
 				case(Measurement::Type::SCALE):
 					fuseScaleMeasurement(m,toFusionSpace,rootNode);
 					break;
+				default:
+					didntFuse = true;
+					break;
+			}
+			if (!didntFuse && !m->accumulateOffset){
+				local_state.non_offset_confidence = std::fmax(getNonOffsetConfidence(m->getTimestamp()),m->confidence);
+				local_state.non_offset_last_update_time = m->getTimestamp();
 			}
 			smallest_latency = std::fmin(smallest_latency,m->getLatency());
 		}
@@ -725,7 +739,7 @@ namespace spooky {
 
 	Transform3D ArticulatedModel::getNodeGlobalPose(const NodeDescriptor& node){
 		if(nodes.count(node) == 0){
-			SPOOKY_LOG("WARNING - Transform3D ArticulatedModel::getNodeGlobalPose(" + node.name + ") - node does not exist");
+			SPOOKY_LOG("WARNING - ArticulatedModel::getNodeGlobalPose(" + node.name + ") - node does not exist");
 			return Transform3D::Identity();
 		} else {
 			return nodes[node]->getFinalGlobalPose();
@@ -734,7 +748,7 @@ namespace spooky {
 
 	Transform3D ArticulatedModel::getNodeLocalPose(const NodeDescriptor& node){
 		if(nodes.count(node) == 0){
-			SPOOKY_LOG("WARNING - Transform3D ArticulatedModel::getNodeLocalPose(" + node.name + ") - node does not exist");
+			SPOOKY_LOG("WARNING - ArticulatedModel::getNodeLocalPose(" + node.name + ") - node does not exist");
 			return Transform3D::Identity();
 		} else {
 			return nodes[node]->getLocalPose();
@@ -743,13 +757,21 @@ namespace spooky {
 
 	float ArticulatedModel::getNodeLastFusionTime(const NodeDescriptor& node){
 		if(nodes.count(node) == 0){
-			SPOOKY_LOG("WARNING - Transform3D ArticulatedModel::getNodeLocalPose(" + node.name + ") - node does not exist");
+			SPOOKY_LOG("WARNING - ArticulatedModel::getNodeLocalPose(" + node.name + ") - node does not exist");
 			return 0;
 		} else {
 			return nodes[node]->getNodeLastFusionTime();
 		}
 	}
 
+	float ArticulatedModel::getNodeNonOffsetConfidence(const NodeDescriptor& node, const float& t){
+		if(nodes.count(node) == 0){
+			SPOOKY_LOG("WARNING - ArticulatedModel::getNodeNonOffsetConfidence(" + node.name + ") - node does not exist");
+			return 0;
+		} else {
+			return nodes[node]->getNonOffsetConfidence(t);
+		}
+	}
 	//-------------------------------------------------------------------------------------------------------
 	//									Private
 	//-------------------------------------------------------------------------------------------------------

@@ -344,7 +344,7 @@ void USpookyFusionPlant::Fuse(float current_time)
 	spooky::utility::profiler.endTimer("AAA FUSION TIME");
 
 	for (auto& skel : skeletal_spirits) {
-		skel->AccumulateOffsets(spookyCore.getSkeleton());
+		skel->AccumulateOffsets(spookyCore.getSkeleton(), current_time);
 	}
 }
 
@@ -546,6 +546,7 @@ void USpookyFusionPlant::setFlags(spooky::Measurement::Ptr m, const FSpookyMeasu
 	m->globalSpace = flags.globalSpace;
 	m->relaxConstraints = flags.relaxConstraints;
 	m->sensorDrifts = flags.sensorDrifts;
+	m->accumulateOffset = flags.accumulateOffsets;
 }
 //===========================
 //DEBUG

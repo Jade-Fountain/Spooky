@@ -338,8 +338,11 @@ namespace spooky {
 		//Should the skeletal constraints and prior be relaxed during multiple fusion steps?
 		bool relaxConstraints = false;
 
-		//Should the measurements 
+		//Should we use velocity measurements if possible?
 		bool sensorDrifts = false;
+
+		//Does the sensor accumulate offset?
+		bool accumulateOffset = false;
 		//--------------------
 
 

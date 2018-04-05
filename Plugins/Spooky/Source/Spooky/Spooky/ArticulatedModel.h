@@ -86,6 +86,12 @@ namespace spooky {
 									   
 			//Last update time
 			float last_update_time = 0;
+
+			//TODO: generalize concepts of confidence
+			//Info for non-offset confidence
+			float non_offset_confidence = 0;
+			float non_offset_last_update_time = 0;
+
 			//Lowest latency from latest set of measurements
 			float smallest_latency = 0;
 			//State is valid - false if state poorly initialised, etc...
@@ -139,6 +145,9 @@ namespace spooky {
 
 		//Gets timestamp associated with latest data fusion, including accounting for latency
 		float getNodeLastFusionTime();
+
+		//Gets the confidence based only on measurments that don't accumulate offsets
+		float getNonOffsetConfidence(const float& t);
 
 		//TODO: reimplement:
 		////Get the local pose deltaT seconds into the future based on velocity
@@ -318,6 +327,9 @@ namespace spooky {
 			
 			//Gets the time last fusion occured
 			float getNodeLastFusionTime(const NodeDescriptor& node);
+
+			//Get confidence for this bone 
+			float getNodeNonOffsetConfidence(const NodeDescriptor& node, const float& t);
 
 		/*//////////////////////////////////////////////////////////////////
 		*				Private Data
