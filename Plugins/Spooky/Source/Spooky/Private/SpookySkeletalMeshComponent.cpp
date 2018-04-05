@@ -61,6 +61,9 @@ void USpookySkeletalMeshComponent::AddOutputBones(const TArray<FName>& bones, co
 			if (i < boneRetargetRotators.Num()) {
 				retargetRotators[bones[i]] = boneRetargetRotators[i];
 			}
+			if (outputBones[bones[i]].flags.accumulateOffsets) {
+				outputOffsets[bones[i]] = FTransform::Identity;
+			}
 		}
 		else {
 			missingBones.push_back(bones[i]);
@@ -253,11 +256,10 @@ bool USpookySkeletalMeshComponent::DoesBoneInputModelVelocity(const FName& bone)
 }
 FTransform USpookySkeletalMeshComponent::GetAccumulatedOffset(const FName& bone) {
 	if (outputOffsets.count(bone) == 0) {
-		throw ("Bone " + bone.ToString() + " doesnt have outputOffsets! - tried to access fusion parameters!");
+		outputOffsets[bone] = FTransform::Identity;
 	}
-	else {
-		return outputOffsets[bone];
-	}
+	return outputOffsets[bone];
+	
 }
 
 
