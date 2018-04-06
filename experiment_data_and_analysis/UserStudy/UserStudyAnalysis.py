@@ -1,8 +1,10 @@
 
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import numpy as np
 import math
+import scipy.stats
 from numpy import genfromtxt
 
 button_task_file = "ButtonBoard.csv"
@@ -63,18 +65,39 @@ def split(X, column):
             splitX[val_i] = np.append(splitX[val_i], [X[i]])
     return splitX
 
+def colourMap(i):
+    return {
+        0 : 'tab:red',
+        1 : 'tab:blue',
+        2 : 'tab:purple'
+    }[int(i)]
+
 def getDataFromFile(file,names,converters):
-    return np.array(genfromtxt(       file,
+    return np.array(genfromtxt(file,
                       delimiter=" ", 
                       comments="#", 
                       names=names,
                       converters=converters))
 
-#Specific analysis functions for each task
-def getParticipantDataButton(folder):
-    data = getDataFromFile(folder+"/"+button_task_file,
+def getRawParticipantData(folder,task_file):
+    if(task_file == button_task_file):
+        return getDataFromFile(folder+"/"+button_task_file,
                       names=["Tech", "Time", "Correct","CorrectPosX", "CorrectPosY", "CorrectPosZ", "TouchPosX", "TouchPosY", "TouchPosZ", "ButtonSize", "ResponseTime"],
                       converters={"Tech":techFromString,"Correct": boolFromString})
+    elif(task_file == sorting_task_file):
+        return getDataFromFile(folder+"/"+sorting_task_file,
+                      names=["Tech", "Time", "Correct", "Floor", "CubeNumber", "CubeColour", "ResponseTime", "NHands", "Grasps"],
+                      converters={"Tech":techFromString, "Correct": boolFromString, "Floor": boolFromString, "CubeColour": colourFromString})
+    elif(task_file == throw_task_file):
+        return getDataFromFile(folder+"/"+throw_task_file,
+                      names=["Tech", "Time", "Success", "HitPosX", "HitPosY", "HitPosZ", "ResponseTime", "GraspCount", "ThrowVelX", "ThrowVelY", "ThrowVelZ"],
+                      converters={"Tech":techFromString, "Success": boolFromString})
+    else:
+        raise ValueError('task not found')
+
+#Specific analysis functions for each task
+def getParticipantDataButton(folder):
+    data = getRawParticipantData(folder,button_task_file)
     
     splitData = split(data,0)
     scores = np.array([0,0,0])
@@ -92,9 +115,7 @@ def getParticipantDataButton(folder):
     return scores,mean_errors,responseTimes
 
 def getParticipantDataSort(folder):
-    data = getDataFromFile(folder+"/"+sorting_task_file,
-                      names=["Tech", "Time", "Correct", "Floor", "CubeNumber", "CubeColour", "ResponseTime", "NHands", "Grasps"],
-                      converters={"Tech":techFromString, "Correct": boolFromString, "Floor": boolFromString, "CubeColour": colourFromString})
+    data = getRawParticipantData(folder,sorting_task_file)
     splitData = split(data,0)
     scores = np.array([0,0,0])
     responseTimes = np.array([0.0,0.0,0.0])
@@ -103,10 +124,9 @@ def getParticipantDataSort(folder):
         responseTimes[int(i)] = splitData[i]['ResponseTime'].mean()
     return scores, responseTimes
 
+
 def getParticipantDataThrow(folder):
-    data = getDataFromFile(folder+"/"+throw_task_file,
-                      names=["Tech", "Time", "Success", "HitPosX", "HitPosY", "HitPosZ", "ResponseTime", "GraspCount", "ThrowVelX", "ThrowVelY", "ThrowVelZ"],
-                      converters={"Tech":techFromString, "Success": boolFromString})
+    data = getRawParticipantData(folder,throw_task_file)
 
     splitData = split(data,0)
     scores = np.array([0,0,0])
@@ -124,6 +144,80 @@ def getParticipantDataThrow(folder):
         mean_errors[int(i)] = errors.mean()
     return scores, mean_errors, responseTimes
 
-print getParticipantDataButton("JakeTest_5_4_18")
-print getParticipantDataSort("JakeTest_5_4_18")
-print getParticipantDataThrow("JakeTest_5_4_18")
+def plotThrowingData(folder):
+    data = getRawParticipantData(folder,throw_task_file)
+
+    splitData = split(data,0)
+
+    fig, ax = plt.subplots()
+
+    ax.set_aspect(1)
+    outer = patches.Circle([0,0], radius=100, color='w',linewidth=1,linestyle='solid',ec='k')
+    middle = patches.Circle([0,0], radius=50, color='b')
+    inner = patches.Circle([0,0], radius=10, color='k')
+    ax.add_patch(outer)
+    ax.add_patch(middle)
+    ax.add_patch(inner)
+
+    for i in splitData.keys():
+        deltaX = splitData[i]['HitPosX']
+        deltaY = splitData[i]['HitPosY']
+        plt.plot(deltaX,deltaY,'o',c=colourMap(i),ms=10)
+    plt.xlim([-300,300])
+    plt.ylim([-300,300])
+    plt.legend(['Leap Motion', 'Perception Neuron', 'Fused Tracking'])
+    
+
+    plt.show()
+
+
+
+def getParticipantSummaryStats(participant):
+    #Button
+    b_scores, b_errors, b_rtimes = getParticipantDataButton(participant)
+    #Sort
+    s_scores, s_rtimes = getParticipantDataSort(participant)
+    #Throw
+    t_scores, t_errors, t_rtimes = getParticipantDataThrow(participant)
+
+    improvements = np.array([[b_scores[2]-b_scores[0],b_scores[2]-b_scores[1],
+                               s_scores[2]-s_scores[0],s_scores[2]-s_scores[1],
+                               t_scores[2]-t_scores[0],t_scores[2]-t_scores[1]]])
+
+    time_improvements = np.array([[b_rtimes[0]-b_rtimes[2],b_rtimes[1]-b_rtimes[2],
+                                   s_rtimes[0]-s_rtimes[2],s_rtimes[1]-s_rtimes[2],
+                                   t_rtimes[0]-t_rtimes[2],t_rtimes[1]-t_rtimes[2]]])
+    
+    error_improvements = np.array([[b_errors[0]-b_errors[2],b_errors[1]-b_errors[2],
+                                    t_errors[0]-t_errors[2],t_errors[1]-t_errors[2]]])
+
+    return improvements, time_improvements, error_improvements
+
+#Pvalue 
+# Probability that we would see such large mean if population mean was zero
+def getPValueNormGT0(data):
+    sigma = data.std(axis=0)
+    mean = data.mean(axis=0)
+    print "mean = ", mean
+    print "sigma = ", sigma
+    pval = 1 - scipy.stats.norm.cdf(mean,scale=sigma/np.sqrt(data.shape[0]))    
+    return pval
+
+plotThrowingData("JakeTest_5_4_18")
+
+improvements, time_improvements, error_improvements = getParticipantSummaryStats("JakeTest_5_4_18")
+
+#test with repeated same measurements
+#TODO: append other participant improvements
+improvements = np.repeat(improvements,5,axis=0)
+time_improvements = np.repeat(time_improvements,5,axis=0)
+error_improvements = np.repeat(error_improvements,5,axis=0)
+# Offset to avoid zero stddev
+improvements[4] = improvements[4]-1
+time_improvements[4] = time_improvements[4]-0.1
+error_improvements[4] = error_improvements[4]-0.1
+
+print improvements,time_improvements,error_improvements
+print getPValueNormGT0(improvements)
+print getPValueNormGT0(time_improvements)
+print getPValueNormGT0(error_improvements)
