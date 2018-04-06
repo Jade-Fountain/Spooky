@@ -164,23 +164,33 @@ def plotThrowingData(folder):
     middle = patches.Circle([0,0], radius=28, color='r')
     inner = patches.Circle([0,0], radius=5, color='k')
     ssize = 30.0
-    player = patches.Rectangle([-200 - ssize/2,-ssize/2], width=ssize, height=ssize, color='k')
-    # ball = patches.Circle([-20,-ssize/2], width=ssize, height=ssize, color='k')
+    player = patches.Rectangle([-250 - ssize/2,-ssize/2], width=ssize, height=ssize, color='k')
+    standsize = 40.0
+    ball_stand = patches.Rectangle([-220.0 - standsize/2.0,-50-standsize/2.0], width=standsize, height=standsize, color='w',linestyle='solid',ec='k',linewidth=1)
+    ball = patches.Circle([-220,-50], radius=5, color='w',linestyle='solid',ec='k',linewidth=1)
     ax.add_patch(outer)
     ax.add_patch(outmiddle)
     ax.add_patch(middle)
     ax.add_patch(inner)
     ax.add_patch(player)
+    ax.add_patch(ball_stand)
+    ax.add_patch(ball)
 
     legend_counts = []
     for i in splitData.keys():
         deltaX = splitData[i]['HitPosX']
         deltaY = splitData[i]['HitPosY']
-        plt.plot(deltaX[deltaX<5000],deltaY[deltaY<5000],markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1)
-        legend_counts += [str(len(deltaX[deltaX<1000]))]
-    plt.legend(['Leap Motion (' + legend_counts[0] + '/' + str(len(splitData[0]['HitPosX'])) + ' throws)',
-                'Perception Neuron (' + legend_counts[1] + '/' + str(len(splitData[1]['HitPosX'])) + ' throws)',
-                'Fused Tracking (' + legend_counts[2] + '/' + str(len(splitData[2]['HitPosX'])) + ' throws)'])
+
+        xtest = np.abs(deltaX) < 200
+        ytest = np.abs(deltaY) < 200 
+        test = np.logical_and(xtest, ytest)
+        deltaFilteredX = deltaX[test]
+        deltaFilteredY = deltaY[test]
+        plt.plot(deltaFilteredX,deltaFilteredY,markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1)
+        legend_counts += [str(len(deltaFilteredX))]
+    plt.legend(['Leap Motion (' + legend_counts[0] + '/' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
+                'Perception Neuron (' + legend_counts[1] + '/' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
+                'Fused Tracking (' + legend_counts[2] + '/' + str(len(splitData[2]['HitPosX'])) + ' valid throws)'])
     
 
     plt.show()
