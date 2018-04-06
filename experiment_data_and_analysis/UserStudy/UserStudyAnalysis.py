@@ -67,9 +67,9 @@ def split(X, column):
 
 def colourMap(i):
     return {
-        0 : 'tab:red',
+        0 : 'tab:green',
         1 : 'tab:blue',
-        2 : 'tab:purple'
+        2 : 'tab:orange'
     }[int(i)]
 
 def markerMap(i):
@@ -196,7 +196,6 @@ def plotThrowingData(folder):
     plt.show()
 
 
-
 def getParticipantSummaryStats(participant):
     #Button
     b_scores, b_errors, b_rtimes = getParticipantDataButton(participant)
@@ -223,14 +222,28 @@ def getParticipantSummaryStats(participant):
 def getPValueNormGT0(data):
     sigma = data.std(axis=0)
     mean = data.mean(axis=0)
-    print "mean = ", mean
-    print "sigma = ", sigma
     pval = 1 - scipy.stats.norm.cdf(mean,scale=sigma/np.sqrt(data.shape[0]))    
     return pval
 
-plotThrowingData("Participant1")
+# plotThrowingData("Participant1")
 
-improvements, time_improvements, error_improvements = getParticipantSummaryStats("Participant1")
+participants = ["Participant1","JakeTest_5_4_18"]
+improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
+
+first = True
+for p in participants:
+    i,t,e = getParticipantSummaryStats(p)
+    if(first):
+        improvements = i
+        time_improvements = t
+        error_improvements = e
+        first = False
+    else:
+        improvements = np.append(improvements,i,axis=0)
+        time_improvements = np.append(time_improvements,t,axis=0)
+        error_improvements = np.append(error_improvements,e,axis=0)
+
+
 
 #TODO: append other participant improvements
 #test with repeated same measurements
@@ -242,7 +255,9 @@ improvements, time_improvements, error_improvements = getParticipantSummaryStats
 # time_improvements[4] = time_improvements[4]-0.1
 # error_improvements[4] = error_improvements[4]-0.1
 
-print improvements,time_improvements,error_improvements
-# print getPValueNormGT0(improvements)
-# print getPValueNormGT0(time_improvements)
-# print getPValueNormGT0(error_improvements)
+print improvements
+print time_improvements
+print error_improvements
+print getPValueNormGT0(improvements)
+print getPValueNormGT0(time_improvements)
+print getPValueNormGT0(error_improvements)
