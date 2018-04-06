@@ -72,6 +72,13 @@ def colourMap(i):
         2 : 'tab:purple'
     }[int(i)]
 
+def markerMap(i):
+    return {
+        0 : 's',
+        1 : 'o',
+        2 : '*'
+    }[int(i)]
+
 def getDataFromFile(file,names,converters):
     return np.array(genfromtxt(file,
                       delimiter=" ", 
@@ -165,11 +172,15 @@ def plotThrowingData(folder):
     ax.add_patch(inner)
     ax.add_patch(player)
 
+    legend_counts = []
     for i in splitData.keys():
         deltaX = splitData[i]['HitPosX']
         deltaY = splitData[i]['HitPosY']
-        plt.plot(deltaX[deltaX<1000],deltaY[deltaY<1000],'o',c=colourMap(i),ms=10)
-    plt.legend(['Leap Motion (x' + str(len(splitData[0]))+')', 'Perception Neuron (x' + str(len(splitData[1]))+')', 'Fused Tracking (x' + str(len(splitData[2]))+')'])
+        plt.plot(deltaX[deltaX<5000],deltaY[deltaY<5000],markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1)
+        legend_counts += [str(len(deltaX[deltaX<1000]))]
+    plt.legend(['Leap Motion (' + legend_counts[0] + '/' + str(len(splitData[0]['HitPosX'])) + ' throws)',
+                'Perception Neuron (' + legend_counts[1] + '/' + str(len(splitData[1]['HitPosX'])) + ' throws)',
+                'Fused Tracking (' + legend_counts[2] + '/' + str(len(splitData[2]['HitPosX'])) + ' throws)'])
     
 
     plt.show()
@@ -207,21 +218,21 @@ def getPValueNormGT0(data):
     pval = 1 - scipy.stats.norm.cdf(mean,scale=sigma/np.sqrt(data.shape[0]))    
     return pval
 
-plotThrowingData("JakeTest_5_4_18")
+plotThrowingData("Participant1")
 
-improvements, time_improvements, error_improvements = getParticipantSummaryStats("JakeTest_5_4_18")
+improvements, time_improvements, error_improvements = getParticipantSummaryStats("Participant1")
 
-#test with repeated same measurements
 #TODO: append other participant improvements
-improvements = np.repeat(improvements,5,axis=0)
-time_improvements = np.repeat(time_improvements,5,axis=0)
-error_improvements = np.repeat(error_improvements,5,axis=0)
-# Offset to avoid zero stddev
-improvements[4] = improvements[4]-1
-time_improvements[4] = time_improvements[4]-0.1
-error_improvements[4] = error_improvements[4]-0.1
+#test with repeated same measurements
+# improvements = np.repeat(improvements,5,axis=0)
+# time_improvements = np.repeat(time_improvements,5,axis=0)
+# error_improvements = np.repeat(error_improvements,5,axis=0)
+# # Offset to avoid zero stddev
+# improvements[4] = improvements[4]-1
+# time_improvements[4] = time_improvements[4]-0.1
+# error_improvements[4] = error_improvements[4]-0.1
 
 print improvements,time_improvements,error_improvements
-print getPValueNormGT0(improvements)
-print getPValueNormGT0(time_improvements)
-print getPValueNormGT0(error_improvements)
+# print getPValueNormGT0(improvements)
+# print getPValueNormGT0(time_improvements)
+# print getPValueNormGT0(error_improvements)
