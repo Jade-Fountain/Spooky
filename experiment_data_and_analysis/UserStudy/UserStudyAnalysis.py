@@ -152,20 +152,24 @@ def plotThrowingData(folder):
     fig, ax = plt.subplots()
 
     ax.set_aspect(1)
-    outer = patches.Circle([0,0], radius=100, color='w',linewidth=1,linestyle='solid',ec='k')
-    middle = patches.Circle([0,0], radius=50, color='b')
-    inner = patches.Circle([0,0], radius=10, color='k')
+    outer = patches.Circle([0,0], radius=130, color='w',linewidth=1,linestyle='solid',ec='k')
+    outmiddle = patches.Circle([0,0], radius=80, color='b')
+    middle = patches.Circle([0,0], radius=28, color='r')
+    inner = patches.Circle([0,0], radius=5, color='k')
+    ssize = 30.0
+    player = patches.Rectangle([-200 - ssize/2,-ssize/2], width=ssize, height=ssize, color='k')
+    # ball = patches.Circle([-20,-ssize/2], width=ssize, height=ssize, color='k')
     ax.add_patch(outer)
+    ax.add_patch(outmiddle)
     ax.add_patch(middle)
     ax.add_patch(inner)
+    ax.add_patch(player)
 
     for i in splitData.keys():
         deltaX = splitData[i]['HitPosX']
         deltaY = splitData[i]['HitPosY']
-        plt.plot(deltaX,deltaY,'o',c=colourMap(i),ms=10)
-    plt.xlim([-300,300])
-    plt.ylim([-300,300])
-    plt.legend(['Leap Motion', 'Perception Neuron', 'Fused Tracking'])
+        plt.plot(deltaX[deltaX<1000],deltaY[deltaY<1000],'o',c=colourMap(i),ms=10)
+    plt.legend(['Leap Motion (x' + str(len(splitData[0]))+')', 'Perception Neuron (x' + str(len(splitData[1]))+')', 'Fused Tracking (x' + str(len(splitData[2]))+')'])
     
 
     plt.show()
