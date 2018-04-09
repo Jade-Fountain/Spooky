@@ -20,6 +20,7 @@ limitations under the License.
 #include <../Classes/Components/SkeletalMeshComponent.h>
 #include <vector>
 #include "Spooky/FusionTypes.h"
+#include "Spooky/Utilities/CommonMath.h"
 #include "Spooky/ArticulatedModel.h"
 #include "SpookySkeletalMeshComponent.generated.h"
 
@@ -197,7 +198,7 @@ private:
 
 	//List of bones which carry measurements of  with associated meta info
 	std::map<FName, FSpookySkeletonBoneOutputParams> outputBones;
-	std::map<FName, FTransform> outputOffsets;
+	std::map<FName, spooky::Transform3D> outputOffsets;
 
 	//List of target nodes for each active bone
 	std::map<FName, spooky::NodeDescriptor> targetNodes;

@@ -245,52 +245,56 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 			bool dontcare;
 			FRotator retargetRotationOffset = skeleton->getOutputRetargetRotator(bone.Name, &dontcare);
 			//Retarget either globally or locally
-			if(spookyBoneInfo.flags.globalSpace){
-				T = componentSpaceTransforms[i];
-				/////WARNING////
-				//For some fucking reason UE4 FTransforms multiply backwards!!!
-				//That is, A*B applies A first and then B. 
-				//HOWEVER, FQuats rotate in the expected order
-				/////WARNING////
-				T.SetRotation(T.GetRotation() * retargetRotationOffset.Quaternion());
-			}
-			else {
-				//Retarget to new skeleton
-				//Requires knowledge of parent rotator relationship
-				bool parent_rotator_set = false;
-				int current_bone = i;
-				/////WARNING////
-				//For some fucking reason UE4 FTransforms multiply backwards!!!
-				//That is, A*B applies A first and then B. 
-				/////WARNING////
-				FTransform parentRetargetRotator = skeleton->BoneSpaceTransforms[i];
-				while (!parent_rotator_set && current_bone >= 0) {
-					//Get next bone
-					current_bone = boneInfo[current_bone].ParentIndex;
-					if (current_bone < 0) {
-						break;
-					}
-					//Find parent retargetor
-					FRotator A = skeleton->getOutputRetargetRotator(boneInfo[current_bone].Name, &parent_rotator_set);
-					if (parent_rotator_set) {
-						parentRetargetRotator = parentRetargetRotator * FTransform(A.GetInverse());
-					}
-					else {
-						parentRetargetRotator = parentRetargetRotator * skeleton->BoneSpaceTransforms[current_bone];
-					}
+			if(!spookyBoneInfo.flags.accumulateOffsets){
+				if(spookyBoneInfo.flags.globalSpace){
+					T = componentSpaceTransforms[i];
+					/////WARNING////
+					//For some fucking reason UE4 FTransforms multiply backwards!!!
+					//That is, A*B applies A first and then B. 
+					//HOWEVER, FQuats rotate in the expected order
+					/////WARNING////
+					T.SetRotation(T.GetRotation() * retargetRotationOffset.Quaternion());
 				}
-				/////WARNING////
-				//For some fucking reason UE4 FTransforms multiply backwards!!!
-				//That is, A*B applies A first and then B. 
-				/////WARNING////
-				T = FTransform(retargetRotationOffset) * parentRetargetRotator;
-				if (bone_name == spooky::NodeDescriptor("LeftShoulder")) {
-					std::stringstream ss;
-					ss << std::endl;
-					ss << "LeftShoulder  " << std::endl;
-					SPOOKY_LOG(ss.str());
+				else {
+					//Retarget to new skeleton
+					//Requires knowledge of parent rotator relationship
+					bool parent_rotator_set = false;
+					int current_bone = i;
+					/////WARNING////
+					//For some fucking reason UE4 FTransforms multiply backwards!!!
+					//That is, A*B applies A first and then B. 
+					/////WARNING////
+					FTransform parentRetargetRotator = skeleton->BoneSpaceTransforms[i];
+					while (!parent_rotator_set && current_bone >= 0) {
+						//Get next bone
+						current_bone = boneInfo[current_bone].ParentIndex;
+						if (current_bone < 0) {
+							break;
+						}
+						//Find parent retargetor
+						FRotator A = skeleton->getOutputRetargetRotator(boneInfo[current_bone].Name, &parent_rotator_set);
+						if (parent_rotator_set) {
+							parentRetargetRotator = parentRetargetRotator * FTransform(A.GetInverse());
+						}
+						else {
+							parentRetargetRotator = parentRetargetRotator * skeleton->BoneSpaceTransforms[current_bone];
+						}
+					}
+					/////WARNING////
+					//For some fucking reason UE4 FTransforms multiply backwards!!!
+					//That is, A*B applies A first and then B. 
+					/////WARNING////
+					T = FTransform(retargetRotationOffset) * parentRetargetRotator;
+				}
+			} else {
+				if (spookyBoneInfo.flags.globalSpace) {
+					T = componentSpaceTransforms[i];
+				}
+				else {
+					T = skeleton->BoneSpaceTransforms[i];
 				}
 			}
+
 
 			if (spookyBoneInfo.flags.filterUnchanged) {
 				if (skeleton->lastHash.count(bone_name) == 0) {

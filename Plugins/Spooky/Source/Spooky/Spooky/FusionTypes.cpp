@@ -36,6 +36,8 @@ namespace spooky {
 		confidence = confidence_;
 		return check_consistent();
 	}
+
+
 	//=========================
 	//Static factory methods:
 	//=========================
