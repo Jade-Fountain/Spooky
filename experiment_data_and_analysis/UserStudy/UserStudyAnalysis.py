@@ -225,9 +225,9 @@ def getPValueNormGT0(data):
     pval = 1 - scipy.stats.norm.cdf(mean,scale=sigma/np.sqrt(data.shape[0]))    
     return pval
 
-# plotThrowingData("Participant1")
+plotThrowingData("JakeTest_9_4_18")
 
-participants = ["Participant1","JakeTest_5_4_18"]
+participants = ["JakeTest_9_4_18","Participant1","JakeTest_5_4_18"]
 improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
 
 first = True
@@ -244,8 +244,6 @@ for p in participants:
         error_improvements = np.append(error_improvements,e,axis=0)
 
 
-
-#TODO: append other participant improvements
 #test with repeated same measurements
 # improvements = np.repeat(improvements,5,axis=0)
 # time_improvements = np.repeat(time_improvements,5,axis=0)
@@ -255,9 +253,15 @@ for p in participants:
 # time_improvements[4] = time_improvements[4]-0.1
 # error_improvements[4] = error_improvements[4]-0.1
 
+print "improvements "
 print improvements
+print "time_improvements "
 print time_improvements
+print "error_improvements "
 print error_improvements
-print getPValueNormGT0(improvements)
-print getPValueNormGT0(time_improvements)
-print getPValueNormGT0(error_improvements)
+print "getPValueNormGT0(improvements) "
+print getPValueNormGT0(improvements) < 0.05
+print "getPValueNormGT0(time_improvements) "
+print getPValueNormGT0(time_improvements) < 0.05
+print "getPValueNormGT0(error_improvements) "
+print getPValueNormGT0(error_improvements) < 0.05
