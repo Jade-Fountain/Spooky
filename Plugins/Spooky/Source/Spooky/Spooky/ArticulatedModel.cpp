@@ -362,7 +362,7 @@ namespace spooky {
 		for(auto& m : measurements){
 			//Throwout bad measurements
 			//TODO: use confidence better
-			if (m->confidence < 0.25) {
+			if (m->confidence < 0.01) {
 				continue;
 			}
 
