@@ -241,7 +241,7 @@ public:
 	@param boneRetargetRotators are rotators that map from target skeleton to this skeleton. For 3x3 matrix: target bone coordinate vectors written in this skeletons bone coords
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
-	void AddOutputBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, const TArray<FRotator>& boneRetargetRotators,ESpookyReturnStatus& branch);
+	void AddOutputBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, const TArray<FRotator>& boneRetargetRotators, ESpookyReturnStatus& branch);
 	
 	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
 	void AddInputBones(const TArray<FName>& bones, ESpookyReturnStatus& branch);
@@ -264,6 +264,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void UpdateOutputConfidence(const FName& bone,const float& confidence);
+
+	UFUNCTION(BlueprintCallable, Category = "Spooky")
+	void UpdateOutputVariances(const FName& bone, const FVector& position_var, const FVector4& rotation_var, const FVector& scale_var);
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void SetAllFlags (const FSpookyMeasurementFlags& flags);

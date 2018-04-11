@@ -153,6 +153,14 @@ void USpookySkeletalMeshComponent::UpdateOutputConfidence(const FName& bone,cons
 	if(!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
 	outputBones[bone].confidence = confidence;
 }
+//TODO: have bone not found checks here
+void USpookySkeletalMeshComponent::UpdateOutputVariances(const FName& bone, const FVector& position_var, const FVector4& quaternion_var, const FVector& scale_var) {
+	if (!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
+	outputBones[bone].position_var = position_var;
+	outputBones[bone].quaternion_var = quaternion_var;
+	outputBones[bone].scale_var = scale_var;
+}
+
 void USpookySkeletalMeshComponent::SetAllFlags(const FSpookyMeasurementFlags& flags) {
 	if (!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
 	for (auto& bone : outputBones) {
