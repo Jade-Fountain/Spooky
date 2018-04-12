@@ -381,31 +381,35 @@ namespace spooky {
 			//rootNode->fuse(calib,referenceSystem,nodes);
 
 			bool didntFuse = false;
+			std::vector<Node::Ptr> updatedNodes;
 			switch (m->type) {
 				case(Measurement::Type::POSITION):
-					fusePositionMeasurement(m, toFusionSpace, rootNode);
+					updatedNodes = fusePositionMeasurement(m, toFusionSpace, rootNode);
 					break;
 				case(Measurement::Type::ROTATION):
 					if (m->sensorDrifts && measurementBuffer.count(m->getSensor()) > 0) {
-						fuseDeltaRotationMeasurement(m, toFusionSpace, rootNode);
+						updatedNodes = fuseDeltaRotationMeasurement(m, toFusionSpace, rootNode);
 					}
 					else {
-						fuseRotationMeasurement(m, toFusionSpace, rootNode);
+						updatedNodes = fuseRotationMeasurement(m, toFusionSpace, rootNode);
 					}
 					break;
 				case(Measurement::Type::RIGID_BODY):
-					fuseRigidMeasurement(m,toFusionSpace,rootNode);
+					updatedNodes = fuseRigidMeasurement(m,toFusionSpace,rootNode);
 					break;
 				case(Measurement::Type::SCALE):
-					fuseScaleMeasurement(m,toFusionSpace,rootNode);
+					updatedNodes = fuseScaleMeasurement(m,toFusionSpace,rootNode);
 					break;
 				default:
 					didntFuse = true;
 					break;
 			}
 			if (!didntFuse && !m->accumulateOffset){
-				local_state.non_offset_confidence = std::fmax(getNonOffsetConfidence(m->getTimestamp()),m->confidence);
-				local_state.non_offset_last_update_time = m->getTimestamp();
+				//Update non-offset confidence
+				for(auto& node : updatedNodes){
+					node->local_state.non_offset_confidence = std::fmax(node->getNonOffsetConfidence(m->getTimestamp()),m->confidence);
+					node->local_state.non_offset_last_update_time = m->getTimestamp();	
+				}
 			}
 			smallest_latency = std::fmin(smallest_latency,m->getLatency());
 		}

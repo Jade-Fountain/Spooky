@@ -130,7 +130,7 @@ namespace spooky{
         return result;
     }
 
-    void Node::fusePositionMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
+    std::vector<Node::Ptr> Node::fusePositionMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 
         //------------------------------------------------------------------
         //Transform measurement to fusion space
@@ -198,9 +198,10 @@ namespace spooky{
 
 
         computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+        return fusion_chain;
     }
 
-    void Node::fuseRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
+    std::vector<Node::Ptr> Node::fuseRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
@@ -263,9 +264,10 @@ namespace spooky{
                 
         //Perform computation
         computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+        return fusion_chain;
     }
 
-    void Node::fuseDeltaRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
+    std::vector<Node::Ptr> Node::fuseDeltaRotationMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
         //Transform measurement to fusion space
         //TODO: optimise: dont transform when possible
         Measurement::Ptr m = m_local->globalSpace ? std::make_unique<Measurement>(m_local->transform(toFusionSpace)) : m_local;
@@ -328,9 +330,10 @@ namespace spooky{
         computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, 0, getPredState, getMeas, getMeasJac, m->relaxConstraints);
 
 		measurementBuffer[m->getSensor()] = TimestampedData(exp_omega, m->getTimestamp());
+        return fusion_chain;
     }
 
-    void Node::fuseRigidMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
+    std::vector<Node::Ptr> Node::fuseRigidMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
         //------------------------------------------------------------------
         //Transform measurement to fusion space
         //------------------------------------------------------------------
@@ -400,6 +403,7 @@ namespace spooky{
 
 
         computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+        return fusion_chain;
         //DEBUG
   //       std::stringstream ss;
 		// ss << std::endl << "wpstate = " << wpstate.transpose() << std::endl;
@@ -408,7 +412,7 @@ namespace spooky{
 
     }
 
-    void Node::fuseScaleMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
+    std::vector<Node::Ptr> Node::fuseScaleMeasurement(const Measurement::Ptr& m_local, const Transform3D& toFusionSpace, const Node::Ptr& rootNode){
 
 
         //Transform measurement to fusion space
@@ -462,6 +466,7 @@ namespace spooky{
         
         //Perform computation
         computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+        return fusion_chain;
 
     }
 

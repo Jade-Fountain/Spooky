@@ -227,11 +227,12 @@ namespace spooky {
 	    std::vector<Node::Ptr> getRequiredChain(const Node::Ptr& destNode, const Measurement::Ptr& m);
 
 		//Fusion of particular mesurement types (defined in FusionProcedures.cpp)
-		void fusePositionMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
-		void fuseRotationMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
-		void fuseDeltaRotationMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
-		void fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
-		void fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
+		//Returns the updated node chain for future reference
+		std::vector<Node::Ptr> fusePositionMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
+		std::vector<Node::Ptr> fuseRotationMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
+		std::vector<Node::Ptr> fuseDeltaRotationMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
+		std::vector<Node::Ptr> fuseRigidMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
+		std::vector<Node::Ptr> fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
 		
 		//Main generic EKF algorithm
 	    void Node::computeEKFUpdate(
