@@ -312,11 +312,13 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 				T = skeleton->GetAccumulatedOffset(bone.Name) * T;
 			}
 
+			bool addMeas = true;
 			switch (spookyBoneInfo.measurementType) {
 				//TODO: local vs global variance?
 				case(ESpookyMeasurementType::GENERIC):
 					//TODO: support generic measurement
-					m = CreatePositionMeasurement(skeleton->system_name, i, spookyBoneInfo.timestamp_sec, T.GetTranslation(), spookyBoneInfo.position_var, spookyBoneInfo.confidence);
+					//m = CreatePositionMeasurement(skeleton->system_name, i, spookyBoneInfo.timestamp_sec, T.GetTranslation(), spookyBoneInfo.position_var, spookyBoneInfo.confidence);
+					addMeas = false;
 					break;
 				case(ESpookyMeasurementType::POSITION):
 					m = CreatePositionMeasurement(skeleton->system_name, i, spookyBoneInfo.timestamp_sec,T.GetTranslation(), spookyBoneInfo.position_var, spookyBoneInfo.confidence);
@@ -331,6 +333,7 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 					m = CreateScaleMeasurement(skeleton->system_name, i, spookyBoneInfo.timestamp_sec, T.GetScale3D(),  spookyBoneInfo.scale_var, spookyBoneInfo.confidence);
 					break;
 			}
+			if (!addMeas) continue;
 			setFlags(m, spookyBoneInfo.flags);
 			spookyCore.addMeasurement(m, targetNode);
 		}
