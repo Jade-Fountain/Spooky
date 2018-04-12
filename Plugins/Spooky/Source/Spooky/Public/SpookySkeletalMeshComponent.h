@@ -91,18 +91,12 @@ struct FSpookySkeletonBoneOutputParams{
 	//TODO: support full matrix variance - currently not supported because unreal matrix types are limited
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
 	FVector position_var;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	bool position_var_global = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
 	FVector4 quaternion_var;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	bool quaternion_var_global = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
 	FVector scale_var;	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spooky")
-	bool scale_var_global = false;
 
 	//Confidence
 	//.........................
@@ -120,9 +114,13 @@ struct FSpookySkeletonBoneOutputParams{
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky")
 	FSpookyMeasurementFlags flags;
 
-	//Whether to use a local or global route to fusion
+	//The learning rate for the exponential filter used to track offsets for this bone
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky")
-	float offsetLearningRate;
+	float offsetLearningRate = 0.001;
+
+	//The threshold of confidence required for another sensor to influence the offset of this bone
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spooky")
+	float offsetConfidenceThreshold = 0.5;
 };
 
 //Fusion parameters describe how the skeleton behaves when targeted by spooky

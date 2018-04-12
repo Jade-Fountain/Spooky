@@ -176,7 +176,9 @@ void USpookySkeletalMeshComponent::AccumulateOffsets(spooky::ArticulatedModel& s
 			spooky::NodeDescriptor boneDesc = targetNodes.count(bone.first) == 0 ? 
 				spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.first.ToString()))):
 				targetNodes[bone.first];
-			spooky::Transform3D currentPose = bone.second.flags.globalSpace ? 
+			float conf = skeleton.getNodeNonOffsetConfidence(boneDesc, t);
+			if (conf < bone.second.offsetConfidenceThreshold) continue;
+			spooky::Transform3D currentPose = bone.second.flags.globalSpace ?
 				skeleton.getNodeGlobalPose(boneDesc):
 				skeleton.getNodeLocalPose(boneDesc);
 			spooky::Transform3D sensedPose = USpookyFusionPlant::convert(
@@ -185,7 +187,7 @@ void USpookySkeletalMeshComponent::AccumulateOffsets(spooky::ArticulatedModel& s
 				BoneSpaceTransforms[bone.second.id].ToMatrixWithScale()
 			);
 			spooky::Transform3D newOffset = sensedPose.inverse() * currentPose;
-			outputOffsets[bone.first] = spooky::utility::slerpTransform3D(outputOffsets[bone.first], newOffset, bone.second.offsetLearningRate * skeleton.getNodeNonOffsetConfidence(boneDesc, t));
+			outputOffsets[bone.first] = spooky::utility::slerpTransform3D(outputOffsets[bone.first], newOffset, bone.second.offsetLearningRate * conf);
 		}
 	}
 }
