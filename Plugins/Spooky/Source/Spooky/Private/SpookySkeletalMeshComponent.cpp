@@ -51,10 +51,10 @@ void USpookySkeletalMeshComponent::AddOutputBones(const TArray<FName>& bones, co
 	}
 	std::vector<FName> missingBones;
 	for(int i = 0; i < bones.Num(); i++){
-		bool thisBoneExists = this->SkeletalMesh->RefSkeleton.FindBoneIndex(bones[i]) != INDEX_NONE;
-		if (thisBoneExists) {
+		int id = this->SkeletalMesh->RefSkeleton.FindBoneIndex(bones[i]);
+		if (id != INDEX_NONE) {
 			outputBones[bones[i]] = *defaultBoneOutputParams;
-			outputBones[bones[i]].id = i;
+			outputBones[bones[i]].id = id;
 			if (i < boneTargetNodes.Num() && boneTargetNodes[i].Compare("") != 0) {
 				targetNodes[bones[i]] = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(boneTargetNodes[i].ToString())));
 			}
@@ -111,12 +111,13 @@ void USpookySkeletalMeshComponent::AddInputBones(const TArray<FName>& bones, ESp
 
 
 void USpookySkeletalMeshComponent::SetBoneOutputParams(const FSpookySkeletonBoneOutputParams& info, ESpookyReturnStatus& branch){
-	if(outputBones.count(info.name) == 0){
+	int id = this->SkeletalMesh->RefSkeleton.FindBoneIndex(info.name);
+	if(outputBones.count(info.name) == 0 || id == INDEX_NONE){
 		branch = ESpookyReturnStatus::Failure;
 	} else {
 		branch = ESpookyReturnStatus::Success;
 		auto info_ = info;
-		info_.id = outputBones[info.name].id;
+		info_.id = id;
 		outputBones[info.name] = info_;
 		if (outputBones[info.name].flags.accumulateOffsets) {
 			outputOffsets[info.name] = spooky::Transform3D::Identity();
