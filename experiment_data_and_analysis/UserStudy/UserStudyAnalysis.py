@@ -225,9 +225,9 @@ def getPValueNormGT0(data):
     pval = 1 - scipy.stats.norm.cdf(mean,scale=sigma/np.sqrt(data.shape[0]))    
     return pval
 
-plotThrowingData("JakeTest_12_4_18")
+plotThrowingData("MattTest2")
 
-participants = ["JakeTest_12_4_18","MattTest"]
+participants = ["JakeTest_12_4_18","MattTest","MattTest2"]
 improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
 
 first = True
