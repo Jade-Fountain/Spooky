@@ -497,11 +497,11 @@ namespace spooky{
 		float last_error = 9999999999999999;
 		int iterations = 0;
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 1; i++) {
 			iterations++;
             //TODO optimise ekf by using information matrices and inverting covariance per node
             newChainState = customEKFMeasurementUpdate(chainState, constraints, stiffness, measurement, measurementJacobian, predictedMeasurement);
-            //newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, wpstate);
+            //newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, predictedMeasurement);
 
             chainState.expectation = newChainState.expectation;
             //Move to next approximation, but keep old variances
