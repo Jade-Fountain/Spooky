@@ -177,16 +177,30 @@ void USpookySkeletalMeshComponent::AccumulateOffsets(spooky::ArticulatedModel& s
 				spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.first.ToString()))):
 				targetNodes[bone.first];
 			float conf = skeleton.getNodeNonOffsetConfidence(boneDesc, t);
+			//Dont correct for offset
 			if (conf < bone.second.offsetConfidenceThreshold) continue;
+			//T, true state of bone
 			spooky::Transform3D currentPose = bone.second.flags.globalSpace ?
 				skeleton.getNodeGlobalPose(boneDesc):
 				skeleton.getNodeLocalPose(boneDesc);
+			//S, sensed pose
 			spooky::Transform3D sensedPose = USpookyFusionPlant::convert(
 				bone.second.flags.globalSpace ?
 				componentSpaceTransforms[bone.second.id].ToMatrixWithScale() :
 				BoneSpaceTransforms[bone.second.id].ToMatrixWithScale()
 			);
-			spooky::Transform3D newOffset = sensedPose.inverse() * currentPose;
+			//new offset based on difference
+			spooky::Transform3D newOffset;
+			if (bone.second.flags.globalSpace) {
+				bool success = false;
+				FRotator retargetRinv = getOutputRetargetRotator(bone.first, &success).GetInverse();
+				FTransform retargetTinv;
+				retargetTinv.SetRotation(retargetRinv.Quaternion());
+				newOffset = USpookyFusionPlant::convert(retargetTinv.ToMatrixWithScale()) * sensedPose.inverse() * currentPose;
+			}
+			else {
+				throw std::runtime_error("SpookySkeletalMeshComponent - local space offset accumulation not yet supported");
+			}
 			outputOffsets[bone.first] = spooky::utility::slerpTransform3D(outputOffsets[bone.first], newOffset, bone.second.offsetLearningRate * conf);
 		}
 	}
