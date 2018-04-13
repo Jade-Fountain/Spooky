@@ -248,6 +248,7 @@ namespace spooky {
 			// pos1[i][k] * X = Y * pos2[i][k] 
 			//Y:System2->System1
 			auto group_result = utility::calibration::Transform::twoSystems_Kronecker_Shah2013(pos1[i], pos2[i], &error, includePosition);
+			if (group_result.first.matrix().hasNaN() || group_result.second.matrix().hasNaN()) continue;
 			transformsX.push_back(group_result.first);
 			transformsY.push_back(group_result.second);
 			weights.push_back(utility::qualityFromError(error, qualityScaleFactor));
