@@ -56,6 +56,7 @@ namespace spooky {
 		std::map<SystemDescriptor, NodeDescriptor> rootNodes;
 
 		//Debug/Stats
+		float framerate = 0;
 		float last_time = 0;
 		long int frame_count = 0;
 

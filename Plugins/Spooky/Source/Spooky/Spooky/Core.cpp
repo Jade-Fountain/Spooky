@@ -170,6 +170,11 @@ namespace spooky {
 		utility::profiler.startTimer("CoreMainLoop");
 
 		frame_count++;
+		if(time != last_time){
+			framerate = 1 / (time - last_time);
+		} else {
+			framerate = -1;
+		}
 		last_time = time;
 		//TODO: add ifdefs for profiling
 
@@ -274,7 +279,7 @@ namespace spooky {
 	}
 
 	std::string Core::getTimingSummary() {
-		return utility::profiler.getReport() + "\n framerate = "  + std::to_string(frame_count / last_time);
+		return utility::profiler.getReport() + "\n FPS = "  + std::to_string(framerate) + " (avg: " + std::to_string(frame_count / last_time) + ")";
 	}
 
 	ArticulatedModel& Core::getSkeleton() {
