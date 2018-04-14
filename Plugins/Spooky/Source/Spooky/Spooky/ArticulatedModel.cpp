@@ -216,7 +216,7 @@ namespace spooky {
 		//Construct new parameters set for combined articulations
 		State::Parameters p(getDimension());
 		//Zero
-		auto p_var = Eigen::MatrixXf::Zero(getDimension(),getDimension());
+		Eigen::MatrixXf p_var = Eigen::MatrixXf::Zero(getDimension(),getDimension());
 		//if velocity not modelled, return zeros
 		if(!local_state.modelVelocity) return p;
 		//Otherwise, return ones for second half of each vector

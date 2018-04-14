@@ -81,9 +81,10 @@ namespace spooky {
 
 				void addProcessNoiseApprox(const Eigen::MatrixXf& P) {
 					variance_ += P;
-					Eigen::VectorXf v_powneg2 = Eigen::VectorXf(-variance_.diagonal()).pow(-2);
+					Eigen::VectorXf v_powneg = Eigen::VectorXf(variance_.diagonal()).cwiseInverse();
+					Eigen::VectorXf v_powneg2 = v_powneg.cwiseProduct(-v_powneg);
 					//Assumes P diagonal, and info diagonal mostly
-					information_ +=  v_powneg2.cwiseProduct(P.diagonal());
+					information_ +=  v_powneg2.cwiseProduct(P.diagonal()).asDiagonal();
 					
 					//assuming (1+X)^-1 = sum(i=0,inf,X^i), if ||X||<1  "binomial series" 
 					//then (X+P)^-1 ~= P^-1 - XP^-2
