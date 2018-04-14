@@ -36,7 +36,6 @@ namespace spooky {
 		class State{
 		public:
 			class Parameters {
-			public:
 				//Vectors of articulation states stored in columns
 				//		theta1	phi1 ...
 				//		theta2	phi2
@@ -47,34 +46,66 @@ namespace spooky {
 				//				y
 				//				z
 				//	e.g. twists:(theta1	theta2 theta3)
-				Eigen::VectorXf expectation;
-				//Covariance associated with vec(expectation)
-				Eigen::MatrixXf variance;
+				Eigen::VectorXf expectation_;
+				//Covariance associated with vec(expectation_)
+				Eigen::MatrixXf variance_;
+				Eigen::MatrixXf information_;
+
+			public:
+				//Getters
+				const Eigen::MatrixXf& variance() const{return variance_;} 
+				const Eigen::MatrixXf& information() const{return information_;} 
+				const Eigen::VectorXf& expectation() const { return expectation_; }
+
+				//Expectation can be modified directly
+				Eigen::VectorXf& expectation(){return expectation_;}
+				
+				//Setters for variance and information 
+				void set_variance(const Eigen::MatrixXf& v){variance_ = v; information_ = v.inverse();}
+				void set_information(const Eigen::MatrixXf& i){information_ = i; variance_ = i.inverse();}
 
 				Parameters getSubstate(const int& position, const int& dim) const {
 					Parameters substate(dim);
-					substate.expectation = expectation.block(position, 0, dim, 1);
-					substate.variance = variance.block(position, position, dim, dim);
+					substate.expectation_ = expectation_.block(position, 0, dim, 1);
+					substate.variance_ = variance_.block(position, position, dim, dim);
+					substate.information_ = information_.block(position, position, dim, dim);
 					return substate;
 				}
 
 				void insertSubstate(const int& position, const Parameters& p) {
-					int dim = p.expectation.size();
-					expectation.block(position, 0, dim, 1) = p.expectation;
-					variance.block(position, position, dim, dim) = p.variance;
+					int dim = p.expectation_.size();
+					expectation_.block(position, 0, dim, 1) = p.expectation_;
+					variance_.block(position, position, dim, dim) = p.variance_;
+					information_.block(position, position, dim, dim) = p.information_;
+				}
+
+				void addProcessNoiseApprox(const Eigen::MatrixXf& P) {
+					variance_ += P;
+					Eigen::VectorXf v_powneg2 = Eigen::VectorXf(-variance_.diagonal()).pow(-2);
+					//Assumes P diagonal, and info diagonal mostly
+					information_ +=  v_powneg2.cwiseProduct(P.diagonal());
+					
+					//assuming (1+X)^-1 = sum(i=0,inf,X^i), if ||X||<1  "binomial series" 
+					//then (X+P)^-1 ~= P^-1 - XP^-2
+					//Eigen::VectorXf diagPinv = P.diagonal().cwiseInverse();
+					//Eigen::VectorXf diagPinv2 = diagPinv.pow(2);
+					//information_ = Eigen::MatrixXf(diagPinv.asDiagonal()) + information_ * diagPinv2.asDiagonal();
 				}
 
 				Parameters(int dim) :
-					expectation(dim),
-					variance(dim, dim)
+					expectation_(dim),
+					variance_(dim, dim),
+					information_(dim, dim)
 				{
-					expectation.setZero();
-					variance.setIdentity();
+					expectation_.setZero();
+					variance_.setIdentity();
+					information_.setIdentity();
 				}
 
-				Parameters(const Eigen::VectorXf& x, const Eigen::MatrixXf& V) : expectation(x), variance(V){
-
-				}
+				Parameters(const Eigen::VectorXf& x, const Eigen::MatrixXf& V) : 
+					expectation_(x), 
+					variance_(V), 
+					information_(V.inverse()){}
 			};
 			bool modelVelocity = true;
 
