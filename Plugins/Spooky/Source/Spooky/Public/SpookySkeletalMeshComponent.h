@@ -246,7 +246,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
 	void SetBoneOutputParams(const FSpookySkeletonBoneOutputParams& info, ESpookyReturnStatus& branch);
-	
+
+	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
+	void SetMultiBoneOutputParams(const TArray<FName>& bones, const FSpookySkeletonBoneOutputParams& info, ESpookyReturnStatus& branch);
+
 	UFUNCTION(BlueprintCallable, Category = "Spooky", Meta = (ExpandEnumAsExecs = "branch"))
 	void SetBoneInputParams(const FSpookyBoneInputParams& info, ESpookyReturnStatus& branch);
 

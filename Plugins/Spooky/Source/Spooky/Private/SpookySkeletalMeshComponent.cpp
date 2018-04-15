@@ -125,6 +125,18 @@ void USpookySkeletalMeshComponent::SetBoneOutputParams(const FSpookySkeletonBone
 	}
 }
 
+void USpookySkeletalMeshComponent::SetMultiBoneOutputParams(const TArray<FName>& bones, const FSpookySkeletonBoneOutputParams& info, ESpookyReturnStatus& branch) {
+	FSpookySkeletonBoneOutputParams infodummy = info;
+	bool allSuccess = true;
+	for (int i = 0; i < bones.Num(); i++) {
+		infodummy.name = bones[i];
+		ESpookyReturnStatus success;
+		SetBoneOutputParams(infodummy, success);
+		allSuccess = allSuccess && success == ESpookyReturnStatus::Success;
+	}
+	branch = allSuccess ? ESpookyReturnStatus::Success : ESpookyReturnStatus::Failure;
+}
+
 void USpookySkeletalMeshComponent::SetBoneInputParams(const FSpookyBoneInputParams& info, ESpookyReturnStatus& branch){
 	if(inputBones.count(info.name) == 0){
 		branch = ESpookyReturnStatus::Failure;
