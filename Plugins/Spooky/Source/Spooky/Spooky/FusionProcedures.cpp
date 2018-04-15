@@ -500,10 +500,17 @@ namespace spooky{
 
 		for (int i = 0; i < 1; i++) {
 			iterations++;
-            //TODO optimise ekf by using information matrices and inverting covariance per node
+
+            //Update with custom constraint inclusive EKF
             newChainState = customEKFMeasurementUpdate(chainState, constraints, stiffness, measurement, measurementJacobian, predictedMeasurement);
             //newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, predictedMeasurement);
+
+            //SINCE WE ONLY DO ONE ITERATION FOR NOW BREAK OUT HERE
+            break;
             
+
+
+
             chainState.expectation() = newChainState.expectation();
             //Move to next approximation, but keep old variances
             setChainState(fusion_chain, chainState, timestamp);
@@ -610,7 +617,7 @@ namespace spooky{
 		return posterior;
 	};
 	
-	Node::State::Parameters Node::customUKFMeasurementUpdate(const State::Parameters& prior, const State::Parameters& constraints, const float& stiffness,
+	Node::State::Parameters Node::UKFMeasurementUpdate(const State::Parameters& prior,
 													   const State::Parameters& measurement,
 													   const std::function<Eigen::VectorXf(const Eigen::VectorXf&)> measurementFunction)
 	{

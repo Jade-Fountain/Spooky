@@ -283,23 +283,22 @@ namespace spooky {
 			bool relaxConstraints
 	    );
 		
-		//UKF
-		Node::State::Parameters customUKFMeasurementUpdate(
-			const State::Parameters& prior,
-			const State::Parameters& constraints,
-			const float& stiffness,
-			const State::Parameters& measurement,
-			const std::function<Eigen::VectorXf(const Eigen::VectorXf&)> measurementFunction);
-		
 		//Basic math for performing EKF with prior, constraints and measurement
 	    static Node::State::Parameters 
 	    customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, 
 	    					const float& stiffness, const State::Parameters& measurement,
                             const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement);
-  		//Basic math for performing EKF with prior, constraints and measurement
+  		
+  		//Basic math for performing EKF with prior and measurement only
 	    static Node::State::Parameters 
 	    EKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& measurement,
                             const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement);
+		
+		//UKF - untested as of yet
+		Node::State::Parameters UKFMeasurementUpdate(
+			const State::Parameters& prior,
+			const State::Parameters& measurement,
+			const std::function<Eigen::VectorXf(const Eigen::VectorXf&)> measurementFunction);
 		
 
 	private:
