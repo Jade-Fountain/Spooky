@@ -79,19 +79,19 @@ namespace spooky {
 					information_.block(position, position, dim, dim) = p.information_;
 				}
 
-				void addProcessNoiseApprox(const Eigen::MatrixXf& P) {
-					variance_ += P;
-					Eigen::VectorXf v_powneg = Eigen::VectorXf(variance_.diagonal()).cwiseInverse();
-					Eigen::VectorXf v_powneg2 = v_powneg.cwiseProduct(-v_powneg);
-					//Assumes P diagonal, and info diagonal mostly
-					information_ +=  v_powneg2.cwiseProduct(P.diagonal()).asDiagonal();
-					
-					//assuming (1+X)^-1 = sum(i=0,inf,X^i), if ||X||<1  "binomial series" 
-					//then (X+P)^-1 ~= P^-1 - XP^-2
-					//Eigen::VectorXf diagPinv = P.diagonal().cwiseInverse();
-					//Eigen::VectorXf diagPinv2 = diagPinv.pow(2);
-					//information_ = Eigen::MatrixXf(diagPinv.asDiagonal()) + information_ * diagPinv2.asDiagonal();
-				}
+				//TODO: make this work!
+				//void addProcessNoiseApprox(const Eigen::MatrixXf& P) {
+				//	variance_ += P;
+				//	Eigen::VectorXf v_powneg = Eigen::VectorXf(variance_.diagonal()).cwiseInverse();
+				//	//Assumes P diagonal, and info diagonal mostly
+				//	information_.diagonal() = v_powneg;
+				//	
+				//	//assuming (1+X)^-1 = sum(i=0,inf,X^i), if ||X||<1  "binomial series" 
+				//	//then (X+P)^-1 ~= P^-1 - XP^-2
+				//	//Eigen::VectorXf diagPinv = P.diagonal().cwiseInverse();
+				//	//Eigen::VectorXf diagPinv2 = diagPinv.pow(2);
+				//	//information_ = Eigen::MatrixXf(diagPinv.asDiagonal()) + information_ * diagPinv2.asDiagonal();
+				//}
 
 				Parameters(int dim) :
 					expectation_(dim),

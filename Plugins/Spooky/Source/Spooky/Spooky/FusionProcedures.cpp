@@ -636,9 +636,9 @@ namespace spooky{
 		chainState = getChainParameters(getPred, fusion_chain);
 		
 		//Exact, but costly:
-		//chainState.set_variance(chainState.variance() + process_noise);
-		//Approx and cheap:
-		chainState.addProcessNoiseApprox(process_noise);
+		chainState.set_variance(chainState.variance() + process_noise);
+		//Approx and cheap and doesnt work:
+		//chainState.addProcessNoiseApprox(process_noise);
         return chainState;
     }
 
