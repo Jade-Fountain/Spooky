@@ -603,10 +603,69 @@ namespace spooky{
 
 		Eigen::MatrixXf K = SigmaBar * H.transpose() * (H * SigmaBar * H.transpose() + Q).inverse();
 		//New state
-		posterior.set_variance((Eigen::MatrixXf::Identity(n,n) - K * H) * SigmaBar);
-        Eigen::VectorXf error = (measurement.expectation() - state_measurement);
-        Eigen::VectorXf delta = K * error;
+		posterior.set_variance((Eigen::MatrixXf::Identity(n, n) - K * H) * SigmaBar);
+		Eigen::VectorXf error = (measurement.expectation() - state_measurement);
+		Eigen::VectorXf delta = K * error;
 		posterior.expectation() = prior.expectation() + delta;
+		return posterior;
+	};
+	
+	Node::State::Parameters Node::customUKFMeasurementUpdate(const State::Parameters& prior, const State::Parameters& constraints, const float& stiffness,
+													   const State::Parameters& measurement,
+													   const std::function<Eigen::VectorXf(const Eigen::VectorXf&)> measurementFunction)
+	{
+		assert(prior.size() == measurementJacobian.cols() && measurement.size() == measurementJacobian.rows() == state_measurement.size() == measurement.size());
+        int n = prior.dimension();
+        
+        //Spread parameters
+        float alpha = 1;
+        float kappa = 1;
+        //gaussian => beta = 2
+        float beta = 2;
+        float lambda = alpha * alpha * (n + kappa) - n;
+
+        // compute the Cholesky decomposition of A
+        Eigen::LLT<Eigen::MatrixXf> sqrtVariance(prior.variance());
+        Eigen::MatrixXf L = sqrtVariance.matrixL();
+        
+        //sigma points 
+        Eigen::MatrixXf sigmaPoints(n,2*n+1);
+        //Weights are all the same for side points
+        Eigen::VectorXf mean_weights = Eigen::VectorXf::Ones(2*n+1) * 1/(2*(n+lambda));
+        Eigen::VectorXf cov_weights = mean_weights;
+
+        //Central sigma point and weights
+        sigmaPoints.col(0) = prior.expectation();
+        mean_weights[0] = lambda / (n+lambda);
+        cov_weights[0] = lambda / (n+lambda) + (1 - alpha * alpha + beta); 
+        
+        //Surrounding sigma points
+        sigmaPoints.block(0,1,n,n) = prior.expectation().replicate(1,n) + std::sqrt(n+lambda) * L;
+        sigmaPoints.block(0,n+1,n,n) = prior.expectation().replicate(1,n) - std::sqrt(n+lambda) * L;
+
+        //Predict sigma points
+		Eigen::MatrixXf sigmaMeasurements(n, 2 * n + 1);
+		for (int i = 0; i < 2 * n + 1; i++) {
+			sigmaMeasurements = measurementFunction(sigmaPoints.col(i));
+		}
+
+        //Predicted measurement
+		Eigen::VectorXf pmeasurementMean = (sigmaMeasurements * mean_weights.asDiagonal()).rowwise().sum();
+		Eigen::MatrixXf mDiff = sigmaMeasurements.colwise() - pmeasurementMean;
+		Eigen::MatrixXf pmeasurementCov = (mDiff * cov_weights.asDiagonal()) * mDiff.transpose() + measurement.variance();
+
+        //Crossover covariance
+		Eigen::VectorXf priorDiff = sigmaPoints.colwise() - prior.expectation();
+		Eigen::MatrixXf crossoverCov = (priorDiff * cov_weights.asDiagonal()) * mDiff.transpose();
+
+        //Kalman gain
+		Eigen::MatrixXf kalmanGain = crossoverCov * pmeasurementCov.inverse();
+
+        //Update
+        State::Parameters posterior(n);
+		posterior.expectation() = prior.expectation() + kalmanGain * (measurement.expectation() - pmeasurementMean);
+        posterior.set_variance(prior.variance() - kalmanGain * pmeasurementCov * kalmanGain.transpose());
+
 		return posterior;
 	};
 

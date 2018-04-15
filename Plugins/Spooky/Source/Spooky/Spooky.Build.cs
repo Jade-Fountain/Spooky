@@ -6,7 +6,10 @@ public class Spooky : ModuleRules
 {
 	public Spooky(TargetInfo Target)
 	{
-		
+        //Improves small project compile times
+		MinFilesUsingPrecompiledHeaderOverride = 1;
+        bFasterWithoutUnity = true;
+
 		PublicIncludePaths.AddRange(
 			new string[] {
 				"Spooky/Public",

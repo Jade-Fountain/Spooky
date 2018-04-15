@@ -107,6 +107,10 @@ namespace spooky {
 					expectation_(x), 
 					variance_(V), 
 					information_(V.inverse()){}
+
+				int dimension() const {
+					return expectation_.size();
+				}
 			};
 			bool modelVelocity = true;
 
@@ -278,7 +282,15 @@ namespace spooky {
 			const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian,
 			bool relaxConstraints
 	    );
-	       
+		
+		//UKF
+		Node::State::Parameters customUKFMeasurementUpdate(
+			const State::Parameters& prior,
+			const State::Parameters& constraints,
+			const float& stiffness,
+			const State::Parameters& measurement,
+			const std::function<Eigen::VectorXf(const Eigen::VectorXf&)> measurementFunction);
+		
 		//Basic math for performing EKF with prior, constraints and measurement
 	    static Node::State::Parameters 
 	    customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, 
@@ -288,7 +300,7 @@ namespace spooky {
 	    static Node::State::Parameters 
 	    EKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& measurement,
                             const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement);
-  
+		
 
 	private:
 		Transform3D getGlobalPose();
