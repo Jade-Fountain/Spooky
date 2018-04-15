@@ -334,7 +334,7 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::Fuse(float current_time)
 {
-	spooky::utility::profiler.startTimer("ZZZ USpookyFusionPlant::Fuse");
+	spooky::utility::Profiler::getInstance().startTimer("ZZZ USpookyFusionPlant::Fuse");
 	for (int i = 0; i < skeletal_spirits.size(); i++) {
 		addSkeletonMeasurement(i);
 	}
@@ -343,7 +343,7 @@ void USpookyFusionPlant::Fuse(float current_time)
 	for (auto& skel : skeletal_spirits) {
 		skel->AccumulateOffsets(spookyCore.getSkeleton(), current_time);
 	}
-	spooky::utility::profiler.endTimer("ZZZ USpookyFusionPlant::Fuse");
+	spooky::utility::Profiler::getInstance().endTimer("ZZZ USpookyFusionPlant::Fuse");
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")

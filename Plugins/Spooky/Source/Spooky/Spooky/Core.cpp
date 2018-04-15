@@ -167,7 +167,7 @@ namespace spooky {
 
 	//Computes data added since last fuse() call. Should be called repeatedly	
 	void Core::fuse(const float& time) {
-		utility::profiler.startTimer("CoreMainLoop");
+		utility::Profiler::getInstance().startTimer("CoreMainLoop");
 
 		frame_count++;
 		if(time != last_time){
@@ -179,21 +179,21 @@ namespace spooky {
 		//TODO: add ifdefs for profiling
 
 		//Get measurements offset by the largest latency so all measurements are valid
-		utility::profiler.startTimer("Sync (Offset)");
+		utility::Profiler::getInstance().startTimer("Sync (Offset)");
 		std::vector<Measurement::Ptr> sync_measurements = measurement_buffer.getOffsetSynchronizedMeasurements(time);
-		utility::profiler.endTimer("Sync (Offset)");
+		utility::Profiler::getInstance().endTimer("Sync (Offset)");
 
 		///////////////////////
 		// FUSE
 		///////////////////////
-		utility::profiler.startTimer("Fuse");
+		utility::Profiler::getInstance().startTimer("Fuse");
 		auto lastMeasurements = measurement_buffer.getLatestMeasurements();
 		skeleton.addMeasurementGroup(lastMeasurements);
 
 		//DEBUG FOR LATENCY TESTING:
 		//skeleton.addMeasurementGroup(sync_measurements);
 		skeleton.fuse(calibrator);
-		utility::profiler.endTimer("Fuse");
+		utility::Profiler::getInstance().endTimer("Fuse");
 		///////////////////////
 		
 
@@ -219,27 +219,27 @@ namespace spooky {
 		///////////////////////
 		// CORRELATE
 		///////////////////////
-		utility::profiler.startTimer("Correlator");
+		utility::Profiler::getInstance().startTimer("Correlator");
 		correlator.addMeasurementGroup(sync_measurements);
 		correlator.identify();
-		utility::profiler.endTimer("Correlator");
+		utility::Profiler::getInstance().endTimer("Correlator");
 		///////////////////////
 		
 
 		///////////////////////
 		// CALIBRATE
 		///////////////////////
-		utility::profiler.startTimer("Calibrator add");
+		utility::Profiler::getInstance().startTimer("Calibrator add");
 		calibrator.addMeasurementGroup(sync_measurements);
-		utility::profiler.endTimer("Calibrator add");
+		utility::Profiler::getInstance().endTimer("Calibrator add");
 
-		utility::profiler.startTimer("Calibrate");
+		utility::Profiler::getInstance().startTimer("Calibrate");
 		calibrator.calibrate();
-		utility::profiler.endTimer("Calibrate");
+		utility::Profiler::getInstance().endTimer("Calibrate");
 		///////////////////////
 
 	
-		utility::profiler.endTimer("CoreMainLoop");
+		utility::Profiler::getInstance().endTimer("CoreMainLoop");
 	}
 
 	CalibrationResult Core::getCalibrationResult(SystemDescriptor s1, SystemDescriptor s2) {
@@ -279,7 +279,7 @@ namespace spooky {
 	}
 
 	std::string Core::getTimingSummary() {
-		return utility::profiler.getReport() + "\n FPS = "  + std::to_string(framerate) + " (avg: " + std::to_string(frame_count / last_time) + ")";
+		return utility::Profiler::getInstance().getReport() + "\n FPS = "  + std::to_string(framerate) + " (avg: " + std::to_string(frame_count / last_time) + ")";
 	}
 
 	ArticulatedModel& Core::getSkeleton() {

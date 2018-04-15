@@ -17,6 +17,7 @@
 #include "Spooky.h"
 #include "ArticulatedModel.h"
 #include "Utilities/Conventions.h"
+#include "Utilities/TimeProfiling.h"
 #include <functional>
 
 namespace spooky {
@@ -385,21 +386,31 @@ namespace spooky {
 			std::vector<Node::Ptr> updatedNodes;
 			switch (m->type) {
 				case(Measurement::Type::POSITION):
+					spooky::utility::Profiler::getInstance().startTimer("fusePositionMeasurement");
 					updatedNodes = fusePositionMeasurement(m, toFusionSpace, rootNode);
+					spooky::utility::Profiler::getInstance().endTimer("fusePositionMeasurement");
 					break;
 				case(Measurement::Type::ROTATION):
 					if (m->sensorDrifts && measurementBuffer.count(m->getSensor()) > 0) {
+						spooky::utility::Profiler::getInstance().startTimer("fuseDeltaRotationMeasurement");
 						updatedNodes = fuseDeltaRotationMeasurement(m, toFusionSpace, rootNode);
+						spooky::utility::Profiler::getInstance().endTimer("fuseDeltaRotationMeasurement");
 					}
 					else {
+						spooky::utility::Profiler::getInstance().startTimer("fuseRotationMeasurement");
 						updatedNodes = fuseRotationMeasurement(m, toFusionSpace, rootNode);
+						spooky::utility::Profiler::getInstance().endTimer("fuseRotationMeasurement");
 					}
 					break;
 				case(Measurement::Type::RIGID_BODY):
+					spooky::utility::Profiler::getInstance().startTimer("fuseRigidMeasurement");
 					updatedNodes = fuseRigidMeasurement(m,toFusionSpace,rootNode);
+					spooky::utility::Profiler::getInstance().endTimer("fuseRigidMeasurement");
 					break;
 				case(Measurement::Type::SCALE):
+					spooky::utility::Profiler::getInstance().startTimer("fuseScaleMeasurement");
 					updatedNodes = fuseScaleMeasurement(m,toFusionSpace,rootNode);
+					spooky::utility::Profiler::getInstance().endTimer("fuseScaleMeasurement");
 					break;
 				default:
 					didntFuse = true;

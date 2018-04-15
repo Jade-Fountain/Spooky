@@ -64,8 +64,15 @@ namespace spooky {
 			};
 
 			std::map<std::string, TimeData> timers;
-			
+		private:
+			Profiler() {}
+
 		public:
+			static Profiler& getInstance() {
+				static Profiler instance;
+				return instance;
+			}
+
 			void startTimer(std::string s) {
 				safeAccess(timers,s).start = Clock::now();
 			}
@@ -83,9 +90,11 @@ namespace spooky {
 				}
 				return report.str();
 			}
+
+			Profiler(Profiler const&) = delete;
+			void operator=(Profiler const&) = delete;
+
 		};
 
-		//Profiling
-		static Profiler profiler;
 	}
 }

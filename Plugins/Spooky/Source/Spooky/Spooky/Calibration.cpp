@@ -140,21 +140,21 @@ namespace spooky {
 		std::vector<Measurement::Ptr> result;
 		//Structure for counting systems per node
 		utility::SafeMap<NodeDescriptor, std::set<SystemDescriptor>> systemsPerNode;
-		//utility::profiler.startTimer("Calibration: Filter - Count");
+		//utility::Profiler::getInstance().startTimer("Calibration: Filter - Count");
 
 		//Count
 		for (auto& m : measurementQueue) {
 			systemsPerNode[m->getNode()].insert(m->getSystem());
 		}
-		//utility::profiler.endTimer("Calibration: Filter - Count");
+		//utility::Profiler::getInstance().endTimer("Calibration: Filter - Count");
 		//Push back relevant measurments
-		//utility::profiler.startTimer("Calibration: Filter - Pushback");
+		//utility::Profiler::getInstance().startTimer("Calibration: Filter - Pushback");
 		for (auto& m : measurementQueue) {
 			if (systemsPerNode[m->getNode()].size() > 1) {
 				result.push_back(m);
 			}
 		}
-		//utility::profiler.endTimer("Calibration: Filter - Pushback");
+		//utility::Profiler::getInstance().endTimer("Calibration: Filter - Pushback");
 		return result;
 	}
 
@@ -194,11 +194,11 @@ namespace spooky {
 		//Calibrate
 		if (count.first > thres && count.second > thres) {
 			//TODO:latency estimation
-			utility::profiler.startTimer("Calibrator Calibrate Systems " + system1.name + ", " + system2.name);
+			utility::Profiler::getInstance().startTimer("Calibrator Calibrate Systems " + system1.name + ", " + system2.name);
 			CalibrationResult latestResult = getResultsFor(system1, system2);
 			getRelevantMeasurements(system1, system2, &measurements1, &measurements2, config.min_count_per_node, true);
 			calibrationResults[sysPair] = calibrateStreams(measurements1, measurements2, latestResult);
-			utility::profiler.endTimer("Calibrator Calibrate Systems " + system1.name + ", " + system2.name);
+			utility::Profiler::getInstance().endTimer("Calibrator Calibrate Systems " + system1.name + ", " + system2.name);
 
 			//Debug
 			//std::stringstream ss;
