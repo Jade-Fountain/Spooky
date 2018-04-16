@@ -219,23 +219,23 @@ namespace spooky {
 		///////////////////////
 		// CORRELATE
 		///////////////////////
-		utility::Profiler::getInstance().startTimer("Correlator");
-		correlator.addMeasurementGroup(sync_measurements);
-		correlator.identify();
-		utility::Profiler::getInstance().endTimer("Correlator");
+		//utility::Profiler::getInstance().startTimer("Correlator");
+		//correlator.addMeasurementGroup(sync_measurements);
+		//correlator.identify();
+		//utility::Profiler::getInstance().endTimer("Correlator");
 		///////////////////////
 		
 
 		///////////////////////
 		// CALIBRATE
 		///////////////////////
-		utility::Profiler::getInstance().startTimer("Calibrator add");
-		calibrator.addMeasurementGroup(sync_measurements);
-		utility::Profiler::getInstance().endTimer("Calibrator add");
+		//utility::Profiler::getInstance().startTimer("Calibrator add");
+		//calibrator.addMeasurementGroup(sync_measurements);
+		//utility::Profiler::getInstance().endTimer("Calibrator add");
 
-		utility::Profiler::getInstance().startTimer("Calibrate");
-		calibrator.calibrate();
-		utility::Profiler::getInstance().endTimer("Calibrate");
+		//utility::Profiler::getInstance().startTimer("Calibrate");
+		//calibrator.calibrate();
+		//utility::Profiler::getInstance().endTimer("Calibrate");
 		///////////////////////
 
 	
