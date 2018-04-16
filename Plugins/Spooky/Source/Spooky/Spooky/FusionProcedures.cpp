@@ -682,7 +682,7 @@ namespace spooky{
         //Process noise: max of ten seconds variance added
 		Eigen::MatrixXf time_matrix = Eigen::MatrixXf::Zero(chainState.expectation().size(), chainState.expectation().size());
 		time_matrix.diagonal() = (timestamp * Eigen::VectorXf::Ones(chainState.expectation().size()) - getChainTimeSinceUpdated(fusion_chain));
-		Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance();// *time_matrix;
+		Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance()*time_matrix;
 
         //DEBUG
   //      std::stringstream ss;
