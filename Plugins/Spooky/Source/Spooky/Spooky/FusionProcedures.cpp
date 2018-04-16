@@ -197,7 +197,7 @@ namespace spooky{
         //------------------------------------------------------------------
 
 
-        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints,5);
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints,2);
         return fusion_chain;
     }
 
@@ -403,7 +403,7 @@ namespace spooky{
         //------------------------------------------------------------------
 
 
-        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints,5);
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints,2);
         return fusion_chain;
         //DEBUG
   //       std::stringstream ss;
