@@ -271,16 +271,17 @@ namespace spooky {
 		std::vector<Node::Ptr> fuseScaleMeasurement(const Measurement::Ptr& m, const Transform3D& toFusionSpace, const Node::Ptr& rootNode);
 		
 		//Main generic EKF algorithm
-	    void Node::computeEKFUpdate(
+		void Node::computeEKFUpdate(
 			const float& timestamp,
 			const std::vector<Node::Ptr>& fusion_chain,
-			const State::Parameters& measurement, 
-			const State::Parameters& constraints, 
+			const State::Parameters& measurement,
+			const State::Parameters& constraints,
 			const float& stiffness,
 			const std::function<State::Parameters(const std::vector<Node::Ptr>&)> getPredictedState,
 			const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
 			const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian,
-			bool relaxConstraints
+			bool relaxConstraints,
+			int max_iterations = 1
 	    );
 		
 		//Basic math for performing EKF with prior, constraints and measurement

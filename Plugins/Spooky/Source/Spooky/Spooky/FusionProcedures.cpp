@@ -197,7 +197,7 @@ namespace spooky{
         //------------------------------------------------------------------
 
 
-        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints,5);
         return fusion_chain;
     }
 
@@ -403,7 +403,7 @@ namespace spooky{
         //------------------------------------------------------------------
 
 
-        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints);
+        computeEKFUpdate(m->getTimestamp(), fusion_chain, measurement, constraints, joint_stiffness, getPredState, getMeas, getMeasJac, m->relaxConstraints,5);
         return fusion_chain;
         //DEBUG
   //       std::stringstream ss;
@@ -472,15 +472,16 @@ namespace spooky{
     }
 
 	void Node::computeEKFUpdate(
-	   const float& timestamp,
-       const std::vector<Node::Ptr>& fusion_chain,
-       const State::Parameters& measurement, 
-       const State::Parameters& constraints, 
-       const float& stiffness,
-       const std::function<State::Parameters(const std::vector<Node::Ptr>&)> getPredictedState,
-       const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
-       const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian,
-       bool relaxConstraints = false
+		const float& timestamp,
+		const std::vector<Node::Ptr>& fusion_chain,
+		const State::Parameters& measurement,
+		const State::Parameters& constraints,
+		const float& stiffness,
+		const std::function<State::Parameters(const std::vector<Node::Ptr>&)> getPredictedState,
+		const std::function<Eigen::VectorXf(const std::vector<Node::Ptr>&)> getMeasurement,
+		const std::function<Eigen::MatrixXf(const std::vector<Node::Ptr>&)> getMeasurementJacobian,
+		bool relaxConstraints = false,
+		int max_iterations
     ){
 		//std::stringstream ss;
 		//ss << "new Frame" << std::endl;
@@ -498,7 +499,7 @@ namespace spooky{
 		float last_error = 9999999999999999;
 		int iterations = 0;
 
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < max_iterations; i++) {
 			iterations++;
 
             //Update with custom constraint inclusive EKF
@@ -506,10 +507,7 @@ namespace spooky{
             //newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, predictedMeasurement);
 
             //SINCE WE ONLY DO ONE ITERATION FOR NOW BREAK OUT HERE
-            break;
-            
-
-
+			if (max_iterations == 1) break;
 
             chainState.expectation() = newChainState.expectation();
             //Move to next approximation, but keep old variances
@@ -684,7 +682,7 @@ namespace spooky{
         //Process noise: max of ten seconds variance added
 		Eigen::MatrixXf time_matrix = Eigen::MatrixXf::Zero(chainState.expectation().size(), chainState.expectation().size());
 		time_matrix.diagonal() = (timestamp * Eigen::VectorXf::Ones(chainState.expectation().size()) - getChainTimeSinceUpdated(fusion_chain));
-        Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance() * time_matrix;
+		Eigen::MatrixXf process_noise = getChainProcessNoise(fusion_chain).variance();// *time_matrix;
 
         //DEBUG
   //      std::stringstream ss;
