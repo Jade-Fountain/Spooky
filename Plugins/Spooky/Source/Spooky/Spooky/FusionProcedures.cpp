@@ -504,13 +504,14 @@ namespace spooky{
 
             if(relaxConstraints && i > 0){
 				//TODO: fix IKUpdate
-                //newChainState = IKUpdate(newChainState,measurement,measurementJacobian,predictedMeasurement);
-				newChainState = customEKFMeasurementUpdate(chainState, constraints, 0, measurement, measurementJacobian, predictedMeasurement);
+                newChainState = IKUpdate(newChainState,measurement,measurementJacobian,predictedMeasurement);
+				//newChainState = customEKFMeasurementUpdate(chainState, constraints, 0, measurement, measurementJacobian, predictedMeasurement);
 			} else {
 
                 //Update with custom constraint inclusive EKF
                 newChainState = customEKFMeasurementUpdate(chainState, constraints, stiffness, measurement, measurementJacobian, predictedMeasurement);
-                //newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, predictedMeasurement);
+				//ss << "before IK updates state = " << newChainState.expectation().transpose() << std::endl;
+				//newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, predictedMeasurement);
             }
 
             //IF WE ONLY DO ONE ITERATION BREAK OUT HERE
@@ -566,9 +567,9 @@ namespace spooky{
         }
         setChainState(fusion_chain, newChainState, timestamp);
 		//ss << "bone = " << fusion_chain[0]->desc.name << std::endl;
-		//ss << "newChainState = " << newChainState.expectation().transpose() << std::endl;
+		//ss << "newChainState = " << getChainState(fusion_chain).expectation().transpose() << std::endl;
 		//ss << "iterations = " << iterations << std::endl;
-		//SPOOKY_LOG(ss.str());
+		//if (fusion_chain[0]->desc == SystemDescriptor("hand_r")) SPOOKY_LOG(ss.str());
 	};
 
     Node::State::Parameters Node::customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, 
@@ -612,12 +613,9 @@ namespace spooky{
 		//Eigen::MatrixXf mdiff = predictedMeasurement - measurement.expectation();
 		//Eigen::MatrixXf mdiffJ = mdiff * measurementJacobian;
   //      posterior.expectation() +=  JTJinv * mdiffJ;
-
-		Eigen::VectorXf zterm = -2 * measurement.expectation().transpose() * measurementJacobian;
-		Eigen::VectorXf Mterm1 = predictedMeasurement.transpose() * measurementJacobian;
-		Eigen::VectorXf Mterm2 = measurementJacobian.transpose() * predictedMeasurement;
-		Eigen::VectorXf dE = (zterm + Mterm1 + Mterm2);
-		posterior.expectation() += - 0.1 * dE.normalized();
+	
+		//dx = gamma * J(x).t * G(x)
+		posterior.expectation() += 0.1 * measurementJacobian.transpose() * (measurement.expectation() - predictedMeasurement);
 		return posterior;
     }
 
