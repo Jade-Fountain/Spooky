@@ -289,6 +289,9 @@ namespace spooky {
 	    customEKFMeasurementUpdate( const State::Parameters& prior, const State::Parameters& constraints, 
 	    					const float& stiffness, const State::Parameters& measurement,
                             const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement);
+
+    	static Node::State::Parameters IKUpdate(const State::Parameters& prior, const State::Parameters& measurement, 
+    						const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& predictedMeasurement);
   		
   		//Basic math for performing EKF with prior and measurement only
 	    static Node::State::Parameters 
@@ -296,7 +299,7 @@ namespace spooky {
                             const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement);
 		
 		//UKF - untested as of yet
-		Node::State::Parameters UKFMeasurementUpdate(
+		static Node::State::Parameters UKFMeasurementUpdate(
 			const State::Parameters& prior,
 			const State::Parameters& measurement,
 			const std::function<Eigen::VectorXf(const Eigen::VectorXf&)> measurementFunction);

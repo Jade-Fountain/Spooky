@@ -502,11 +502,18 @@ namespace spooky{
 		for (int i = 0; i < max_iterations; i++) {
 			iterations++;
 
-            //Update with custom constraint inclusive EKF
-            newChainState = customEKFMeasurementUpdate(chainState, constraints, stiffness, measurement, measurementJacobian, predictedMeasurement);
-            //newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, predictedMeasurement);
+            if(relaxConstraints && i > 0){
+				//TODO: fix IKUpdate
+                //newChainState = IKUpdate(newChainState,measurement,measurementJacobian,predictedMeasurement);
+				newChainState = customEKFMeasurementUpdate(chainState, constraints, 0, measurement, measurementJacobian, predictedMeasurement);
+			} else {
 
-            //SINCE WE ONLY DO ONE ITERATION FOR NOW BREAK OUT HERE
+                //Update with custom constraint inclusive EKF
+                newChainState = customEKFMeasurementUpdate(chainState, constraints, stiffness, measurement, measurementJacobian, predictedMeasurement);
+                //newChainState = EKFMeasurementUpdate(chainState, measurement, measurementJacobian, predictedMeasurement);
+            }
+
+            //IF WE ONLY DO ONE ITERATION BREAK OUT HERE
 			if (max_iterations == 1) break;
 
             chainState.expectation() = newChainState.expectation();
@@ -523,18 +530,20 @@ namespace spooky{
 			//			+ originalChainState.information() * (chainState.expectation() - originalChainState.expectation())
 			//			+ stiffness * constraints.information() * (chainState.expectation() - constraints.expectation());
 			//float error = error_vec.norm();
-
+            float error = 0;
+			if(relaxConstraints){
+                error = (predictedMeasurement - measurement.expectation()).norm();
+            } else {
+                //Measurement error:
+                float m_error = ((predictedMeasurement - measurement.expectation()).transpose() * measurement.information() * (predictedMeasurement - measurement.expectation()))(0, 0);
+                //Prior error
+                float p_error = ((chainState.expectation() - originalChainState.expectation()).transpose() * originalChainState.information() * (chainState.expectation() - originalChainState.expectation()))(0, 0);
+                //Constraint Error
+                float c_error = (stiffness *(chainState.expectation() - constraints.expectation()).transpose() * constraints.information() * (chainState.expectation() - constraints.expectation()))(0, 0);
+                //Energy:
+                error = p_error + c_error + m_error;
+            }
 			
-			//Measurement error:
-			float m_error = ((predictedMeasurement - measurement.expectation()).transpose() * measurement.information() * (predictedMeasurement - measurement.expectation()))(0, 0);
-			//Prior error
-			float p_error = ((chainState.expectation() - originalChainState.expectation()).transpose() * originalChainState.information() * (chainState.expectation() - originalChainState.expectation()))(0, 0);
-			//Constraint Error
-			float c_error = (stiffness *(chainState.expectation() - constraints.expectation()).transpose() * constraints.information() * (chainState.expectation() - constraints.expectation()))(0, 0);
-			//Energy:
-            //TODO: why does this relaxation work?
-			float error = relaxConstraints ? m_error : p_error + c_error + m_error;
-
 			//ss << "error_vec = " << error_vec.transpose() << std::endl;
 			//ss << "error = " << error << std::endl;
 			//ss << "m_error = " << m_error << std::endl;
@@ -593,6 +602,24 @@ namespace spooky{
 
         return posterior;
     };
+
+    Node::State::Parameters Node::IKUpdate(const State::Parameters& prior, const State::Parameters& measurement, const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& predictedMeasurement){
+        State::Parameters posterior = prior;
+        //Minimise the energy ||z-M(x+dx)||^2~||z-M(x)-J*dx||^2
+        // by choice of dx
+		//Eigen::MatrixXf JTJ = measurementJacobian.transpose() * measurementJacobian;
+		//Eigen::MatrixXf JTJinv = JTJ.inverse();
+		//Eigen::MatrixXf mdiff = predictedMeasurement - measurement.expectation();
+		//Eigen::MatrixXf mdiffJ = mdiff * measurementJacobian;
+  //      posterior.expectation() +=  JTJinv * mdiffJ;
+
+		Eigen::VectorXf zterm = -2 * measurement.expectation().transpose() * measurementJacobian;
+		Eigen::VectorXf Mterm1 = predictedMeasurement.transpose() * measurementJacobian;
+		Eigen::VectorXf Mterm2 = measurementJacobian.transpose() * predictedMeasurement;
+		Eigen::VectorXf dE = (zterm + Mterm1 + Mterm2);
+		posterior.expectation() += - 0.1 * dE.normalized();
+		return posterior;
+    }
 
 	Node::State::Parameters Node::EKFMeasurementUpdate(const State::Parameters& prior, const State::Parameters& measurement,
 		const Eigen::MatrixXf& measurementJacobian, const Eigen::VectorXf& state_measurement)
