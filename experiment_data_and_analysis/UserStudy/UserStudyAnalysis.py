@@ -126,10 +126,12 @@ def getParticipantDataSort(folder):
     splitData = split(data,0)
     scores = np.array([0,0,0])
     responseTimes = np.array([0.0,0.0,0.0])
+    mistakes = np.array([0.0,0.0,0.0])
     for i in splitData.keys():
-        scores[int(i)] = splitData[i]['Correct'].sum()
+        scores[int(i)] = (1-splitData[i]['Floor']).sum()
         responseTimes[int(i)] = splitData[i]['ResponseTime'].mean()
-    return scores, responseTimes
+        mistakes[int(i)] = splitData[i]['Floor'].sum()
+    return scores,mistakes, responseTimes
 
 
 def getParticipantDataThrow(folder):
@@ -151,8 +153,13 @@ def getParticipantDataThrow(folder):
         mean_errors[int(i)] = errors.mean()
     return scores, mean_errors, responseTimes
 
-def plotThrowingData(folder):
-    data = getRawParticipantData(folder,throw_task_file)
+def plotThrowingData(folders):
+    data = np.array([])
+    for folder in folders:
+        if len(data) == 0:
+            data = getRawParticipantData(folder,throw_task_file)
+        else:
+            data = np.append(data,getRawParticipantData(folder,throw_task_file))
 
     splitData = split(data,0)
 
@@ -186,21 +193,49 @@ def plotThrowingData(folder):
         test = np.logical_and(xtest, ytest)
         deltaFilteredX = deltaX[test]
         deltaFilteredY = deltaY[test]
-        plt.plot(deltaFilteredX,deltaFilteredY,markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1)
+        plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1)
         legend_counts += [str(len(deltaFilteredX))]
     plt.legend(['Leap Motion (' + legend_counts[0] + '/' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
                 'Perception Neuron (' + legend_counts[1] + '/' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
                 'Fused Tracking (' + legend_counts[2] + '/' + str(len(splitData[2]['HitPosX'])) + ' valid throws)'])
     
 
-    plt.show()
+
+def boxPlotColumns(data):
+    plt.figure()
+    
+    #X axis 
+    x = [0,7]
+    y = [0,0]
+    plt.plot(x,y,'k',linewidth=1)
+
+    bp = plt.boxplot(data)
+    
+    # Labels
+    x = [1,2,3,4,5,6]
+    labels = ['Leap', 'PN', 'Leap', 'PN','Leap', 'PN']
+    plt.xticks(x,labels)
+
+    #Colours
+    colors = ["red","blue"]
+    i = 0
+    for patch in bp['boxes']:
+        # patch.set(facecolor=colors[i%2])
+        patch.set(color=colors[i%2])
+        i+=1
+
+    # Scatter points
+    # for i in range(data.shape[1]):
+    #     y = data[:,i]
+    #     x = np.random.normal(1+i, 0.0, size=len(y))
+    #     plt.plot(x, y, 'xk', alpha=1)
 
 
 def getParticipantSummaryStats(participant):
     #Button
     b_scores, b_errors, b_rtimes = getParticipantDataButton(participant)
     #Sort
-    s_scores, s_rtimes = getParticipantDataSort(participant)
+    s_scores, s_errors, s_rtimes = getParticipantDataSort(participant)
     #Throw
     t_scores, t_errors, t_rtimes = getParticipantDataThrow(participant)
 
@@ -213,6 +248,7 @@ def getParticipantSummaryStats(participant):
                                    t_rtimes[0]-t_rtimes[2],t_rtimes[1]-t_rtimes[2]]])
     
     error_improvements = np.array([[b_errors[0]-b_errors[2],b_errors[1]-b_errors[2],
+                                    s_errors[0]-s_errors[2],s_errors[1]-s_errors[2],
                                     t_errors[0]-t_errors[2],t_errors[1]-t_errors[2]]])
 
     return improvements, time_improvements, error_improvements
@@ -225,9 +261,8 @@ def getPValueNormGT0(data):
     pval = 1 - scipy.stats.norm.cdf(mean,scale=sigma/np.sqrt(data.shape[0]))    
     return pval
 
-plotThrowingData("TaylorTest")
 
-participants = ["AlexTest","Participant2","Participant3","Participant4","TaylorTest"]
+participants = ["AlexTest","TaylorTest","Participant2","Participant3","Participant4"]
 improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
 
 first = True
@@ -243,6 +278,14 @@ for p in participants:
         time_improvements = np.append(time_improvements,t,axis=0)
         error_improvements = np.append(error_improvements,e,axis=0)
 
+plotThrowingData(participants)
+boxPlotColumns(improvements)
+plt.title("Score Improvements")
+boxPlotColumns(time_improvements)
+plt.title("Time Improvements")
+boxPlotColumns(error_improvements)
+plt.title("Error Improvements")
+plt.show()
 
 #test with repeated same measurements
 # improvements = np.repeat(improvements,5,axis=0)
