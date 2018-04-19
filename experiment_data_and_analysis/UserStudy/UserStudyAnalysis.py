@@ -193,7 +193,7 @@ def plotThrowingData(folders):
         test = np.logical_and(xtest, ytest)
         deltaFilteredX = deltaX[test]
         deltaFilteredY = deltaY[test]
-        plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1)
+        plt.plot(deltaFilteredX,deltaFilteredY,markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1)
         legend_counts += [str(len(deltaFilteredX))]
     plt.legend(['Leap Motion (' + legend_counts[0] + '/' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
                 'Perception Neuron (' + legend_counts[1] + '/' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
@@ -262,7 +262,7 @@ def getPValueNormGT0(data):
     return pval
 
 
-participants = ["Participant2","Participant3","Participant4"]
+participants = ["Participant2","Participant3","Participant4","Participant5"]
 improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
 
 first = True
@@ -279,6 +279,7 @@ for p in participants:
         error_improvements = np.append(error_improvements,e,axis=0)
 
 plotThrowingData(participants)
+plotThrowingData(["Participant5"])
 boxPlotColumns(improvements)
 plt.title("Score Improvements")
 boxPlotColumns(time_improvements)
