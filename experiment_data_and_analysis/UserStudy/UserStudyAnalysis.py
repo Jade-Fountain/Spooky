@@ -262,7 +262,7 @@ def getPValueNormGT0(data):
     return pval
 
 
-participants = ["Participant2","Participant3","Participant4","Participant5"]
+participants = ["Participant5","Participant6"]
 improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
 
 first = True
@@ -279,7 +279,7 @@ for p in participants:
         error_improvements = np.append(error_improvements,e,axis=0)
 
 plotThrowingData(participants)
-plotThrowingData(["Participant5"])
+plotThrowingData(["Participant6"])
 boxPlotColumns(improvements)
 plt.title("Score Improvements")
 boxPlotColumns(time_improvements)
