@@ -112,7 +112,8 @@ def getParticipantDataButton(folder):
     mean_errors = np.array([0.0,0.0,0.0])
     for i in splitData.keys():
         scores[int(i)] = splitData[i]['Correct'].sum()
-        responseTimes[int(i)] = splitData[i]['ResponseTime'].mean()
+        success = splitData[i]['Correct'] == 1
+        responseTimes[int(i)] = splitData[i]['ResponseTime'][success].mean()
 
         deltaX = splitData[i]['CorrectPosX'] - splitData[i]["TouchPosX"]
         deltaY = splitData[i]['CorrectPosY'] - splitData[i]["TouchPosY"]
@@ -129,7 +130,8 @@ def getParticipantDataSort(folder):
     mistakes = np.array([0.0,0.0,0.0])
     for i in splitData.keys():
         scores[int(i)] = (1-splitData[i]['Floor']).sum()
-        responseTimes[int(i)] = splitData[i]['ResponseTime'].mean()
+        success = splitData[i]['Floor'] == 0
+        responseTimes[int(i)] = splitData[i]['ResponseTime'][success].mean()
         mistakes[int(i)] = splitData[i]['Floor'].sum()
     return scores,mistakes, responseTimes
 
@@ -143,7 +145,7 @@ def getParticipantDataThrow(folder):
     mean_errors = np.array([0.0,0.0,0.0])
     for i in splitData.keys():
         scores[int(i)] = splitData[i]['Success'].sum()
-        responseTimes[int(i)] = splitData[i]['ResponseTime'].mean()
+
 
         deltaX = splitData[i]['HitPosX']
         deltaY = splitData[i]['HitPosY']
@@ -151,6 +153,9 @@ def getParticipantDataThrow(folder):
         #Filter large errors (corresponding to ball disappearing)
         errors = (errors < 1000).astype(float) * errors
         mean_errors[int(i)] = errors.mean()
+        #Only count response times which are successful
+        success = errors < 130
+        responseTimes[int(i)] = splitData[i]['ResponseTime'][success].mean()
     return scores, mean_errors, responseTimes
 
 def plotThrowingData(folders):
@@ -194,6 +199,7 @@ def plotThrowingData(folders):
         deltaFilteredX = deltaX[test]
         deltaFilteredY = deltaY[test]
         plt.plot(deltaFilteredX,deltaFilteredY,markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1)
+        plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=20,markeredgewidth=1,markeredgecolor='black')
         legend_counts += [str(len(deltaFilteredX))]
     plt.legend(['Leap Motion (' + legend_counts[0] + '/' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
                 'Perception Neuron (' + legend_counts[1] + '/' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
@@ -225,10 +231,10 @@ def boxPlotColumns(data):
         i+=1
 
     # Scatter points
-    # for i in range(data.shape[1]):
-    #     y = data[:,i]
-    #     x = np.random.normal(1+i, 0.0, size=len(y))
-    #     plt.plot(x, y, 'xk', alpha=1)
+    for i in range(data.shape[1]):
+        y = data[:,i]
+        x = np.random.normal(1+i, 0.0, size=len(y))
+        plt.plot(x, y, 'xk', alpha=1)
 
 
 def getParticipantSummaryStats(participant):
@@ -262,7 +268,7 @@ def getPValueNormGT0(data):
     return pval
 
 
-participants = ["Participant5","Participant6","Participant7"]
+participants = ["Participant5","Participant6","Participant7","Participant8"]
 improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
 
 first = True
@@ -279,7 +285,7 @@ for p in participants:
         error_improvements = np.append(error_improvements,e,axis=0)
 
 plotThrowingData(participants)
-plotThrowingData(["Participant7"])
+plotThrowingData(["Participant8"])
 boxPlotColumns(improvements)
 plt.title("Score Improvements")
 boxPlotColumns(time_improvements)
