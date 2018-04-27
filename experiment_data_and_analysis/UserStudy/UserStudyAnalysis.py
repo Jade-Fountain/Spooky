@@ -219,7 +219,7 @@ def boxPlotColumns(data):
     
     # Labels
     x = [1,2,3,4,5,6]
-    labels = ['Leap', 'PN', 'Leap', 'PN','Leap', 'PN']
+    labels = ['Leap\nKeyboard', 'PN\nKeyboard', 'Leap\nSorting', 'PN\nSorting','Leap\nThrowing', 'PN\nThrowing']
     plt.xticks(x,labels)
 
     #Colours
@@ -268,7 +268,7 @@ def getPValueNormGT0(data):
     return pval
 
 
-participants = ["Participant5","Participant6","Participant7","Participant8"]
+participants = ["Participant5","Participant6","Participant7","Participant8","Participant9"]
 improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
 
 first = True
@@ -285,7 +285,7 @@ for p in participants:
         error_improvements = np.append(error_improvements,e,axis=0)
 
 plotThrowingData(participants)
-plotThrowingData(["Participant8"])
+plotThrowingData(["Participant9"])
 boxPlotColumns(improvements)
 plt.title("Score Improvements")
 boxPlotColumns(time_improvements)
