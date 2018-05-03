@@ -195,9 +195,10 @@ def plotThrowingData(folders):
 
         xtest = np.abs(deltaX) < 200
         ytest = np.abs(deltaY) < 200 
+        rtest = np.square(deltaY) + np.square(deltaX) < 130**2
         test = np.logical_and(xtest, ytest)
-        deltaFilteredX = deltaX[test]
-        deltaFilteredY = deltaY[test]
+        deltaFilteredX = deltaX[rtest]
+        deltaFilteredY = deltaY[rtest]
         plt.plot(deltaFilteredX,deltaFilteredY,markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1)
         plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=20,markeredgewidth=1,markeredgecolor='black')
         legend_counts += [str(len(deltaFilteredX))]
@@ -231,10 +232,10 @@ def boxPlotColumns(data):
         i+=1
 
     # Scatter points
-    for i in range(data.shape[1]):
-        y = data[:,i]
-        x = np.random.normal(1+i, 0.0, size=len(y))
-        plt.plot(x, y, 'xk', alpha=1)
+    for i in range(data.shape[0]):
+        y = data[i,:]
+        x = range(1,data.shape[1]+1) + np.random.normal(0, 0.0, size=len(y))
+        plt.plot(x, y, '-xk', alpha=1)
 
 
 def getParticipantSummaryStats(participant):
@@ -268,7 +269,7 @@ def getPValueNormGT0(data):
     return pval
 
 
-participants = ["Participant5","Participant6","Participant7","Participant8","Participant9","Participant10","Participant11"]
+participants = ["Participant5","Participant6","Participant7","Participant8","Participant9","Participant10","Participant11","Participant12"]
 improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
 
 first = True
@@ -285,7 +286,7 @@ for p in participants:
         error_improvements = np.append(error_improvements,e,axis=0)
 
 plotThrowingData(participants)
-plotThrowingData(["Participant11"])
+plotThrowingData(["Participant12"])
 boxPlotColumns(improvements)
 plt.title("Score Improvements")
 boxPlotColumns(time_improvements)
