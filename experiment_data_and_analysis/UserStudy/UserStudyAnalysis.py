@@ -57,19 +57,23 @@ def colourFromString(s):
 
 def split(X, column):
     splitX = {X[0][column] : np.array([X[0]])}
+    order_count = 1
+    orders = {X[0][column] : order_count}
     for i in range(1,len(X)):
         val_i = X[i][column]
         if(not (val_i in splitX.keys())):
             splitX[val_i] = np.array([X[i]])
+            order_count = order_count+1
+            orders[val_i] = order_count
         else:
             splitX[val_i] = np.append(splitX[val_i], [X[i]])
-    return splitX
+    return splitX, orders
 
 def colourMap(i):
     return {
-        0 : 'tab:green',
-        1 : 'tab:blue',
-        2 : 'tab:orange'
+        0 : 'green',
+        1 : 'blue',
+        2 : 'orange'
     }[int(i)]
 
 def markerMap(i):
@@ -106,10 +110,13 @@ def getRawParticipantData(folder,task_file):
 def getParticipantDataButton(folder):
     data = getRawParticipantData(folder,button_task_file)
     
-    splitData = split(data,0)
+    splitData, splitOrders = split(data,0)
+    # print "data", data
+    # print "splitOrders", splitOrders
     scores = np.array([0,0,0])
     responseTimes = np.array([0.0,0.0,0.0])
     mean_errors = np.array([0.0,0.0,0.0])
+    orders = np.array([0.0,0.0,0.0])
     for i in splitData.keys():
         scores[int(i)] = splitData[i]['Correct'].sum()
         success = splitData[i]['Correct'] == 1
@@ -120,29 +127,33 @@ def getParticipantDataButton(folder):
         deltaZ = splitData[i]['CorrectPosZ'] - splitData[i]["TouchPosZ"]
         errors = np.sqrt(deltaX**2+deltaY**2+deltaZ**2)
         mean_errors[int(i)] = errors.mean()
-    return scores,mean_errors,responseTimes
+        orders[int(i)] = splitOrders[i]
+    return scores,mean_errors,responseTimes,orders
 
 def getParticipantDataSort(folder):
     data = getRawParticipantData(folder,sorting_task_file)
-    splitData = split(data,0)
+    splitData, splitOrders = split(data,0)
     scores = np.array([0,0,0])
     responseTimes = np.array([0.0,0.0,0.0])
     mistakes = np.array([0.0,0.0,0.0])
+    orders = np.array([0.0,0.0,0.0])
     for i in splitData.keys():
         scores[int(i)] = (1-splitData[i]['Floor']).sum()
         success = splitData[i]['Floor'] == 0
         responseTimes[int(i)] = splitData[i]['ResponseTime'][success].mean()
         mistakes[int(i)] = splitData[i]['Floor'].sum()
-    return scores,mistakes, responseTimes
+        orders[int(i)] = splitOrders[i]
+    return scores,mistakes, responseTimes,orders
 
 
 def getParticipantDataThrow(folder):
     data = getRawParticipantData(folder,throw_task_file)
 
-    splitData = split(data,0)
+    splitData, splitOrders = split(data,0)
     scores = np.array([0,0,0])
     responseTimes = np.array([0.0,0.0,0.0])
     mean_errors = np.array([0.0,0.0,0.0])
+    orders = np.array([0.0,0.0,0.0])
     for i in splitData.keys():
         scores[int(i)] = splitData[i]['Success'].sum()
 
@@ -155,8 +166,9 @@ def getParticipantDataThrow(folder):
         mean_errors[int(i)] = errors.mean()
         #Only count response times which are successful
         success = errors < 130
+        orders[int(i)] = splitOrders[i]
         responseTimes[int(i)] = splitData[i]['ResponseTime'][success].mean()
-    return scores, mean_errors, responseTimes
+    return scores, mean_errors, responseTimes,orders
 
 def plotThrowingData(folders):
     data = np.array([])
@@ -166,7 +178,7 @@ def plotThrowingData(folders):
         else:
             data = np.append(data,getRawParticipantData(folder,throw_task_file))
 
-    splitData = split(data,0)
+    splitData,splitOrders = split(data,0)
 
     fig, ax = plt.subplots()
 
@@ -208,7 +220,7 @@ def plotThrowingData(folders):
     
 
 
-def boxPlotColumns(data):
+def boxPlotColumns(data,data_subclasses=None):
     plt.figure()
     
     #X axis 
@@ -231,24 +243,38 @@ def boxPlotColumns(data):
         patch.set(color=colors[i%2])
         i+=1
 
+    if(data_subclasses is None):        
+        data_subclasses = np.zeros(data.shape)
+    max_subclass = data_subclasses.max()
+    min_subclass = data_subclasses.min()
+    centre_subclass = (max_subclass - min_subclass)/ 0.5
+    subclass_spacing = 1
+    if(max_subclass!=min_subclass):
+        subclass_spacing = 1/(max_subclass-min_subclass)
+    subclass_width = 0.5
     # Scatter points
     for i in range(data.shape[0]):
         y = data[i,:]
-        x = range(1,data.shape[1]+1) + np.random.normal(0, 0.0, size=len(y))
-        plt.plot(x, y, '-xk', alpha=1)
+        x = range(1,data.shape[1]+1) + ((data_subclasses[i,:] - min_subclass) * subclass_spacing - 0.5)*subclass_width  # np.random.normal(0, 0.0, size=len(y))
+        plt.plot(x, y, 'ok', alpha=1)
 
 
 def getParticipantSummaryStats(participant):
     #Button
-    b_scores, b_errors, b_rtimes = getParticipantDataButton(participant)
+    b_scores, b_errors, b_rtimes, b_orders = getParticipantDataButton(participant)
     #Sort
-    s_scores, s_errors, s_rtimes = getParticipantDataSort(participant)
+    s_scores, s_errors, s_rtimes, s_orders = getParticipantDataSort(participant)
     #Throw
-    t_scores, t_errors, t_rtimes = getParticipantDataThrow(participant)
+    t_scores, t_errors, t_rtimes, t_orders = getParticipantDataThrow(participant)
 
     improvements = np.array([[b_scores[2]-b_scores[0],b_scores[2]-b_scores[1],
                                s_scores[2]-s_scores[0],s_scores[2]-s_scores[1],
                                t_scores[2]-t_scores[0],t_scores[2]-t_scores[1]]])
+    
+    # Order which fused was attempted (1,2,3)
+    orders = np.array([[         b_orders[2]-b_orders[0],b_orders[2]-b_orders[1],
+                                s_orders[2]-s_orders[0],s_orders[2]-s_orders[1],
+                                t_orders[2]-t_orders[0],t_orders[2]-t_orders[1]]])
 
     time_improvements = np.array([[b_rtimes[0]-b_rtimes[2],b_rtimes[1]-b_rtimes[2],
                                    s_rtimes[0]-s_rtimes[2],s_rtimes[1]-s_rtimes[2],
@@ -258,7 +284,7 @@ def getParticipantSummaryStats(participant):
                                     s_errors[0]-s_errors[2],s_errors[1]-s_errors[2],
                                     t_errors[0]-t_errors[2],t_errors[1]-t_errors[2]]])
 
-    return improvements, time_improvements, error_improvements
+    return improvements, time_improvements, error_improvements, orders
 
 #Pvalue 
 # Probability that we would see such large mean if population mean was zero
@@ -270,28 +296,31 @@ def getPValueNormGT0(data):
 
 
 participants = ["Participant5","Participant6","Participant7","Participant8","Participant9","Participant10","Participant11","Participant12"]
-improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
+improvements, time_improvements, error_improvements, orders = np.array([]),np.array([]),np.array([]),np.array([])
 
 first = True
 for p in participants:
-    i,t,e = getParticipantSummaryStats(p)
+    i,t,e,o = getParticipantSummaryStats(p)
     if(first):
         improvements = i
         time_improvements = t
         error_improvements = e
+        orders = o
         first = False
     else:
         improvements = np.append(improvements,i,axis=0)
         time_improvements = np.append(time_improvements,t,axis=0)
         error_improvements = np.append(error_improvements,e,axis=0)
+        orders = np.append(orders,o,axis=0)
 
+print "orders",orders
 plotThrowingData(participants)
 plotThrowingData(["Participant12"])
-boxPlotColumns(improvements)
+boxPlotColumns(improvements, orders)
 plt.title("Score Improvements")
-boxPlotColumns(time_improvements)
+boxPlotColumns(time_improvements, orders)
 plt.title("Time Improvements")
-boxPlotColumns(error_improvements)
+boxPlotColumns(error_improvements, orders)
 plt.title("Error Improvements")
 plt.show()
 
