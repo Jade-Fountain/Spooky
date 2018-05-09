@@ -1,3 +1,5 @@
+7, ABC, ABC, "Aimed at right side to hit centre; hard to throw far","Right hand was doing something stange" because leap saw left in right,"Ball falling often","Difficult to aim"
+8, CAB,CAB,"","right hand felt off + left pinky stretched","C felt really good apart from right hand",""
 9, CAB,CBA,"Arm and hands and digits flipped out","fingers curled back"; B>A because "I found a way"; "thumb is inconsistent","",""
 10, ABC,BCA, "Overarm didnt work","Overarm didnt work; underarm worked","underarm worked;thumb was stuck",Participant didnt try underarm with leap but also didnt try overarm with PN/FT
 11, ACB,ACB, "hard to throw; easy to pick up";"Arm is bugging out - is if working?" participant asked if it was broken; leap lost tracking outside FOV, Right hand didnt work at all, "right hand jumping around",""

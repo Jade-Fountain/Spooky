@@ -1,4 +1,6 @@
 # Participant, Quality, Utility, CommentsA, CommentsB, CommentsC, GeneralComments
+7,CAB,CAB,"","cube was letting go; hand was rotating without movement","",""
+#TODO: decide what to do about contradiction with participant 8, ACB,ACB, "felt rigid","left hand unresponsive; cube thrown away","cubes also thrown away"
 9, ACB,ACB, "Cleanest","Hand had no fingers; grab too easy to let go","Lost sight of hand",
 10, ABC,ABC, "","cube was flicked away","tracking didnt pick up; arms didnt load; cube was flicked away",""
 11, ACB,ACB, "","Struggled; fingers curling and hand spinning","Sensitivity low but I got used to it"; participant seemed to lean to control arm a lot, ""
