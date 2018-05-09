@@ -1,4 +1,5 @@
 # Participant, Quality, Utility, CommentsA, CommentsB, CommentsC, GeneralComments
+9, CAB, BCA, "","B was too finicky but good depth","C had good motion but slow; digits angled backwards","other digits came in contact with keys" participant seemed distracted from task by examining tracking result. also vision was not exactly normal- wears glasses for reading but could perceive stereo depth and read in rift fine
 10,ACB,ACB,"","hand was tilted","hand was wonky" -> did gesture, ""
 11, ACB,ACB, "Perfect; hand a little above where it was", "Fingers spazzed out","Fingers spazzed out"; leap didnt track immediately, pressed wrong buttons at start when keyboard appeared; participant didnt understand random tracking selection
 12, ACB, ACB, "Felt best", "fingers moved a lot... unstable","similar to B but a little better","fingers hit wrong button." first trial had lots of accidental presses. very tall participant - skeleton seems like it might be off

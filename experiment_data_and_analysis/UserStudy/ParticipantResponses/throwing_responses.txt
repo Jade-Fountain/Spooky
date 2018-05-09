@@ -1,3 +1,4 @@
+9, CAB,CBA,"Arm and hands and digits flipped out","fingers curled back"; B>A because "I found a way"; "thumb is inconsistent","",""
 10, ABC,BCA, "Overarm didnt work","Overarm didnt work; underarm worked","underarm worked;thumb was stuck",Participant didnt try underarm with leap but also didnt try overarm with PN/FT
 11, ACB,ACB, "hard to throw; easy to pick up";"Arm is bugging out - is if working?" participant asked if it was broken; leap lost tracking outside FOV, Right hand didnt work at all, "right hand jumping around",""
 12, CAB, CBA, "Difficult at first","Pinky finger backwards", Leap lost tracking lots, "Ball throwing difficult compared to real world"

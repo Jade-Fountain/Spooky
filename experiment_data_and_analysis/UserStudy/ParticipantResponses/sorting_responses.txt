@@ -1,4 +1,5 @@
 # Participant, Quality, Utility, CommentsA, CommentsB, CommentsC, GeneralComments
+9, ACB,ACB, "Cleanest","Hand had no fingers; grab too easy to let go","Lost sight of hand",
 10, ABC,ABC, "","cube was flicked away","tracking didnt pick up; arms didnt load; cube was flicked away",""
 11, ACB,ACB, "","Struggled; fingers curling and hand spinning","Sensitivity low but I got used to it"; participant seemed to lean to control arm a lot, ""
 12, BCA, CBA, "really buggy","thumb unresponsive","thumb unresponsive; pinky wigging out",""
