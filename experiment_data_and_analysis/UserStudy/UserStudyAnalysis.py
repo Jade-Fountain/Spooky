@@ -391,9 +391,11 @@ throwing_responses = getResponseData("throwing")
 print keyboard_responses
 print sorting_responses
 print throwing_responses
+print "NONSENSE DATA INCOMING - NEED TO CONFIRM WITH UE4 CODE"
 print (decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"throwing") 
     + decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"throwing")
     + decodePreferences(throwing_responses["Participant"],throwing_responses["Quality"],"throwing"))
+print "NONSENSE DATA INCOMING - NEED TO CONFIRM WITH UE4 CODE"
 
 
 def performanceAnalysis():
