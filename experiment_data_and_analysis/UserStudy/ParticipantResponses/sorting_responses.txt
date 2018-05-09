@@ -1,0 +1,3 @@
+# Participant, Quality, Utility, CommentsA, CommentsB, CommentsC, GeneralComments
+12, BCA, CBA, "really buggy","thumb unresponsive","thumb unresponsive; pinky wigging out",""
+13, CAB,CAB,"","responsiveness off ... glitched a bit","",""

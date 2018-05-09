@@ -1,0 +1,3 @@
+# Participant, Quality, Utility, CommentsA, CommentsB, CommentsC, GeneralComments
+12, ACB, ACB, "Felt best", "fingers moved a lot... unstable","similar to B, but a little better","fingers hit wrong button." first trial had lots of accidental presses. very tall participant - skeleton seems like it might be off
+13, ABC, ABC, "", "Left index finger wouldn't go down", "skeleton got tangled",""
