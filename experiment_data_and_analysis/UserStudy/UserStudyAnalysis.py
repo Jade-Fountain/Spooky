@@ -381,13 +381,19 @@ def getResponseData(task):
     return genfromtxt("ParticipantResponses/"+task+"_responses.txt",
                       delimiter=",", 
                       comments="#", 
-                      # converters={"Quality":techFromString, "Utility": boolFromString},
                       names=["Participant", "Quality", "Utility", "CommentsA", "CommentsB", "CommentsC", "GeneralComments"],
                       dtype=None)
 
 
-responses = getResponseData("throwing")
-print decodePreferences(responses["Participant"],responses["Quality"],"throwing")
+keyboard_responses = getResponseData("keyboard")
+sorting_responses = getResponseData("sorting")
+throwing_responses = getResponseData("throwing")
+print keyboard_responses
+print sorting_responses
+print throwing_responses
+print (decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"throwing") 
+    + decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"throwing")
+    + decodePreferences(throwing_responses["Participant"],throwing_responses["Quality"],"throwing"))
 
 
 def performanceAnalysis():

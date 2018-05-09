@@ -1,3 +1,4 @@
 # Participant, Quality, Utility, CommentsA, CommentsB, CommentsC, GeneralComments
-12, ACB, ACB, "Felt best", "fingers moved a lot... unstable","similar to B, but a little better","fingers hit wrong button." first trial had lots of accidental presses. very tall participant - skeleton seems like it might be off
+11, ACB,ACB, "Perfect; hand a little above where it was", "Fingers spazzed out","Fingers spazzed out"; leap didnt track immediately, pressed wrong buttons at start when keyboard appeared; participant didnt understand random tracking selection
+12, ACB, ACB, "Felt best", "fingers moved a lot... unstable","similar to B but a little better","fingers hit wrong button." first trial had lots of accidental presses. very tall participant - skeleton seems like it might be off
 13, ABC, ABC, "", "Left index finger wouldn't go down", "skeleton got tangled",""
