@@ -331,7 +331,7 @@ def getPValueNormGT0(data):
     pval = 1 - scipy.stats.norm.cdf(mean,scale=sigma/np.sqrt(data.shape[0]))
     return pval
 
-#TODO: fix this:
+#returns tech_order[i] = t, map from slot to tech order
 perms = [[0,1,2],[2,0,1],[1,2,0],[1,0,2],[2,1,0],[0,2,1]]
 def techOrder(pID,taskID):
     p = pID-1
@@ -431,29 +431,78 @@ def getResponseData(task):
                       dtype=None)
 
 
+def plotPreferenceAnalysis(GraphName,prefs):
+    #Preferences totalled over all tasks
+    prefsTotal = np.sum(prefs,axis=0)
+
+    print "prefs"
+    print prefs
+    print "prefsTotal",prefsTotal
+    #-----------------------------
+
+    #-----------------------------
+    plt.figure()
+    ind = np.array(range(3))
+    width = 0.2
+    tick_pos = width*3/2
+    plt.title(GraphName + " - Tech Ranking Frequencies")
+    for i in range(prefsTotal.shape[0]):
+        plt.bar(ind+i*width,prefsTotal[i],width,color=colourMap(i))
+    x = np.array([0,1,2]) + tick_pos
+    labels = ['1st Count', '2nd Count', '3rd Count']
+    plt.xticks(x,labels)
+    #-----------------------------
+
+    #-----------------------------
+    #THIS GRAPH IS ACE:
+    # Plotting scores 
+    #-----------------------------
+    plt.figure()
+    #points per ranking
+    weight_vector = [1,0.5,0]
+    ##summed
+    # prefsSummed = np.dot(prefsTotal,weight_vector)
+    # print "prefsSummed"
+    # print prefsSummed
+    # plt.bar(ind,prefsSummed,width*3,color="white")
+    #individual
+
+    techIDs = np.array([0,1,2])
+    techID_widths = width * np.array([0,1,2])
+    plt.title(GraphName + " - Task Preference Scores")
+
+    for taskID in range(len(prefs)):
+        #Vector of tech scores
+        tech_scores = np.dot(prefs[taskID],weight_vector)
+        print tech_scores
+        plt.bar(techID_widths + taskID, tech_scores, width, color=map(colourMap,techIDs))
+
+    x = np.array([0,1,2]) + tick_pos
+    labels = ['Keyboard', 'Sorting', 'Throwing']
+    plt.xticks(x,labels)
+    #-----------------------------
+
+
+
 keyboard_responses = getResponseData("keyboard")
 sorting_responses = getResponseData("sorting")
 throwing_responses = getResponseData("throwing")
 print keyboard_responses
 print sorting_responses
 print throwing_responses
-prefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"throwing") 
-    , decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"throwing")
+# prefs[taskid][techid][rank] gives the number of times that task ranked that tech as rank rank
+Qprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"keyboard") 
+    , decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"sorting")
     , decodePreferences(throwing_responses["Participant"],throwing_responses["Quality"],"throwing")]
-prefsTotal = (decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"throwing") 
-    + decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"throwing")
-    + decodePreferences(throwing_responses["Participant"],throwing_responses["Quality"],"throwing"))
 
-plt.figure()
-ind = np.array(range(3))
-width = 0.2
-for i in range(prefsTotal.shape[0]):
-    plt.bar(ind+i*width,prefsTotal[i],width,color=colourMap(i))
-# plt.show()
+Uprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses["Utility"],"keyboard") 
+    , decodePreferences(sorting_responses["Participant"],sorting_responses["Utility"],"sorting")
+    , decodePreferences(throwing_responses["Participant"],throwing_responses["Utility"],"throwing")]
 
-plt.figure()
-prefsSummed = np.dot(prefsTotal,[2,1,0])
-plt.bar(ind,prefsSummed,0.2)
+
+plotPreferenceAnalysis("Quality",Qprefs)
+plotPreferenceAnalysis("Utility",Uprefs)
+plt.show()
 
 def performanceAnalysis():
     participants = [5,6,7,8,9,10,11,12,13]
