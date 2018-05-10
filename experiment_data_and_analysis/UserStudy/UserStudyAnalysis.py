@@ -428,18 +428,41 @@ ind = np.array(range(3))
 width = 0.2
 for i in range(prefsTotal.shape[0]):
     plt.bar(ind+i*width,prefsTotal[i],width,color=colourMap(i))
-plt.show()
+# plt.show()
 
+def inversePermutation(p):
+    p_inv = np.zeros(len(p))
+    for i in range(len(p)):
+        # print p[i]," -> ", i
+        p_inv[p[i]] = i
+    return p_inv
+
+def checkOrders(orders,pID):
+        # print "orders ",orders
+    for taskID in range(3):
+        # print techOrder(pID,taskID) 
+        #inverse because techOrder returns which tech given the task, attempt
+        # the actual order returns which order a given task was performed
+        predicted_order = inversePermutation(techOrder(pID,taskID))
+        actual_order = orders[taskID*3:taskID*3+3] - 1
+        if (predicted_order != actual_order).any():
+            print "Order wrong!!"
+            print "predicted_order = ", predicted_order        
+            print "actual_order = ", actual_order  
+            raise ValueError("Something has gone wrong with the orders!")      
 
 
 def performanceAnalysis():
-    participants = ["Participant5","Participant6","Participant7","Participant8","Participant9","Participant10","Participant11","Participant12","Participant13"]
+    participants = [5,6,7,8,9,10,11,12,13]
     # improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
     # scores, times, errors = np.array([]),np.array([]),np.array([])
-
+    parNames = []
     first = True
     for p in participants:
-        s,T,E,o,i,t,e,do = getParticipantSummaryStats(p)
+        participantName = "Participant"+str(p)
+        parNames += [participantName]
+        s,T,E,o,i,t,e,do = getParticipantSummaryStats(participantName)
+        checkOrders(o[0],p)
         if(first):
             improvements = i
             time_improvements = t
@@ -461,7 +484,7 @@ def performanceAnalysis():
             deltaOrders = np.append(deltaOrders,do,axis=0)
 
     print "orders",orders
-    plotThrowingData(participants)
+    plotThrowingData(parNames)
     plotThrowingData(["Participant13"])
     boxPlotColumns(improvements,deltaOrders)
     plt.title("Score Improvements")
