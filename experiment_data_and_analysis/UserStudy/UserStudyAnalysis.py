@@ -379,57 +379,6 @@ def parsePref(pref):
         i+=1
     return rankings
 
-def decodePreferences(participantIDs,preferences,task):
-    # Preference counts for each tech
-    taskID = taskIDFromString(task)
-
-    # rankings 
-    #           Tech1, Tech2, Tech3
-    # 1st Count     0,     1,     1
-    # 2nd Count
-    # 3rd Count
-    rank_counts = np.zeros([3,3])
-    for i in range(len(preferences)):
-        pID = participantIDs[i]
-        pref = preferences[i]
-        rankings = parsePref(pref)
-        t_order = techOrder(pID,taskID)
-        for j in range(len(rankings)):
-            rank = rankings[j]
-            rank_counts[t_order[j]][rank] += 1
-    return rank_counts
-
-
-
-
-def getResponseData(task):
-    return genfromtxt("ParticipantResponses/"+task+"_responses.txt",
-                      delimiter=",", 
-                      comments="#", 
-                      names=["Participant", "Quality", "Utility", "CommentsA", "CommentsB", "CommentsC", "GeneralComments"],
-                      dtype=None)
-
-
-keyboard_responses = getResponseData("keyboard")
-sorting_responses = getResponseData("sorting")
-throwing_responses = getResponseData("throwing")
-print keyboard_responses
-print sorting_responses
-print throwing_responses
-print (decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"throwing") 
-    + decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"throwing")
-    + decodePreferences(throwing_responses["Participant"],throwing_responses["Quality"],"throwing"))
-prefsTotal = (decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"throwing") 
-    + decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"throwing")
-    + decodePreferences(throwing_responses["Participant"],throwing_responses["Quality"],"throwing"))
-
-plt.figure()
-ind = np.array(range(3))
-width = 0.2
-for i in range(prefsTotal.shape[0]):
-    plt.bar(ind+i*width,prefsTotal[i],width,color=colourMap(i))
-# plt.show()
-
 def inversePermutation(p):
     p_inv = np.zeros(len(p))
     for i in range(len(p)):
@@ -451,6 +400,60 @@ def checkOrders(orders,pID):
             print "actual_order = ", actual_order  
             raise ValueError("Something has gone wrong with the orders!")      
 
+
+def decodePreferences(participantIDs,preferences,task):
+    # Preference counts for each tech
+    taskID = taskIDFromString(task)
+
+    # rankings 
+    #           Tech1, Tech2, Tech3
+    # 1st Count     0,     1,     1
+    # 2nd Count     ....
+    # 3rd Count
+    rank_counts = np.zeros([3,3])
+    for i in range(len(preferences)):
+        pID = participantIDs[i]
+        pref = preferences[i]
+        rankings = parsePref(pref)
+        t_order = techOrder(pID,taskID)
+        for j in range(len(rankings)):
+            rank = rankings[j]
+            tech_id = t_order[j]
+            rank_counts[tech_id][rank] += 1
+    return rank_counts
+
+
+def getResponseData(task):
+    return genfromtxt("ParticipantResponses/"+task+"_responses.txt",
+                      delimiter=",", 
+                      comments="#", 
+                      names=["Participant", "Quality", "Utility", "CommentsA", "CommentsB", "CommentsC", "GeneralComments"],
+                      dtype=None)
+
+
+keyboard_responses = getResponseData("keyboard")
+sorting_responses = getResponseData("sorting")
+throwing_responses = getResponseData("throwing")
+print keyboard_responses
+print sorting_responses
+print throwing_responses
+prefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"throwing") 
+    , decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"throwing")
+    , decodePreferences(throwing_responses["Participant"],throwing_responses["Quality"],"throwing")]
+prefsTotal = (decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"throwing") 
+    + decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"throwing")
+    + decodePreferences(throwing_responses["Participant"],throwing_responses["Quality"],"throwing"))
+
+plt.figure()
+ind = np.array(range(3))
+width = 0.2
+for i in range(prefsTotal.shape[0]):
+    plt.bar(ind+i*width,prefsTotal[i],width,color=colourMap(i))
+# plt.show()
+
+plt.figure()
+prefsSummed = np.dot(prefsTotal,[2,1,0])
+plt.bar(ind,prefsSummed,0.2)
 
 def performanceAnalysis():
     participants = [5,6,7,8,9,10,11,12,13]
@@ -524,4 +527,4 @@ def performanceAnalysis():
     print getPValueNormGT0(time_improvements) < 0.05
     print "getPValueNormGT0(error_improvements) "
     print getPValueNormGT0(error_improvements) < 0.05
-performanceAnalysis()
+# performanceAnalysis()
