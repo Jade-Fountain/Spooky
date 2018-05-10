@@ -332,10 +332,21 @@ def getPValueNormGT0(data):
     return pval
 
 #TODO: fix this:
-perms = [[0,1,2],[1,2,0],[2,0,1],[0,2,1],[2,1,0],[1,0,2]]
-def techOrder(t,p):
-    return perms[(p-1+t)%6]
+perms = [[0,1,2],[2,0,1],[1,2,0],[1,0,2],[2,1,0],[0,2,1]]
+def techOrder(pID,taskID):
+    p = pID-1
+    #Every second participant gets the second half of permutations
+    p_odd = p%2
+    #3 perms one for each tech, but order of which one goes to which task is selected by task_perm
+    tech_perms = perms[p_odd*3:p_odd*3+3]
+    #task perm permutes tech_perms
+    task_perm = perms[p%len(perms)]
+    #The index for the permutation for this task
+    tech_index = task_perm[taskID]
+    #Return the actual perm
+    return tech_perms[tech_index]
 
+    
 def getNumber(c):
     if(c == 'A'):
         return 0
@@ -343,6 +354,20 @@ def getNumber(c):
         return 1
     if(c == 'C'):
         return 2
+
+
+def testTechOrders():
+    for p in range(20):
+        pID = p+1
+        message = "P"+str(pID) + " "
+        for taskID in range(3):
+            message += stringFromTaskID(taskID) + " "
+            #Task changes every three trials
+            order = techOrder(pID,taskID)
+            for i in order:
+                message += stringFromTechID(i) + " "
+        print message
+# testTechOrders()
 
 #Returns vector of preferences for 1st,2nd,3rd tasks
 def parsePref(pref):
@@ -391,11 +416,20 @@ throwing_responses = getResponseData("throwing")
 print keyboard_responses
 print sorting_responses
 print throwing_responses
-print "NONSENSE DATA INCOMING - NEED TO CONFIRM WITH UE4 CODE"
 print (decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"throwing") 
     + decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"throwing")
     + decodePreferences(throwing_responses["Participant"],throwing_responses["Quality"],"throwing"))
-print "NONSENSE DATA INCOMING - NEED TO CONFIRM WITH UE4 CODE"
+prefsTotal = (decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"throwing") 
+    + decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"throwing")
+    + decodePreferences(throwing_responses["Participant"],throwing_responses["Quality"],"throwing"))
+
+plt.figure()
+ind = np.array(range(3))
+width = 0.2
+for i in range(prefsTotal.shape[0]):
+    plt.bar(ind+i*width,prefsTotal[i],width,color=colourMap(i))
+plt.show()
+
 
 
 def performanceAnalysis():
@@ -467,3 +501,4 @@ def performanceAnalysis():
     print getPValueNormGT0(time_improvements) < 0.05
     print "getPValueNormGT0(error_improvements) "
     print getPValueNormGT0(error_improvements) < 0.05
+performanceAnalysis()
