@@ -336,8 +336,13 @@ def getPValueNormGT0(data):
 perms = [[0,1,2],[2,0,1],[1,2,0],[1,0,2],[2,1,0],[0,2,1]]
 def techOrder(pID,taskID):
     p = pID-1
-    #Every second participant gets the second half of permutations
-    p_odd = (p/6)%2
+    if(pID <= 16):
+        #Every second participant gets the second half of permutations
+        p_odd = p%2
+    elif(pID <= 28):
+        p_odd = (p+1)%2
+    else:
+        p_odd = (p/len(perms))%2
     #3 perms one for each tech, but order of which one goes to which task is selected by task_perm
     tech_perms = perms[p_odd*3:p_odd*3+3]
     #task perm permutes tech_perms
@@ -387,22 +392,23 @@ def plotRowFrequencies(data):
 
 def plotTestTechOrders():
     orders = []
-    for p in range(600):
-        pID = p+1
+    first_part = 5
+    n_part = 24
+    participants = range(first_part,first_part+n_part)
+    for pID in participants:
         participant_orders = []
         for taskID in range(3):
             #Task changes every three trials
-            order = inversePermutation(techOrder(pID+1,taskID))
+            order = inversePermutation(techOrder(pID,taskID))
             participant_orders = np.append(participant_orders,order)
         orders += [participant_orders]
-        print participant_orders
     print orders
     plotRowFrequencies(np.array(orders))
-    plt.title("Predicted Order Frequencies")
+    plt.title("Predicted Order Frequencies "+str(len(participants)) + "\n" + str(participants))
 plotTestTechOrders()
 
 def printTechOrders():
-    for p in range(20):
+    for p in range(4,28):
         pID = p+1
         message = "P"+str(pID) + " "
         for taskID in range(3):
