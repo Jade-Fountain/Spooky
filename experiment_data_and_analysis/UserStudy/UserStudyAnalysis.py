@@ -393,7 +393,8 @@ def plotRowFrequencies(data):
 def plotTestTechOrders():
     orders = []
     first_part = 5
-    n_part = 24
+    #any multiple of 4 balances
+    n_part = 12+24
     participants = range(first_part,first_part+n_part)
     for pID in participants:
         participant_orders = []
