@@ -1,0 +1,10 @@
+# Participant, Quality, Utility, CommentsA, CommentsB, CommentsC, GeneralComments
+5, BAC,BAC,"My palm touched the keyboard","Finger not moving"-before tracking initialised,"Sorry my hand is not working; tracking [frustrating]",Participant seemed to have trouble understanding how to press buttons
+6, ACB, ACB,,,,"LP: used fists fingers too jumpy;LP: long reach didnt pick it up; slow in general" leap was very noise for this participant
+7, ACB,ACB,"","Didnt correspond accurately; required larger movements","Didnt correspond accurately; required larger movements",many accidental keypresses
+#TODO look up correspondences 8, BCA,BCA,
+9, CAB, BCA, "","B was too finicky but good depth","C had good motion but slow; digits angled backwards","other digits came in contact with keys" participant seemed distracted from task by examining tracking result. also vision was not exactly normal- wears glasses for reading but could perceive stereo depth and read in rift fine
+10,ACB,ACB,"","hand was tilted","hand was wonky" -> did gesture, ""
+11, ACB,ACB, "Perfect; hand a little above where it was", "Fingers spazzed out","Fingers spazzed out"; leap didnt track immediately, pressed wrong buttons at start when keyboard appeared; participant didnt understand random tracking selection
+12, ACB, ACB, "Felt best", "fingers moved a lot... unstable","similar to B but a little better","fingers hit wrong button." first trial had lots of accidental presses. very tall participant - skeleton seems like it might be off
+13, ABC, ABC, "", "Left index finger wouldn't go down", "skeleton got tangled",""

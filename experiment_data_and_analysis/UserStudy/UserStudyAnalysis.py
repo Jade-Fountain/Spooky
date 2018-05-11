@@ -6,6 +6,7 @@ import numpy as np
 import math
 import scipy.stats
 from numpy import genfromtxt
+# from sets import Sets
 
 button_task_file = "ButtonBoard.csv"
 sorting_task_file = "SortingTask.csv"
@@ -42,6 +43,32 @@ def stringFromTechID(i):
         return "PN"
     elif(i==2):
         return "FT"
+    else:
+        raise ValueError("ID " + i + " doesnt correspond to a tracking technology")
+
+def taskIDFromString(s):
+    #LP = 0 = Leap Motion
+    #PN = 1 = Perception Neuron
+    #FT = 2 = Fused Tracking
+    if(s == "keyboard"):
+        return 0
+    elif(s == "sorting"):
+        return 1
+    elif(s == "throwing"):
+        return 2
+    else:
+        raise ValueError("String " + s + " doesnt correspond to a task")
+
+def stringFromTaskID(i):
+    #LP = 0 = Leap Motion
+    #PN = 1 = Perception Neuron
+    #FT = 2 = Fused Tracking
+    if(i==0):
+        return "keyboard"
+    elif(i==1):
+        return "sorting"
+    elif(i==2):
+        return "throwing"
     else:
         raise ValueError("ID " + i + " doesnt correspond to a tracking technology")
 
@@ -83,7 +110,7 @@ def markerMap(i):
         2 : '*'
     }[int(i)]
 
-def getDataFromFile(file,names,converters):
+def getDataFromFile(file,names,converters=[]):
     return np.array(genfromtxt(file,
                       delimiter=" ", 
                       comments="#", 
@@ -305,72 +332,303 @@ def getPValueNormGT0(data):
     pval = 1 - scipy.stats.norm.cdf(mean,scale=sigma/np.sqrt(data.shape[0]))
     return pval
 
-
-participants = ["Participant5","Participant6","Participant7","Participant8","Participant9","Participant10","Participant11","Participant12","Participant13"]
-# improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
-# scores, times, errors = np.array([]),np.array([]),np.array([])
-
-first = True
-for p in participants:
-    s,T,E,o,i,t,e,do = getParticipantSummaryStats(p)
-    if(first):
-        improvements = i
-        time_improvements = t
-        error_improvements = e
-        orders = o
-        scores = s
-        times = T
-        errors = E
-        deltaOrders = do
-        first = False
+#returns tech_order[i] = t, map from slot to tech order
+perms = [[0,1,2],[2,0,1],[1,2,0],[1,0,2],[2,1,0],[0,2,1]]
+def techOrder(pID,taskID):
+    p = pID-1
+    if(pID <= 13):
+        #Every second participant gets the second half of permutations
+        p_odd = p%2
+    elif(pID <= 25):
+        #Fill in missed perms
+        p_odd = (p+1)%2
+    elif(pID <= 28):
+        # go back and fix up
+        p_odd = p%2
     else:
-        improvements = np.append(improvements,i,axis=0)
-        time_improvements = np.append(time_improvements,t,axis=0)
-        error_improvements = np.append(error_improvements,e,axis=0)
-        scores = np.append(scores,s,axis=0)
-        times = np.append(times,T,axis=0)
-        errors = np.append(errors,E,axis=0)
-        orders = np.append(orders,o,axis=0)
-        deltaOrders = np.append(deltaOrders,do,axis=0)
+        p_odd = (p/len(perms))%2
+    #3 perms one for each tech, but order of which one goes to which task is selected by task_perm
+    tech_perms = perms[p_odd*3:p_odd*3+3]
+    #task perm permutes tech_perms
+    task_perm = perms[p%len(perms)]
+    #The index for the permutation for this task
+    tech_index = task_perm[taskID]
+    #Return the actual perm
+    return tech_perms[tech_index]
 
-print "orders",orders
-plotThrowingData(participants)
-plotThrowingData(["Participant13"])
-boxPlotColumns(improvements,deltaOrders)
-plt.title("Score Improvements")
-boxPlotColumns(time_improvements, deltaOrders)
-plt.title("Time Improvements")
-boxPlotColumns(error_improvements, deltaOrders)
-plt.title("Error Improvements")
+    
+def getNumber(c):
+    if(c == 'A'):
+        return 0
+    if(c == 'B'):
+        return 1
+    if(c == 'C'):
+        return 2
 
-print scores, orders
-boxPlotColumns(scores, orders)
-plt.title("Raw Scores")
-boxPlotColumns(errors, orders)
-plt.title("Raw Errors")
-boxPlotColumns(times, orders)
-plt.title("Raw Times")
 
+
+def inversePermutation(p):
+    p_inv = np.zeros(len(p))
+    for i in range(len(p)):
+        # print p[i]," -> ", i
+        p_inv[p[i]] = i
+    return p_inv
+
+def plotRowFrequencies(data):
+    setOfTypes = set(data.flatten())
+    n_types = len(setOfTypes)
+    n_rows = data.shape[1]
+    result = np.zeros(n_rows*n_types)
+    listOfTypes = sorted(setOfTypes)
+    for row in range(n_rows):
+        counts_row = {e:0 for e in setOfTypes}
+        for element in data[:,row]:
+            counts_row[element] += 1
+        result[row*n_types:(row+1)*n_types] = counts_row.values()
+    
+    plt.figure()
+    width = 1
+    indicies = np.array(range(len(result))) + np.array([a/n_types for a in range(len(result))])
+    plt.bar(indicies,result,width)
+    x = [x.mean() + width/2 for x in np.reshape(indicies.astype(float),[n_rows,n_types])]
+    labels = ['Leap\nKeyboard', 'PN\nKeyboard','Fused\nKeyboard', 'Leap\nSorting', 'PN\nSorting','Fused\nSorting','Leap\nThrowing', 'PN\nThrowing','Fused\nThrowing']
+    plt.xticks(x,labels)
+
+def plotTestTechOrders():
+    orders = []
+    first_part = 5
+    #any multiple of 4 balances
+    n_part = 15
+    participants = range(first_part,first_part+n_part)
+    for pID in participants:
+        participant_orders = []
+        for taskID in range(3):
+            #Task changes every three trials
+            order = inversePermutation(techOrder(pID,taskID))
+            participant_orders = np.append(participant_orders,order)
+        orders += [participant_orders]
+    print orders
+    plotRowFrequencies(np.array(orders))
+    plt.title("Predicted Order Frequencies "+str(len(participants)) + "\n" + str(participants))
+plotTestTechOrders()
+
+def printTechOrders():
+    for p in range(4,28):
+        pID = p+1
+        message = "P"+str(pID) + " "
+        for taskID in range(3):
+            message += stringFromTaskID(taskID) + " "
+            #Task changes every three trials
+            order = techOrder(pID,taskID)
+            for i in order:
+                message += stringFromTechID(i) + " "
+        print message
+printTechOrders()
+
+#Returns vector of preferences for 1st,2nd,3rd tasks
+def parsePref(pref):
+    rankings = [0,0,0]
+    i = 0
+    for c in pref.strip():
+        n = getNumber(c)
+        rankings[n] = i
+        i+=1
+    return rankings
+
+
+def checkOrders(orders,pID):
+        # print "orders ",orders
+    for taskID in range(3):
+        # print techOrder(pID,taskID) 
+        #inverse because techOrder returns which tech given the task, attempt
+        # the actual order returns which order a given task was performed
+        predicted_order = inversePermutation(techOrder(pID,taskID))
+        actual_order = orders[taskID*3:taskID*3+3] - 1
+        if (predicted_order != actual_order).any():
+            print "Order wrong!!"
+            print "predicted_order = ", predicted_order        
+            print "actual_order = ", actual_order  
+            raise ValueError("Something has gone wrong with the orders!")      
+
+
+def decodePreferences(participantIDs,preferences,task):
+    # Preference counts for each tech
+    taskID = taskIDFromString(task)
+
+    # rankings 
+    #           Tech1, Tech2, Tech3
+    # 1st Count     0,     1,     1
+    # 2nd Count     ....
+    # 3rd Count
+    rank_counts = np.zeros([3,3])
+    for i in range(len(preferences)):
+        pID = participantIDs[i]
+        pref = preferences[i]
+        rankings = parsePref(pref)
+        t_order = techOrder(pID,taskID)
+        for j in range(len(rankings)):
+            rank = rankings[j]
+            tech_id = t_order[j]
+            rank_counts[tech_id][rank] += 1
+    return rank_counts
+
+
+def getResponseData(task):
+    return genfromtxt("ParticipantResponses/"+task+"_responses.txt",
+                      delimiter=",", 
+                      comments="#", 
+                      names=["Participant", "Quality", "Utility", "CommentsA", "CommentsB", "CommentsC", "GeneralComments"],
+                      dtype=None)
+
+
+def plotPreferenceAnalysis(GraphName,prefs):
+    #Preferences totalled over all tasks
+    prefsTotal = np.sum(prefs,axis=0)
+
+    print "prefs"
+    print prefs
+    print "prefsTotal",prefsTotal
+    #-----------------------------
+
+    #-----------------------------
+    plt.figure()
+    ind = np.array(range(3))
+    width = 0.2
+    tick_pos = width*3/2
+    plt.title(GraphName + " - Tech Ranking Frequencies")
+    for i in range(prefsTotal.shape[0]):
+        plt.bar(ind+i*width,prefsTotal[i],width,color=colourMap(i))
+    x = np.array([0,1,2]) + tick_pos
+    labels = ['1st Count', '2nd Count', '3rd Count']
+    plt.xticks(x,labels)
+    #-----------------------------
+
+    #-----------------------------
+    #THIS GRAPH IS ACE:
+    # Plotting scores 
+    #-----------------------------
+    plt.figure()
+    #points per ranking
+    weight_vector = [1,0.5,0]
+    ##summed
+    # prefsSummed = np.dot(prefsTotal,weight_vector)
+    # print "prefsSummed"
+    # print prefsSummed
+    # plt.bar(ind,prefsSummed,width*3,color="white")
+    #individual
+
+    techIDs = np.array([0,1,2])
+    techID_widths = width * np.array([0,1,2])
+    plt.title(GraphName + " - Task Preference Scores")
+
+    for taskID in range(len(prefs)):
+        #Vector of tech scores
+        tech_scores = np.dot(prefs[taskID],weight_vector)
+        print tech_scores
+        plt.bar(techID_widths + taskID, tech_scores, width, color=map(colourMap,techIDs))
+
+    x = np.array([0,1,2]) + tick_pos
+    labels = ['Keyboard', 'Sorting', 'Throwing']
+    plt.xticks(x,labels)
+    #-----------------------------
+
+
+
+keyboard_responses = getResponseData("keyboard")
+sorting_responses = getResponseData("sorting")
+throwing_responses = getResponseData("throwing")
+print keyboard_responses
+print sorting_responses
+print throwing_responses
+# prefs[taskid][techid][rank] gives the number of times that task ranked that tech as rank rank
+Qprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"keyboard") 
+    , decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"sorting")
+    , decodePreferences(throwing_responses["Participant"],throwing_responses["Quality"],"throwing")]
+
+Uprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses["Utility"],"keyboard") 
+    , decodePreferences(sorting_responses["Participant"],sorting_responses["Utility"],"sorting")
+    , decodePreferences(throwing_responses["Participant"],throwing_responses["Utility"],"throwing")]
+
+
+plotPreferenceAnalysis("Quality",Qprefs)
+plotPreferenceAnalysis("Utility",Uprefs)
+# plt.show()
+
+
+def performanceAnalysis():
+    participants = [5,6,7,8,9,10,11,12,13]
+    # improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
+    # scores, times, errors = np.array([]),np.array([]),np.array([])
+    parNames = []
+    first = True
+    for p in participants:
+        participantName = "Participant"+str(p)
+        parNames += [participantName]
+        s,T,E,o,i,t,e,do = getParticipantSummaryStats(participantName)
+        # checkOrders(o[0],p)
+        if(first):
+            improvements = i
+            time_improvements = t
+            error_improvements = e
+            orders = o
+            scores = s
+            times = T
+            errors = E
+            deltaOrders = do
+            first = False
+        else:
+            improvements = np.append(improvements,i,axis=0)
+            time_improvements = np.append(time_improvements,t,axis=0)
+            error_improvements = np.append(error_improvements,e,axis=0)
+            scores = np.append(scores,s,axis=0)
+            times = np.append(times,T,axis=0)
+            errors = np.append(errors,E,axis=0)
+            orders = np.append(orders,o,axis=0)
+            deltaOrders = np.append(deltaOrders,do,axis=0)
+
+    print "orders",orders
+    plotRowFrequencies(orders)
+    plt.title("Actual Orders")
+
+    plotThrowingData(parNames)
+    plotThrowingData(["Participant13"])
+    boxPlotColumns(improvements,deltaOrders)
+    plt.title("Score Improvements")
+    boxPlotColumns(time_improvements, deltaOrders)
+    plt.title("Time Improvements")
+    boxPlotColumns(error_improvements, deltaOrders)
+    plt.title("Error Improvements")
+
+    print scores, orders
+    boxPlotColumns(scores, orders)
+    plt.title("Raw Scores")
+    boxPlotColumns(errors, orders)
+    plt.title("Raw Errors")
+    boxPlotColumns(times, orders)
+    plt.title("Raw Times")
+
+    # plt.show()
+
+    #test with repeated same measurements
+    # improvements = np.repeat(improvements,5,axis=0)
+    # time_improvements = np.repeat(time_improvements,5,axis=0)
+    # error_improvements = np.repeat(error_improvements,5,axis=0)
+    # # Offset to avoid zero stddev
+    # improvements[4] = improvements[4]-1
+    # time_improvements[4] = time_improvements[4]-0.1
+    # error_improvements[4] = error_improvements[4]-0.1
+
+    print "improvements "
+    print improvements
+    print "time_improvements "
+    print time_improvements
+    print "error_improvements "
+    print error_improvements
+    print "getPValueNormGT0(improvements) "
+    print getPValueNormGT0(improvements) < 0.05
+    print "getPValueNormGT0(time_improvements) "
+    print getPValueNormGT0(time_improvements) < 0.05
+    print "getPValueNormGT0(error_improvements) "
+    print getPValueNormGT0(error_improvements) < 0.05
+performanceAnalysis()
 plt.show()
-
-#test with repeated same measurements
-# improvements = np.repeat(improvements,5,axis=0)
-# time_improvements = np.repeat(time_improvements,5,axis=0)
-# error_improvements = np.repeat(error_improvements,5,axis=0)
-# # Offset to avoid zero stddev
-# improvements[4] = improvements[4]-1
-# time_improvements[4] = time_improvements[4]-0.1
-# error_improvements[4] = error_improvements[4]-0.1
-
-print "improvements "
-print improvements
-print "time_improvements "
-print time_improvements
-print "error_improvements "
-print error_improvements
-print "getPValueNormGT0(improvements) "
-print getPValueNormGT0(improvements) < 0.05
-print "getPValueNormGT0(time_improvements) "
-print getPValueNormGT0(time_improvements) < 0.05
-print "getPValueNormGT0(error_improvements) "
-print getPValueNormGT0(error_improvements) < 0.05
