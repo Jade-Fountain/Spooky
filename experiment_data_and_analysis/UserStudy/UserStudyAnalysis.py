@@ -179,8 +179,9 @@ def getParticipantDataThrow(folder):
     splitData, splitOrders = split(data,0)
     scores = np.array([0,0,0])
     responseTimes = np.array([0.0,0.0,0.0])
-    mean_errors = np.array([0.0,0.0,0.0])
+    drops = np.array([0.0,0.0,0.0])
     orders = np.array([0.0,0.0,0.0])
+    error_distances = np.array([0.0,0.0,0.0])
     for i in splitData.keys():
         scores[int(i)] = splitData[i]['Success'].sum()
 
@@ -189,13 +190,14 @@ def getParticipantDataThrow(folder):
         deltaY = splitData[i]['HitPosY']
         errors = np.sqrt(deltaX**2+deltaY**2) 
         #Filter large errors (corresponding to ball disappearing)
-        errors = (errors < 1000).astype(float) * errors
-        mean_errors[int(i)] = errors.mean()
-        #Only count response times which are successful
+        errors = errors[errors < 1000]
         success = errors < 130
+        error_distances[int(i)] = errors[success].mean()
+        drops[int(i)] = np.logical_not(success).sum()
+        #Only count response times which are successful
         orders[int(i)] = splitOrders[i]
         responseTimes[int(i)] = splitData[i]['ResponseTime'][success].mean()
-    return scores, mean_errors, responseTimes,orders
+    return scores, drops, responseTimes,orders,error_distances
 
 def plotThrowingData(folders):
     data = np.array([])
@@ -232,18 +234,18 @@ def plotThrowingData(folders):
         deltaX = splitData[i]['HitPosX']
         deltaY = splitData[i]['HitPosY']
 
-        xtest = np.abs(deltaX) < 200
+        xtest = np.abs(deltaX) < 300
         ytest = np.abs(deltaY) < 200 
         rtest = np.square(deltaY) + np.square(deltaX) < 130**2
         test = np.logical_and(xtest, ytest)
         deltaFilteredX = deltaX[test]
         deltaFilteredY = -deltaY[test]
         plt.plot(deltaFilteredX,deltaFilteredY,markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1,markeredgecolor='black')
-        plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=20,markeredgewidth=1,markeredgecolor='black')
-        legend_counts += [str(len(deltaFilteredX))]
-    plt.legend(['Leap Motion (' + legend_counts[0] + '/' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
-                'Perception Neuron (' + legend_counts[1] + '/' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
-                'Fused Tracking (' + legend_counts[2] + '/' + str(len(splitData[2]['HitPosX'])) + ' valid throws)'])
+        # plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=20,markeredgewidth=1,markeredgecolor='black')
+        legend_counts += [len(deltaFilteredX)]
+    plt.legend(['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% of ' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
+                'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% of ' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
+                'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% of ' + str(len(splitData[2]['HitPosX'])) + ' valid throws)'])
     
 
 
@@ -262,7 +264,7 @@ def boxPlotColumns(data,data_subclasses=None):
         x = [1,2,3,4,5,6]
         labels = ['Leap\nKeyboard', 'PN\nKeyboard', 'Leap\nSorting', 'PN\nSorting','Leap\nThrowing', 'PN\nThrowing']
         plt.xticks(x,labels)
-    else:
+    elif(data.shape[1]==9):
         x = [1,2,3,4,5,6,7,8,9]
         labels = ['Leap\nKeyboard', 'PN\nKeyboard','Fused\nKeyboard', 'Leap\nSorting', 'PN\nSorting','Fused\nSorting','Leap\nThrowing', 'PN\nThrowing','Fused\nThrowing']
         plt.xticks(x,labels)
@@ -297,7 +299,7 @@ def getParticipantSummaryStats(participant):
     #Sort
     s_scores, s_errors, s_rtimes, s_orders = getParticipantDataSort(participant)
     #Throw
-    t_scores, t_errors, t_rtimes, t_orders = getParticipantDataThrow(participant)
+    t_scores, t_errors, t_rtimes, t_orders, d_error = getParticipantDataThrow(participant)
 
     # Order which fused was attempted (1,2,3)
     delta_orders = np.array([[         b_orders[2]-b_orders[0],b_orders[2]-b_orders[1],
@@ -322,7 +324,7 @@ def getParticipantSummaryStats(participant):
     errors = np.array([np.append(b_errors,[s_errors,t_errors])])
     orders = np.array([np.append(b_orders,[s_orders,t_orders])])
 
-    return scores, times, errors,orders, improvements, time_improvements, error_improvements, delta_orders
+    return scores, times, errors,orders, improvements, time_improvements, error_improvements, delta_orders, d_error
 
 #Pvalue 
 # Probability that we would see such large mean if population mean was zero
@@ -332,7 +334,7 @@ def getPValueNormGT0(data):
     pval = 1 - scipy.stats.norm.cdf(mean,scale=sigma/np.sqrt(data.shape[0]))
     return pval
 
-#returns tech_order[i] = t, map from slot to tech order
+#returns tech_order[i] = t, map from slot to technology used
 perms = [[0,1,2],[2,0,1],[1,2,0],[1,0,2],[2,1,0],[0,2,1]]
 def techOrder(pID,taskID):
     p = pID-1
@@ -410,7 +412,7 @@ def plotTestTechOrders():
     print orders
     plotRowFrequencies(np.array(orders))
     plt.title("Predicted Order Frequencies "+str(len(participants)) + "\n" + str(participants))
-plotTestTechOrders()
+# plotTestTechOrders()
 
 def printTechOrders():
     for p in range(4,28):
@@ -423,7 +425,7 @@ def printTechOrders():
             for i in order:
                 message += stringFromTechID(i) + " "
         print message
-printTechOrders()
+# printTechOrders()
 
 #Returns vector of preferences for 1st,2nd,3rd tasks
 def parsePref(pref):
@@ -455,11 +457,12 @@ def decodePreferences(participantIDs,preferences,task):
     # Preference counts for each tech
     taskID = taskIDFromString(task)
 
-    # rankings 
-    #           Tech1, Tech2, Tech3
-    # 1st Count     0,     1,     1
-    # 2nd Count     ....
-    # 3rd Count
+    # rankings[Tech][N] = number of times Tech was ranked Nth best
+    #               Frequency
+    #           1st,   2nd,   3rd
+    # Tech1     0,     1,     1
+    # Tech2     ....
+    # Tech3
     rank_counts = np.zeros([3,3])
     for i in range(len(preferences)):
         pID = participantIDs[i]
@@ -485,22 +488,22 @@ def plotPreferenceAnalysis(GraphName,prefs):
     #Preferences totalled over all tasks
     prefsTotal = np.sum(prefs,axis=0)
 
-    print "prefs"
-    print prefs
-    print "prefsTotal",prefsTotal
-    #-----------------------------
-
-    #-----------------------------
-    plt.figure()
-    ind = np.array(range(3))
+    # print "prefs"
+    # print prefs
+    # print "prefsTotal",prefsTotal
     width = 0.2
     tick_pos = width*3/2
-    plt.title(GraphName + " - Tech Ranking Frequencies")
-    for i in range(prefsTotal.shape[0]):
-        plt.bar(ind+i*width,prefsTotal[i],width,color=colourMap(i))
-    x = np.array([0,1,2]) + tick_pos
-    labels = ['1st Count', '2nd Count', '3rd Count']
-    plt.xticks(x,labels)
+    #-----------------------------
+    # Number of times each system was ranked 1st, 2nd, and 3rd
+    #-----------------------------
+    # plt.figure()
+    # ind = np.array(range(3))
+    # plt.title(GraphName + " - Tech Ranking Frequencies")
+    # for i in range(prefsTotal.shape[0]):
+    #     plt.bar(ind+i*width,prefsTotal[i],width,color=colourMap(i))
+    # x = np.array([0,1,2]) + tick_pos
+    # labels = ['1st Count', '2nd Count', '3rd Count']
+    # plt.xticks(x,labels)
     #-----------------------------
 
     #-----------------------------
@@ -510,12 +513,6 @@ def plotPreferenceAnalysis(GraphName,prefs):
     plt.figure()
     #points per ranking
     weight_vector = [1,0.5,0]
-    ##summed
-    # prefsSummed = np.dot(prefsTotal,weight_vector)
-    # print "prefsSummed"
-    # print prefsSummed
-    # plt.bar(ind,prefsSummed,width*3,color="white")
-    #individual
 
     techIDs = np.array([0,1,2])
     techID_widths = width * np.array([0,1,2])
@@ -524,7 +521,6 @@ def plotPreferenceAnalysis(GraphName,prefs):
     for taskID in range(len(prefs)):
         #Vector of tech scores
         tech_scores = np.dot(prefs[taskID],weight_vector)
-        print tech_scores
         plt.bar(techID_widths + taskID, tech_scores, width, color=map(colourMap,techIDs))
 
     x = np.array([0,1,2]) + tick_pos
@@ -532,14 +528,17 @@ def plotPreferenceAnalysis(GraphName,prefs):
     plt.xticks(x,labels)
     #-----------------------------
 
+    #TODO: I thought it might be a good idea to plot preferences against order of tech seen - is it worth the effort?
+
+
 
 
 keyboard_responses = getResponseData("keyboard")
 sorting_responses = getResponseData("sorting")
 throwing_responses = getResponseData("throwing")
-print keyboard_responses
-print sorting_responses
-print throwing_responses
+# print keyboard_responses
+# print sorting_responses
+# print throwing_responses
 # prefs[taskid][techid][rank] gives the number of times that task ranked that tech as rank rank
 Qprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"keyboard") 
     , decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"sorting")
@@ -564,8 +563,8 @@ def performanceAnalysis():
     for p in participants:
         participantName = "Participant"+str(p)
         parNames += [participantName]
-        s,T,E,o,i,t,e,do = getParticipantSummaryStats(participantName)
-        # checkOrders(o[0],p)
+        s,T,E,o,i,t,e,do,de,dei = getParticipantSummaryStats(participantName)
+        checkOrders(o[0],p)
         if(first):
             improvements = i
             time_improvements = t
@@ -575,6 +574,9 @@ def performanceAnalysis():
             times = T
             errors = E
             deltaOrders = do
+            distanceError = [de]
+            distanceErrorImprovements = [de]
+
             first = False
         else:
             improvements = np.append(improvements,i,axis=0)
@@ -585,8 +587,11 @@ def performanceAnalysis():
             errors = np.append(errors,E,axis=0)
             orders = np.append(orders,o,axis=0)
             deltaOrders = np.append(deltaOrders,do,axis=0)
+            distanceError = np.append(distanceError,[de],axis=0)
+            distanceErrorImprovements = np.append(distanceErrorImprovements,[dei],axis=0)
 
-    print "orders",orders
+    # print "distanceError = ", distanceError
+    # print "orders",orders
     plotRowFrequencies(orders)
     plt.title("Actual Orders")
 
@@ -597,15 +602,17 @@ def performanceAnalysis():
     boxPlotColumns(time_improvements, deltaOrders)
     plt.title("Time Improvements")
     boxPlotColumns(error_improvements, deltaOrders)
-    plt.title("Error Improvements")
+    plt.title("Error Improvements")    
 
-    print scores, orders
+    # print scores, orders
     boxPlotColumns(scores, orders)
     plt.title("Raw Scores")
     boxPlotColumns(errors, orders)
     plt.title("Raw Errors")
     boxPlotColumns(times, orders)
     plt.title("Raw Times")
+    boxPlotColumns(distanceError, orders[:,6:9])
+    plt.title("Mean Throwing Error Distance")
 
     # plt.show()
 
