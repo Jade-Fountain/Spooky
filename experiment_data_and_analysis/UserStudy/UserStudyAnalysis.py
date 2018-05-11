@@ -336,11 +336,15 @@ def getPValueNormGT0(data):
 perms = [[0,1,2],[2,0,1],[1,2,0],[1,0,2],[2,1,0],[0,2,1]]
 def techOrder(pID,taskID):
     p = pID-1
-    if(pID <= 16):
+    if(pID <= 13):
         #Every second participant gets the second half of permutations
         p_odd = p%2
-    elif(pID <= 28):
+    elif(pID <= 25):
+        #Fill in missed perms
         p_odd = (p+1)%2
+    elif(pID <= 28):
+        # go back and fix up
+        p_odd = p%2
     else:
         p_odd = (p/len(perms))%2
     #3 perms one for each tech, but order of which one goes to which task is selected by task_perm
@@ -394,7 +398,7 @@ def plotTestTechOrders():
     orders = []
     first_part = 5
     #any multiple of 4 balances
-    n_part = 12+24
+    n_part = 15
     participants = range(first_part,first_part+n_part)
     for pID in participants:
         participant_orders = []
