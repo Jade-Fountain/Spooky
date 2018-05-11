@@ -6,6 +6,7 @@ import numpy as np
 import math
 import scipy.stats
 from numpy import genfromtxt
+# from sets import Sets
 
 button_task_file = "ButtonBoard.csv"
 sorting_task_file = "SortingTask.csv"
@@ -336,7 +337,7 @@ perms = [[0,1,2],[2,0,1],[1,2,0],[1,0,2],[2,1,0],[0,2,1]]
 def techOrder(pID,taskID):
     p = pID-1
     #Every second participant gets the second half of permutations
-    p_odd = p%2
+    p_odd = (p/6)%2
     #3 perms one for each tech, but order of which one goes to which task is selected by task_perm
     tech_perms = perms[p_odd*3:p_odd*3+3]
     #task perm permutes tech_perms
@@ -356,7 +357,51 @@ def getNumber(c):
         return 2
 
 
-def testTechOrders():
+
+def inversePermutation(p):
+    p_inv = np.zeros(len(p))
+    for i in range(len(p)):
+        # print p[i]," -> ", i
+        p_inv[p[i]] = i
+    return p_inv
+
+def plotRowFrequencies(data):
+    setOfTypes = set(data.flatten())
+    n_types = len(setOfTypes)
+    n_rows = data.shape[1]
+    result = np.zeros(n_rows*n_types)
+    listOfTypes = sorted(setOfTypes)
+    for row in range(n_rows):
+        counts_row = {e:0 for e in setOfTypes}
+        for element in data[:,row]:
+            counts_row[element] += 1
+        result[row*n_types:(row+1)*n_types] = counts_row.values()
+    
+    plt.figure()
+    width = 1
+    indicies = np.array(range(len(result))) + np.array([a/n_types for a in range(len(result))])
+    plt.bar(indicies,result,width)
+    x = [x.mean() + width/2 for x in np.reshape(indicies.astype(float),[n_rows,n_types])]
+    labels = ['Leap\nKeyboard', 'PN\nKeyboard','Fused\nKeyboard', 'Leap\nSorting', 'PN\nSorting','Fused\nSorting','Leap\nThrowing', 'PN\nThrowing','Fused\nThrowing']
+    plt.xticks(x,labels)
+
+def plotTestTechOrders():
+    orders = []
+    for p in range(600):
+        pID = p+1
+        participant_orders = []
+        for taskID in range(3):
+            #Task changes every three trials
+            order = inversePermutation(techOrder(pID+1,taskID))
+            participant_orders = np.append(participant_orders,order)
+        orders += [participant_orders]
+        print participant_orders
+    print orders
+    plotRowFrequencies(np.array(orders))
+    plt.title("Predicted Order Frequencies")
+plotTestTechOrders()
+
+def printTechOrders():
     for p in range(20):
         pID = p+1
         message = "P"+str(pID) + " "
@@ -367,7 +412,7 @@ def testTechOrders():
             for i in order:
                 message += stringFromTechID(i) + " "
         print message
-# testTechOrders()
+printTechOrders()
 
 #Returns vector of preferences for 1st,2nd,3rd tasks
 def parsePref(pref):
@@ -379,12 +424,6 @@ def parsePref(pref):
         i+=1
     return rankings
 
-def inversePermutation(p):
-    p_inv = np.zeros(len(p))
-    for i in range(len(p)):
-        # print p[i]," -> ", i
-        p_inv[p[i]] = i
-    return p_inv
 
 def checkOrders(orders,pID):
         # print "orders ",orders
@@ -502,7 +541,8 @@ Uprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses
 
 plotPreferenceAnalysis("Quality",Qprefs)
 plotPreferenceAnalysis("Utility",Uprefs)
-plt.show()
+# plt.show()
+
 
 def performanceAnalysis():
     participants = [5,6,7,8,9,10,11,12,13]
@@ -514,7 +554,7 @@ def performanceAnalysis():
         participantName = "Participant"+str(p)
         parNames += [participantName]
         s,T,E,o,i,t,e,do = getParticipantSummaryStats(participantName)
-        checkOrders(o[0],p)
+        # checkOrders(o[0],p)
         if(first):
             improvements = i
             time_improvements = t
@@ -536,6 +576,9 @@ def performanceAnalysis():
             deltaOrders = np.append(deltaOrders,do,axis=0)
 
     print "orders",orders
+    plotRowFrequencies(orders)
+    plt.title("Actual Orders")
+
     plotThrowingData(parNames)
     plotThrowingData(["Participant13"])
     boxPlotColumns(improvements,deltaOrders)
@@ -553,7 +596,7 @@ def performanceAnalysis():
     boxPlotColumns(times, orders)
     plt.title("Raw Times")
 
-    plt.show()
+    # plt.show()
 
     #test with repeated same measurements
     # improvements = np.repeat(improvements,5,axis=0)
@@ -576,4 +619,5 @@ def performanceAnalysis():
     print getPValueNormGT0(time_improvements) < 0.05
     print "getPValueNormGT0(error_improvements) "
     print getPValueNormGT0(error_improvements) < 0.05
-# performanceAnalysis()
+performanceAnalysis()
+plt.show()
