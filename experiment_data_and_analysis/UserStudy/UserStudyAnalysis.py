@@ -194,11 +194,10 @@ def getParticipantDataThrow(folder):
         ytest = np.abs(deltaY) < 200 
         test = np.logical_and(xtest, ytest)
 
-
         #Filter large errors (corresponding to ball disappearing)
-        errors = errors[test]
+        valid_errors = errors[test]
         success = errors < 130
-        error_distances[int(i)] = errors.mean()
+        error_distances[int(i)] = valid_errors.mean()
         drops[int(i)] = np.logical_not(success).sum()
         #Only count response times which are successful
         orders[int(i)] = splitOrders[i]
