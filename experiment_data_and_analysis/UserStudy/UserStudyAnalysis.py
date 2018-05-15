@@ -554,11 +554,11 @@ Uprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses
 
 plotPreferenceAnalysis("Quality",Qprefs)
 plotPreferenceAnalysis("Utility",Uprefs)
-# plt.show()
+plt.show()
 
 
 def performanceAnalysis():
-    participants = [5,6,7,8,9,10,11,12,13]
+    participants = [5,6,7,8,9,10,11,12,13,14]
     # improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
     # scores, times, errors = np.array([]),np.array([]),np.array([])
     parNames = []
@@ -598,8 +598,13 @@ def performanceAnalysis():
     plotRowFrequencies(orders)
     plt.title("Actual Orders")
 
+    #All Participants
     plotThrowingData(parNames)
-    plotThrowingData(["Participant13"])
+    
+    #This participant
+    plotThrowingData(["Participant14"])
+
+
     boxPlotColumns(improvements,deltaOrders)
     plt.title("Score Improvements")
     boxPlotColumns(time_improvements, deltaOrders)
