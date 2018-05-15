@@ -189,10 +189,16 @@ def getParticipantDataThrow(folder):
         deltaX = splitData[i]['HitPosX']
         deltaY = splitData[i]['HitPosY']
         errors = np.sqrt(deltaX**2+deltaY**2) 
+
+        xtest = np.abs(deltaX) < 300
+        ytest = np.abs(deltaY) < 200 
+        test = np.logical_and(xtest, ytest)
+
+
         #Filter large errors (corresponding to ball disappearing)
-        errors = errors[errors < 1000]
+        errors = errors[test]
         success = errors < 130
-        error_distances[int(i)] = errors[success].mean()
+        error_distances[int(i)] = errors.mean()
         drops[int(i)] = np.logical_not(success).sum()
         #Only count response times which are successful
         orders[int(i)] = splitOrders[i]
@@ -319,14 +325,14 @@ def getParticipantSummaryStats(participant):
                                     s_errors[0]-s_errors[2],s_errors[1]-s_errors[2],
                                     t_errors[0]-t_errors[2],t_errors[1]-t_errors[2]]])
 
-    # d_error_improvements = np.array
+    d_error_improvements = np.array([d_error[2]-d_error[0],d_error[2]-d_error[1]])
 
     scores = np.array([np.append(b_scores,[s_scores,t_scores])])
     times = np.array([np.append(b_rtimes,[s_rtimes,t_rtimes])])
     errors = np.array([np.append(b_errors,[s_errors,t_errors])])
     orders = np.array([np.append(b_orders,[s_orders,t_orders])])
 
-    return scores, times, errors,orders, improvements, time_improvements, error_improvements, delta_orders, d_error
+    return scores, times, errors,orders, improvements, time_improvements, error_improvements, delta_orders, d_error, d_error_improvements
 
 #Pvalue 
 # Probability that we would see such large mean if population mean was zero
@@ -578,7 +584,7 @@ def performanceAnalysis():
             errors = E
             deltaOrders = do
             distanceError = [de]
-            distanceErrorImprovements = [de]
+            distanceErrorImprovements = [dei]
 
             first = False
         else:
@@ -602,7 +608,7 @@ def performanceAnalysis():
     plotThrowingData(parNames)
     
     #This participant
-    plotThrowingData(["Participant14"])
+    plotThrowingData(["Participant13"])
 
 
     boxPlotColumns(improvements,deltaOrders)
@@ -621,7 +627,10 @@ def performanceAnalysis():
     plt.title("Raw Times")
     boxPlotColumns(distanceError, orders[:,6:9])
     plt.title("Mean Throwing Error Distance")
-
+    boxPlotColumns(distanceErrorImprovements, deltaOrders[:,4:5])
+    print "distanceError",distanceError
+    print "distanceErrorImprovements",distanceErrorImprovements
+    plt.title("Mean Throwing Error Improvements")
     # plt.show()
 
     #test with repeated same measurements
