@@ -8,3 +8,4 @@
 11, ACB,ACB, "","Struggled; fingers curling and hand spinning","Sensitivity low but I got used to it"; participant seemed to lean to control arm a lot, ""
 12, BCA, CBA, "really buggy","thumb unresponsive","thumb unresponsive; pinky wigging out",""
 13, CAB,CAB,"","responsiveness off ... glitched a bit","",""
+14, BCA, BCA, "Pick up and turning cube unstable","Stable turning","",""

@@ -6,11 +6,18 @@ import numpy as np
 import math
 import scipy.stats
 from numpy import genfromtxt
+import os
 # from sets import Sets
 
 button_task_file = "ButtonBoard.csv"
 sorting_task_file = "SortingTask.csv"
 throw_task_file = "ThrowingTask.csv"
+
+thesis_folder = "/Users/jake/MEGA/PhD/Documents/Thesis/chapters/user_study/figure/"
+
+def saveFigure(name):
+    plt.savefig("figure/"+name+".pdf")
+    plt.savefig(thesis_folder+name+".pdf")
 
 def boolFromString(s):
     if(s.lower() == "true"):
@@ -153,7 +160,7 @@ def getParticipantDataButton(folder):
         deltaY = splitData[i]['CorrectPosY'] - splitData[i]["TouchPosY"]
         deltaZ = splitData[i]['CorrectPosZ'] - splitData[i]["TouchPosZ"]
         errors = np.sqrt(deltaX**2+deltaY**2+deltaZ**2)
-        mean_errors[int(i)] = errors.mean()
+        mean_errors[int(i)] = np.logical_not(success).sum()
         orders[int(i)] = splitOrders[i]
     return scores,mean_errors,responseTimes,orders
 
@@ -258,7 +265,7 @@ def boxPlotColumns(data,data_subclasses=None):
     plt.figure()
     
     #X axis 
-    x = [0,data.shape[1]]
+    x = [0,data.shape[1]+1]
     y = [0,0]
     plt.plot(x,y,'k',linewidth=1)
 
@@ -307,24 +314,46 @@ def getParticipantSummaryStats(participant):
     t_scores, t_errors, t_rtimes, t_orders, d_error = getParticipantDataThrow(participant)
 
     # Order which fused was attempted (1,2,3)
-    delta_orders = np.array([[         b_orders[2]-b_orders[0],b_orders[2]-b_orders[1],
+    delta_orders = np.array([[  b_orders[2]-b_orders[0],b_orders[2]-b_orders[1],
                                 s_orders[2]-s_orders[0],s_orders[2]-s_orders[1],
                                 t_orders[2]-t_orders[0],t_orders[2]-t_orders[1]]])
 
+    #SCORE IMPROVEMENTS
     improvements = np.array([[b_scores[2]-b_scores[0],b_scores[2]-b_scores[1],
                                s_scores[2]-s_scores[0],s_scores[2]-s_scores[1],
-                               t_scores[2]-t_scores[0],t_scores[2]-t_scores[1]]])
-    
+                               t_scores[2]-t_scores[0],t_scores[2]-t_scores[1]]]).astype(float)
 
+    basescores = np.array([b_scores[0],b_scores[1],
+                          s_scores[0],s_scores[1],
+                          t_scores[0],t_scores[1]]).astype(float)
+   
+    improvements[0] = 100 * improvements[0] / basescores
+    
+    #TIME IMPROVEMENTS
     time_improvements = np.array([[b_rtimes[0]-b_rtimes[2],b_rtimes[1]-b_rtimes[2],
                                    s_rtimes[0]-s_rtimes[2],s_rtimes[1]-s_rtimes[2],
                                    t_rtimes[0]-t_rtimes[2],t_rtimes[1]-t_rtimes[2]]])
-    
+
+    basetimes = np.array([b_rtimes[0],b_rtimes[1],
+                          s_rtimes[0],s_rtimes[1],
+                          t_rtimes[0],t_rtimes[1]]).astype(float)
+    time_improvements[0] = 100 * time_improvements[0]/basetimes
+   
+    #MISTAKE IMPROVEMENTS
     error_improvements = np.array([[b_errors[0]-b_errors[2],b_errors[1]-b_errors[2],
                                     s_errors[0]-s_errors[2],s_errors[1]-s_errors[2],
                                     t_errors[0]-t_errors[2],t_errors[1]-t_errors[2]]])
+    baseerror = np.array([b_errors[0],b_errors[1],
+                          s_errors[0],s_errors[1],
+                          t_errors[0],t_errors[1]]).astype(float)
+    error_improvements[0] = 100 * error_improvements[0] / baseerror
 
+    #Distance Error Improvements
     d_error_improvements = np.array([d_error[2]-d_error[0],d_error[2]-d_error[1]])
+
+    base_d_error = d_error[0:1]
+
+    d_error_improvements = 100 * d_error_improvements / base_d_error
 
     scores = np.array([np.append(b_scores,[s_scores,t_scores])])
     times = np.array([np.append(b_rtimes,[s_rtimes,t_rtimes])])
@@ -558,8 +587,10 @@ Uprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses
 
 
 plotPreferenceAnalysis("Quality",Qprefs)
+saveFigure("QualityResponses")
 plotPreferenceAnalysis("Utility",Uprefs)
-plt.show()
+saveFigure("UtilityResponses")
+# plt.show()
 
 
 def performanceAnalysis():
@@ -602,35 +633,56 @@ def performanceAnalysis():
     # print "orders",orders
     plotRowFrequencies(orders)
     plt.title("Actual Orders")
+    saveFigure("Orders")
 
     #All Participants
     plotThrowingData(parNames)
-    
+    plt.title("All Throws")    
+    saveFigure("AllThrows")
+
     #This participant
-    plotThrowingData(["Participant13"])
+    plotThrowingData(["Participant14"])
+    plt.title("Participant 14 Throws")    
+    saveFigure("Participant14Throws")
 
-
+    #Improvements
     boxPlotColumns(improvements,deltaOrders)
-    plt.title("Score Improvements")
-    boxPlotColumns(time_improvements, deltaOrders)
-    plt.title("Time Improvements")
-    boxPlotColumns(error_improvements, deltaOrders)
-    plt.title("Error Improvements")    
+    plt.title("% Change in Score (Fusion vs. X)")
+    saveFigure("ImprovementsScore")
+    boxPlotColumns(-time_improvements, deltaOrders)
+    plt.title("% Change in Time (Fusion vs. X)")
+    saveFigure("ImprovementsTime")
+    boxPlotColumns(-error_improvements, deltaOrders)
+    plt.title("% Change in Mistakes (Fusion vs. X)")    
+    saveFigure("ImprovementsError")
 
     # print scores, orders
     boxPlotColumns(scores, orders)
+    fig = plt.gcf()
+    fig.set_size_inches(20,10)
     plt.title("Raw Scores")
+    saveFigure("RawScores")
+
     boxPlotColumns(errors, orders)
+    fig = plt.gcf()
+    fig.set_size_inches(20,10)
     plt.title("Raw Errors")
+    saveFigure("RawErrors")
+    
     boxPlotColumns(times, orders)
+    fig = plt.gcf()
+    fig.set_size_inches(20,10)
     plt.title("Raw Times")
+    saveFigure("RawTimes")
+
+    #Throwing task specifically:
     boxPlotColumns(distanceError, orders[:,6:9])
     plt.title("Mean Throwing Error Distance")
-    boxPlotColumns(distanceErrorImprovements, deltaOrders[:,4:5])
-    print "distanceError",distanceError
-    print "distanceErrorImprovements",distanceErrorImprovements
-    plt.title("Mean Throwing Error Improvements")
-    # plt.show()
+    saveFigure("MeanThrowingErrorDistance")
+    
+    boxPlotColumns(-distanceErrorImprovements, deltaOrders[:,4:5])
+    plt.title("% Change in Mean Throwing Error (Fusion vs. X)")
+    saveFigure("ImprovementsMeanThrowingError")
 
     #test with repeated same measurements
     # improvements = np.repeat(improvements,5,axis=0)
@@ -642,7 +694,7 @@ def performanceAnalysis():
     # error_improvements[4] = error_improvements[4]-0.1
 
     print "improvements "
-    print improvements
+    print improvements 
     print "time_improvements "
     print time_improvements
     print "error_improvements "
@@ -654,4 +706,3 @@ def performanceAnalysis():
     print "getPValueNormGT0(error_improvements) "
     print getPValueNormGT0(error_improvements) < 0.05
 performanceAnalysis()
-plt.show()
