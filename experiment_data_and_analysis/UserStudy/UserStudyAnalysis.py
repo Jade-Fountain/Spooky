@@ -319,6 +319,8 @@ def getParticipantSummaryStats(participant):
                                     s_errors[0]-s_errors[2],s_errors[1]-s_errors[2],
                                     t_errors[0]-t_errors[2],t_errors[1]-t_errors[2]]])
 
+    # d_error_improvements = np.array
+
     scores = np.array([np.append(b_scores,[s_scores,t_scores])])
     times = np.array([np.append(b_rtimes,[s_rtimes,t_rtimes])])
     errors = np.array([np.append(b_errors,[s_errors,t_errors])])
@@ -343,6 +345,7 @@ def techOrder(pID,taskID):
         p_odd = p%2
     elif(pID <= 25):
         #Fill in missed perms
+        #x12 participants
         p_odd = (p+1)%2
     elif(pID <= 28):
         # go back and fix up
