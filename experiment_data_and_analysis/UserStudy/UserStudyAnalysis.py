@@ -13,11 +13,12 @@ button_task_file = "ButtonBoard.csv"
 sorting_task_file = "SortingTask.csv"
 throw_task_file = "ThrowingTask.csv"
 
-thesis_folder = "figure/"
+thesis_folder = "/Users/jake/MEGA/PhD/Documents/Thesis/chapters/user_study/figure/"
 
 def saveFigure(name):
     plt.savefig("figure/"+name+".pdf")
-    plt.savefig(thesis_folder+name+".pdf")
+    if(os.name=='Darwin'):
+        plt.savefig(thesis_folder+name+".pdf")
 
 def boolFromString(s):
     if(s.lower() == "true"):
