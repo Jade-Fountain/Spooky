@@ -13,7 +13,7 @@ button_task_file = "ButtonBoard.csv"
 sorting_task_file = "SortingTask.csv"
 throw_task_file = "ThrowingTask.csv"
 
-thesis_folder = "/Users/jake/MEGA/PhD/Documents/Thesis/chapters/user_study/figure/"
+thesis_folder = "figure/"
 
 def saveFigure(name):
     plt.savefig("figure/"+name+".pdf")
@@ -555,13 +555,26 @@ def plotPreferenceAnalysis(GraphName,prefs):
     techID_widths = width * np.array([0,1,2])
     plt.title(GraphName + " - Task Preference Scores")
 
+    total_tech_scores = 0
     for taskID in range(len(prefs)):
         #Vector of tech scores
         tech_scores = np.dot(prefs[taskID],weight_vector)
+        total_tech_scores += tech_scores
         plt.bar(techID_widths + taskID, tech_scores, width, color=map(colourMap,techIDs))
 
     x = np.array([0,1,2]) + tick_pos
     labels = ['Keyboard', 'Sorting', 'Throwing']
+    plt.xticks(x,labels)
+    #-----------------------------
+    #-----------------------------
+    # Plotting sum scores 
+    #-----------------------------
+    plt.figure()
+    plt.title(GraphName + " - Sum Preference Scores")
+    plt.bar(np.array([0,1,2]), total_tech_scores, 1, color=map(colourMap,techIDs))
+    
+    x = np.array([0,1,2])
+    labels = ['Leap Motion', 'Perception Neuron', 'Fused Tracking']
     plt.xticks(x,labels)
     #-----------------------------
 
@@ -594,7 +607,7 @@ saveFigure("UtilityResponses")
 
 
 def performanceAnalysis():
-    participants = [5,6,7,8,9,10,11,12,13,14]
+    participants = [5,6,7,8,9,10,11,12,13,14,15]
     # improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
     # scores, times, errors = np.array([]),np.array([]),np.array([])
     parNames = []
@@ -641,9 +654,9 @@ def performanceAnalysis():
     saveFigure("AllThrows")
 
     #This participant
-    plotThrowingData(["Participant14"])
-    plt.title("Participant 14 Throws")    
-    saveFigure("Participant14Throws")
+    plotThrowingData(["Participant15"])
+    plt.title("Participant 15 Throws")    
+    saveFigure("Participant15Throws")
 
     #Improvements
     boxPlotColumns(improvements,deltaOrders)
@@ -706,3 +719,4 @@ def performanceAnalysis():
     print "getPValueNormGT0(error_improvements) "
     print getPValueNormGT0(error_improvements) < 0.05
 performanceAnalysis()
+plt.show()
