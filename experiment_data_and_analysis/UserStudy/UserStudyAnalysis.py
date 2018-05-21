@@ -608,7 +608,7 @@ saveFigure("UtilityResponses")
 
 
 def performanceAnalysis():
-    participants = [5,6,7,8,9,10,11,12,13,14,15]
+    participants = [5,6,7,8,9,10,11,12,13,14,15,16]
     # improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
     # scores, times, errors = np.array([]),np.array([]),np.array([])
     parNames = []
@@ -655,9 +655,9 @@ def performanceAnalysis():
     saveFigure("AllThrows")
 
     #This participant
-    plotThrowingData(["Participant15"])
-    plt.title("Participant 15 Throws")    
-    saveFigure("Participant15Throws")
+    plotThrowingData(["Participant16"])
+    plt.title("Participant 16 Throws")    
+    saveFigure("Participant16Throws")
 
     #Improvements
     boxPlotColumns(improvements,deltaOrders)
