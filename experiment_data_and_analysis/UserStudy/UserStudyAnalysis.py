@@ -17,7 +17,7 @@ thesis_folder = "/Users/jake/MEGA/PhD/Documents/Thesis/chapters/user_study/figur
 
 def saveFigure(name):
     plt.savefig("figure/"+name+".pdf")
-    if(os.name=='Darwin'):
+    if(os.name=='posix'):
         plt.savefig(thesis_folder+name+".pdf")
 
 def boolFromString(s):
@@ -566,6 +566,7 @@ def plotPreferenceAnalysis(GraphName,prefs):
     x = np.array([0,1,2]) + tick_pos
     labels = ['Keyboard', 'Sorting', 'Throwing']
     plt.xticks(x,labels)
+    saveFigure(GraphName+"Responses")
     #-----------------------------
     #-----------------------------
     # Plotting sum scores 
@@ -601,9 +602,9 @@ Uprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses
 
 
 plotPreferenceAnalysis("Quality",Qprefs)
-saveFigure("QualityResponses")
+saveFigure("QualitySumResponses")
 plotPreferenceAnalysis("Utility",Uprefs)
-saveFigure("UtilityResponses")
+saveFigure("UtilitySumResponses")
 # plt.show()
 
 
@@ -720,4 +721,4 @@ def performanceAnalysis():
     print "getPValueNormGT0(error_improvements) "
     print getPValueNormGT0(error_improvements) < 0.05
 performanceAnalysis()
-plt.show()
+# plt.show()

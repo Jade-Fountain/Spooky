@@ -8,3 +8,4 @@
 12, CAB, CBA, "Difficult at first","Pinky finger backwards", Leap lost tracking lots, "Ball throwing difficult compared to real world"
 13, CAB, CAB, "Picking up the ball was frustrating", "Picking up the ball was frustrating; didn't pick up my hand","",""
 14, ABC,ABC, Tried overarm, Shotput technique used, Shotput technique again,"Hard to throw ball - couldn't generate power"; perhaps people who use fused first use a more natural technique
+15, ABC, BAC, Right hand difficulty picking up ball, ,,"Picking up ball difficult. Throwing ball difficult." Rankings seem mistaken he did better in C but ranked it last
