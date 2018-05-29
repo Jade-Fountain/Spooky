@@ -14,4 +14,4 @@
 17, ABC, BAC, "trouble grasping at first", "started grasping differently", "kept flying out of control" "elbows were crazy",""
 18, BAC, BCA, "Didnt work for picking up at first but I learned a better approach","Picking up better" "Could move around a lot more", "Lots of dropping",""
 19, ABC, ABC, "Sometimes I lost grip","","A mess" "Glitching out!" "Rotating the wrong way",""
-20, BAC,
+20, BAC, ABC, "Rotation dropped cube",,, "Difficult to rotate w/o dropping" "got stuck on box" Participant had trouble remembering and seemed discontent - A was definitely his worst trial (see video)
