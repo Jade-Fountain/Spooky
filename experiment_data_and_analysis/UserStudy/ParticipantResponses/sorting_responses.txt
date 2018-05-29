@@ -10,3 +10,4 @@
 13, CAB,CAB,"","responsiveness off ... glitched a bit","",""
 14, BCA, BCA, "Pick up and turning cube unstable","Stable turning","",""
 15, ABC, ABC, Leap seems very unstable today, Leap right hand no fingers, PN right hand not gripping (video 11:10); "Right hand didn't work; sometimes cube would be flicked away",""
+16, ACB, CAB, "dropped [cube] a lot", "thumbs unresponsive","",""

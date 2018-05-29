@@ -10,3 +10,4 @@
 13, ABC, ABC, "", "Left index finger wouldn't go down", "skeleton got tangled",""
 14, BAC, ABC, "","","","Keyboard too close - hard to judge angle - thumb brushed against it"
 15, BAC,BAC, "","","Hand wouldn't show up; Palm would hit [wrong] key",Leap seemed unusually noisy
+16,BCA,BCA,"","I seem to have broken my left arm" (leap elbow was glitching),"","Left tracked better"
