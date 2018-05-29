@@ -12,3 +12,4 @@
 16, BCA, CBA, "Had to throw to right to hit target", "Ball dropped from hand at peripheral","Ball dropped from hand at peripheral",""
 17, ABC, ABC, figured out overarm with PN, , PN drifted a lot and threw out fused tracking, "Ball dropped a lot and it was hard to gain height"
 18, BAC, BAC, "","Definitely easier could actually hit red target", "Hands very wonky" "Fingers bad" "Couldnt let go [of ball]", Really good footage showing fused tracking working well
+19, BAC, BCA, "Why is it sticky?",[Laughs at hand pose] "Why is...[my pinky up]" "Spawned hand in weird [place]" "Tracking more consistent than A"

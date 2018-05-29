@@ -12,4 +12,5 @@
 15, BAC,BAC, "","","Hand wouldn't show up; Palm would hit [wrong] key",Leap seemed unusually noisy
 16,BCA,BCA,"","I seem to have broken my left arm" (leap elbow was glitching),"","Left tracked better"
 17, ACB, ACB, "",ghost collisions "model seemed unreliable", "Is everything still plugged in?" "Weird phantom appendage movements",""
-18, CAB, CAB, "Fingers seem a tad wonky" "Unstable fingers at distance", "Didnt like my right arm at all" "couldnt use right arm" "hands didnt match", "seemed to match closest",
+18, CAB, CAB, "Fingers seem a tad wonky" "Unstable fingers at distance", "Didnt like my right arm at all" "couldnt use right arm" "hands didnt match", "seemed to match closest",""
+19, ACB, ACB, "","My hand has glitched out" "Cant get my other finger" [Laughing at hands] "Fingers doing their own thing. Tried spreading fingers", "Left hand floated away when using right and accidentally hit key",PC crashed so orders might not be correct - but it loads ok
