@@ -235,15 +235,14 @@ FIELD = {
 
 def drawThrowingBG(ax):
     ax.set_aspect(1)
-    outer = patches.Circle([0,0], radius=130, color='w',linewidth=1,linestyle='solid',ec='k',fill=False)
-    outmiddle = patches.Circle([0,0], radius=80, color='b',fill=False)
-    middle = patches.Circle([0,0], radius=28, color='r',fill=False)
-    inner = patches.Circle([0,0], radius=5, color='k',fill=False)
-    ssize = 30.0
-    player = patches.Rectangle([-250 - ssize/2,-ssize/2], width=ssize, height=ssize, color='k',fill=False)
+    outer = patches.Circle([0,0], radius=FIELD["TARGET"]["OUTER_R"], color='w',linewidth=1,linestyle='solid',ec='k',fill=False)
+    outmiddle = patches.Circle([0,0], radius=FIELD["TARGET"]["BLUE_R"], color='b',fill=False)
+    middle = patches.Circle([0,0], radius=FIELD["TARGET"]["RED_R"], color='r',fill=False)
+    inner = patches.Circle([0,0], radius=FIELD["TARGET"]["CENTRE_R"], color='k',fill=False)
+    player = patches.Rectangle(FIELD["PLAYER"]["POS"], width=FIELD["PLAYER"]["SIZE"][0], height=FIELD["PLAYER"]["SIZE"][1], color='g',fill=False)
     standsize = 40.0
-    ball_stand = patches.Rectangle([-220.0 - standsize/2.0,-50-standsize/2.0], width=standsize, height=standsize, color='w',linestyle='solid',ec='k',linewidth=1,fill=False)
-    ball = patches.Circle([-220,-50], radius=5, color='w',linestyle='solid',ec='k',linewidth=1)
+    ball_stand = patches.Rectangle(FIELD["BALL"]["POS"]-np.array(FIELD["BALL"]["STAND"]["SIZE"])/2, width=FIELD["BALL"]["STAND"]["SIZE"][0], height=FIELD["BALL"]["STAND"]["SIZE"][1], color='w',linestyle='solid',ec='w',linewidth=1,fill=False)
+    ball = patches.Circle(FIELD["BALL"]["POS"], radius=FIELD["BALL"]["RADIUS"], color='w',linestyle='solid',ec='w',linewidth=1)
     ax.add_patch(outer)
     ax.add_patch(outmiddle)
     ax.add_patch(middle)
@@ -308,10 +307,24 @@ def plotThrowingData(folders,saveNames=[]):
         x_pos = np.linspace(plot_range[0][0],plot_range[0][1],len(x_hist))
         plt.plot(x_pos,x_hist,c=colourMap(i))
     
-    plt.title("Throw Density vs. Distance")
+    # plt.title("Throw Density vs. Distance")
     max_y = 60
-    # plt.plot([0,0],[0,max_y+field.],'-k')
-    # plt.plot([0,0],[0,max_y],)
+    # True centre
+    plt.plot([0,0],[0,max_y],'-k')
+    # inner circle
+    plt.plot([+FIELD["TARGET"]["CENTRE_R"],+FIELD["TARGET"]["CENTRE_R"]],[0,max_y],':k')
+    plt.plot([-FIELD["TARGET"]["CENTRE_R"],-FIELD["TARGET"]["CENTRE_R"]],[0,max_y],':k')
+    #Red circle
+    plt.plot([FIELD["TARGET"]["RED_R"],FIELD["TARGET"]["RED_R"]],[0,max_y],':r')
+    plt.plot([-FIELD["TARGET"]["RED_R"],-FIELD["TARGET"]["RED_R"]],[0,max_y],':r')    
+    #Blue circle
+    plt.plot([FIELD["TARGET"]["BLUE_R"],FIELD["TARGET"]["BLUE_R"]],[0,max_y],':b')
+    plt.plot([-FIELD["TARGET"]["BLUE_R"],-FIELD["TARGET"]["BLUE_R"]],[0,max_y],':b')
+    #Outer circle
+    plt.plot([FIELD["TARGET"]["OUTER_R"],FIELD["TARGET"]["OUTER_R"]],[0,max_y],'--k')
+    plt.plot([-FIELD["TARGET"]["OUTER_R"],-FIELD["TARGET"]["OUTER_R"]],[0,max_y],'--k')
+    plt.ylabel("Throws")
+    plt.xlabel("X (cm)")
     if(len(saveNames)>0):
         saveFigure("ThrowXPlot")
     
