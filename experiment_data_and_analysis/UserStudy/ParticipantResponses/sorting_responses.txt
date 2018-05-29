@@ -15,3 +15,4 @@
 18, BAC, BCA, "Didnt work for picking up at first but I learned a better approach","Picking up better" "Could move around a lot more", "Lots of dropping",""
 19, ABC, ABC, "Sometimes I lost grip","","A mess" "Glitching out!" "Rotating the wrong way",""
 20, BAC, ABC, "Rotation dropped cube",,, "Difficult to rotate w/o dropping" "got stuck on box" Participant had trouble remembering and seemed discontent - A was definitely his worst trial (see video)
+21, CBA, BCA, "hands are gone again" - said when hands dissappeared, "","",had trouble grasping so they were directed to make a fist "hard to grab object but closing fist worked"
