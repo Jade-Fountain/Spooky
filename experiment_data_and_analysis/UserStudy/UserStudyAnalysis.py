@@ -212,16 +212,37 @@ def getParticipantDataThrow(folder):
         responseTimes[int(i)] = splitData[i]['ResponseTime'][success].mean()
     return scores, drops, responseTimes,orders,error_distances
 
+FIELD = {
+    "TARGET" : {
+        "CENTRE_R" : 5,
+        "RED_R" : 28,
+        "BLUE_R" : 80,
+        "OUTER_R" : 130
+    },
+    "PLAYER":{
+        "SIZE" : [30,30],
+        "POS" : [-265,-15]
+    },
+    "BALL":{
+        "RADIUS" : 5,
+        "POS" : [-220,-50],
+        "STAND" : {
+            "SIZE" : [40,40],
+            "POS" : [-240,-70]
+        }
+    }
+}
+
 def drawThrowingBG(ax):
     ax.set_aspect(1)
-    outer = patches.Circle([0,0], radius=130, color='w',linewidth=1,linestyle='solid',ec='k')
-    outmiddle = patches.Circle([0,0], radius=80, color='b')
-    middle = patches.Circle([0,0], radius=28, color='r')
-    inner = patches.Circle([0,0], radius=5, color='k')
+    outer = patches.Circle([0,0], radius=130, color='w',linewidth=1,linestyle='solid',ec='k',fill=False)
+    outmiddle = patches.Circle([0,0], radius=80, color='b',fill=False)
+    middle = patches.Circle([0,0], radius=28, color='r',fill=False)
+    inner = patches.Circle([0,0], radius=5, color='k',fill=False)
     ssize = 30.0
-    player = patches.Rectangle([-250 - ssize/2,-ssize/2], width=ssize, height=ssize, color='k')
+    player = patches.Rectangle([-250 - ssize/2,-ssize/2], width=ssize, height=ssize, color='k',fill=False)
     standsize = 40.0
-    ball_stand = patches.Rectangle([-220.0 - standsize/2.0,-50-standsize/2.0], width=standsize, height=standsize, color='w',linestyle='solid',ec='k',linewidth=1)
+    ball_stand = patches.Rectangle([-220.0 - standsize/2.0,-50-standsize/2.0], width=standsize, height=standsize, color='w',linestyle='solid',ec='k',linewidth=1,fill=False)
     ball = patches.Circle([-220,-50], radius=5, color='w',linestyle='solid',ec='k',linewidth=1)
     ax.add_patch(outer)
     ax.add_patch(outmiddle)
@@ -241,34 +262,59 @@ def plotThrowingData(folders,saveNames=[]):
 
     splitData,splitOrders = split(data,0)
 
-    legend_counts,deltaFilteredX,deltaFilteredY = [],[],[]
+    plot_range = [[-300,150],[-150,150]]
+    legend_counts,deltaFilteredX,deltaFilteredY,heatmaps = [],[],[],[]
     for i in splitData.keys():
         deltaX = splitData[i]['HitPosX']
         deltaY = splitData[i]['HitPosY']
 
-        xtest = np.abs(deltaX) < 300
-        ytest = np.abs(deltaY) < 200 
+        xtest = np.logical_and(deltaX < 150, -deltaX < 300) 
+        ytest = np.abs(deltaY) < 150 
         rtest = np.square(deltaY) + np.square(deltaX) < 130**2
         test = np.logical_and(xtest, ytest)
         deltaFilteredX += [deltaX[test]]
         deltaFilteredY += [-deltaY[test]]
         legend_counts += [len(deltaFilteredX[int(i)])]
+        hm, xedges, yedges = np.histogram2d(deltaFilteredX[int(i)], deltaFilteredY[int(i)],range=plot_range, bins=20)
+        heatmaps += [hm]
 
-    
     titles = ['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% of ' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
               'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% of ' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
               'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% of ' + str(len(splitData[2]['HitPosX'])) + ' valid throws)']
-
+    max_throw_density = np.max(heatmaps)
+    
     for i in splitData.keys():
         fig, ax = plt.subplots()
+        # plt.plot(deltaFilteredX[int(i)],deltaFilteredY[int(i)],markerMap(i),c=colourMap(2),ms=10,markeredgewidth=1,markeredgecolor='black')
+        
+        norm_heatmap = heatmaps[int(i)]
+        extent = [plot_range[0][0],plot_range[0][1],plot_range[1][0],plot_range[1][1]]
+        plt.imshow(norm_heatmap.T, extent=extent, origin='lower',interpolation='nearest')
         drawThrowingBG(ax)
-        plt.plot(deltaFilteredX[int(i)],deltaFilteredY[int(i)],markerMap(i),c=colourMap(2),ms=10,markeredgewidth=1,markeredgecolor='black')
         # plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=20,markeredgewidth=1,markeredgecolor='black')
         plt.title(titles[int(i)])
+        plt.clim(0,max_throw_density)
+        cbar = plt.colorbar()
+        cbar.ax.set_ylabel('Hit Density')
         if(len(saveNames)>0):
             saveFigure(saveNames[int(i)])
     
-
+    fig, ax = plt.subplots()
+    for i in splitData.keys():
+        # plt.plot(deltaFilteredX[int(i)],deltaFilteredY[int(i)],markerMap(i),c=colourMap(2),ms=10,markeredgewidth=1,markeredgecolor='black')
+        
+        norm_heatmap = heatmaps[int(i)]
+        x_hist = np.sum(norm_heatmap.T,axis=0)
+        x_pos = np.linspace(plot_range[0][0],plot_range[0][1],len(x_hist))
+        plt.plot(x_pos,x_hist,c=colourMap(i))
+    
+    plt.title("Throw Density vs. Distance")
+    max_y = 60
+    # plt.plot([0,0],[0,max_y+field.],'-k')
+    # plt.plot([0,0],[0,max_y],)
+    if(len(saveNames)>0):
+        saveFigure("ThrowXPlot")
+    
 
 def boxPlotColumns(data,data_subclasses=None):
     plt.figure()
@@ -733,4 +779,4 @@ def performanceAnalysis():
     print "getPValueNormGT0(error_improvements) "
     print getPValueNormGT0(error_improvements) < 0.05
 performanceAnalysis()
-plt.show()
+# plt.show()
