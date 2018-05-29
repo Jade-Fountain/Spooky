@@ -7,6 +7,7 @@ import math
 import scipy.stats
 from numpy import genfromtxt
 import os
+import csv
 # from sets import Sets
 
 button_task_file = "ButtonBoard.csv"
@@ -19,6 +20,17 @@ def saveFigure(name):
     plt.savefig("figure/"+name+".pdf")
     if(os.name=='posix'):
         plt.savefig(thesis_folder+name+".pdf")
+
+def saveTable(name,data,header=[]):
+    if(len(header) > 0 and len(data[0]) != len(header)):
+        raise ValueError("Header doesnt match data")
+
+    fname = "data/"+name+".csv"
+    file = open(fname,'w')
+    writer = csv.writer(file,delimiter=',')
+    writer.writerow(header)
+    for row in data:
+        writer.writerow(row.tolist())
 
 def boolFromString(s):
     if(s.lower() == "true"):
@@ -140,6 +152,8 @@ def getRawParticipantData(folder,task_file):
                       converters={"Tech":techFromString, "Success": boolFromString})
     else:
         raise ValueError('task not found')
+
+
 
 #Specific analysis functions for each task
 def getParticipantDataButton(folder):
@@ -431,42 +445,39 @@ def getParticipantSummaryStats(participant):
     t_scores, t_errors, t_rtimes, t_orders, d_error = getParticipantDataThrow(participant)
 
     # Order which fused was attempted (1,2,3)
-    delta_orders = np.array([[  b_orders[2]-b_orders[0],b_orders[2]-b_orders[1],
+    delta_orders = np.array([ b_orders[2]-b_orders[0],b_orders[2]-b_orders[1],
                                 s_orders[2]-s_orders[0],s_orders[2]-s_orders[1],
-                                t_orders[2]-t_orders[0],t_orders[2]-t_orders[1]]])
+                                t_orders[2]-t_orders[0],t_orders[2]-t_orders[1]])
 
     #SCORE IMPROVEMENTS
-    improvements = np.array([[b_scores[2]-b_scores[0],b_scores[2]-b_scores[1],
+    improvements = np.array([b_scores[2]-b_scores[0],b_scores[2]-b_scores[1],
                                s_scores[2]-s_scores[0],s_scores[2]-s_scores[1],
-                               t_scores[2]-t_scores[0],t_scores[2]-t_scores[1]]]).astype(float)
+                               t_scores[2]-t_scores[0],t_scores[2]-t_scores[1]]).astype(float)
 
     basescores = np.array([b_scores[0],b_scores[1],
                           s_scores[0],s_scores[1],
                           t_scores[0],t_scores[1]]).astype(float)
    
-    # improvements[0] = 100 * improvements[0] / basescores
-    improvements[0] = improvements[0]
+    # improvements = 100 * improvements / basescores
     
     #TIME IMPROVEMENTS
-    time_improvements = np.array([[b_rtimes[0]-b_rtimes[2],b_rtimes[1]-b_rtimes[2],
+    time_improvements = np.array([b_rtimes[0]-b_rtimes[2],b_rtimes[1]-b_rtimes[2],
                                    s_rtimes[0]-s_rtimes[2],s_rtimes[1]-s_rtimes[2],
-                                   t_rtimes[0]-t_rtimes[2],t_rtimes[1]-t_rtimes[2]]])
+                                   t_rtimes[0]-t_rtimes[2],t_rtimes[1]-t_rtimes[2]])
 
     basetimes = np.array([b_rtimes[0],b_rtimes[1],
                           s_rtimes[0],s_rtimes[1],
                           t_rtimes[0],t_rtimes[1]]).astype(float)
-    # time_improvements[0] = 100 * time_improvements[0]/basetimes
-    time_improvements[0] = time_improvements[0]
+    # time_improvements = 100 * time_improvements/basetimes
    
     #MISTAKE IMPROVEMENTS
-    error_improvements = np.array([[b_errors[0]-b_errors[2],b_errors[1]-b_errors[2],
+    error_improvements = np.array([b_errors[0]-b_errors[2],b_errors[1]-b_errors[2],
                                     s_errors[0]-s_errors[2],s_errors[1]-s_errors[2],
-                                    t_errors[0]-t_errors[2],t_errors[1]-t_errors[2]]])
+                                    t_errors[0]-t_errors[2],t_errors[1]-t_errors[2]])
     baseerror = np.array([b_errors[0],b_errors[1],
                           s_errors[0],s_errors[1],
                           t_errors[0],t_errors[1]]).astype(float)
-    # error_improvements[0] = 100 * error_improvements[0] / baseerror
-    error_improvements[0] = error_improvements[0]
+    # error_improvements = 100 * error_improvements / baseerror
 
     #Distance Error Improvements
     d_error_improvements = np.array([d_error[2]-d_error[0],d_error[2]-d_error[1]])
@@ -474,14 +485,13 @@ def getParticipantSummaryStats(participant):
     base_d_error = d_error[0:1]
 
     # d_error_improvements = 100 * d_error_improvements / base_d_error
-    d_error_improvements = d_error_improvements
 
-    scores = np.array([np.append(b_scores,[s_scores,t_scores])])
-    times = np.array([np.append(b_rtimes,[s_rtimes,t_rtimes])])
-    errors = np.array([np.append(b_errors,[s_errors,t_errors])])
-    orders = np.array([np.append(b_orders,[s_orders,t_orders])])
+    scores = np.append(b_scores,[s_scores,t_scores])
+    times = np.append(b_rtimes,[s_rtimes,t_rtimes])
+    errors = np.append(b_errors,[s_errors,t_errors])
+    orders = np.append(b_orders,[s_orders,t_orders])
 
-    return scores, times, errors,orders, improvements, time_improvements, error_improvements, delta_orders, d_error, d_error_improvements
+    return scores, times, errors, orders, improvements, time_improvements, error_improvements, delta_orders, d_error, d_error_improvements
 
 #Pvalue 
 # Probability that we would see such large mean if population mean was zero
@@ -734,35 +744,77 @@ def performanceAnalysis():
     # scores, times, errors = np.array([]),np.array([]),np.array([])
     parNames = []
     first = True
+    dataTable = []
     for p in participants:
         participantName = "Participant"+str(p)
         parNames += [participantName]
         s,T,E,o,i,t,e,do,de,dei = getParticipantSummaryStats(participantName)
-        checkOrders(o[0],p)
+        print "s,T,E,o,i,t,e,do,de,dei",s,T,E,o,i,t,e,do,de,dei
+        dataTable+=[np.concatenate([[participantName],s,T,E,o,i,t,e,do,de,dei])]
+        checkOrders(o,p)
         if(first):
-            improvements = i
-            time_improvements = t
-            error_improvements = e
-            orders = o
-            scores = s
-            times = T
-            errors = E
-            deltaOrders = do
+            improvements = [i]
+            time_improvements = [t]
+            error_improvements = [e]
+            orders = [o]
+            scores = [s]
+            times = [T]
+            errors = [E]
+            deltaOrders = [do]
             distanceError = [de]
             distanceErrorImprovements = [dei]
 
             first = False
         else:
-            improvements = np.append(improvements,i,axis=0)
-            time_improvements = np.append(time_improvements,t,axis=0)
-            error_improvements = np.append(error_improvements,e,axis=0)
-            scores = np.append(scores,s,axis=0)
-            times = np.append(times,T,axis=0)
-            errors = np.append(errors,E,axis=0)
-            orders = np.append(orders,o,axis=0)
-            deltaOrders = np.append(deltaOrders,do,axis=0)
+            improvements = np.append(improvements,[i],axis=0)
+            time_improvements = np.append(time_improvements,[t],axis=0)
+            error_improvements = np.append(error_improvements,[e],axis=0)
+            scores = np.append(scores,[s],axis=0)
+            times = np.append(times,[T],axis=0)
+            errors = np.append(errors,[E],axis=0)
+            orders = np.append(orders,[o],axis=0)
+            deltaOrders = np.append(deltaOrders,[do],axis=0)
             distanceError = np.append(distanceError,[de],axis=0)
             distanceErrorImprovements = np.append(distanceErrorImprovements,[dei],axis=0)
+    # print "dataTable",dataTable
+    table_header = ["#Participant","Score Leap Keyboard", "Score Neuron Keyboard","Score Fused Keyboard",
+                                   "Score Leap Sorting", "Score Neuron Sorting","Score Fused Sorting",
+                                   "Score Leap Throwing", "Score Neuron Throwing","Score Fused Throwing",
+                                   
+                                   "Time Leap Keyboard", "Time Neuron Keyboard","Time Fused Keyboard",
+                                   "Time Leap Sorting", "Time Neuron Sorting","Time Fused Sorting",
+                                   "Time Leap Throwing", "Time Neuron Throwing","Time Fused Throwing",
+                                   
+                                   "Mistake Leap Keyboard", "Mistake Neuron Keyboard","Mistake Fused Keyboard",
+                                   "Mistake Leap Sorting", "Mistake Neuron Sorting","Mistake Fused Sorting",
+                                   "Mistake Leap Throwing", "Mistake Neuron Throwing","Mistake Fused Throwing",
+
+                                   "Order Leap Keyboard", "Order Neuron Keyboard","Order Fused Keyboard",
+                                   "Order Leap Sorting", "Order Neuron Sorting","Order Fused Sorting",
+                                   "Order Leap Throwing", "Order Neuron Throwing","Order Fused Throwing",
+
+                                   "Score Improvement Leap Keyboard", "Score Improvement Neuron Keyboard",
+                                   "Score Improvement Leap Sorting", "Score Improvement Neuron Sorting",
+                                   "Score Improvement Leap Throwing", "Score Improvement Neuron Throwing",
+
+                                   "Time Improvement Leap Keyboard", "Time Improvement Neuron Keyboard",
+                                   "Time Improvement Leap Sorting", "Time Improvement Neuron Sorting",
+                                   "Time Improvement Leap Throwing", "Time Improvement Neuron Throwing",
+
+                                   "Mistake Improvement Leap Keyboard", "Mistake Improvement Neuron Keyboard",
+                                   "Mistake Improvement Leap Sorting", "Mistake Improvement Neuron Sorting",
+                                   "Mistake Improvement Leap Throwing", "Mistake Improvement Neuron Throwing",
+
+                                   "Delta Orders Leap Keyboard", "Delta Orders Neuron Keyboard",
+                                   "Delta Orders Leap Sorting", "Delta Orders Neuron Sorting",
+                                   "Delta Orders Leap Throwing", "Delta Orders Neuron Throwing",
+
+                                   "Throwing Error Leap", "Throwing Error Neuron", "Throwing Error Fused",
+                                   "Throwing Error Improvement Leap", "Throwing Error Improvement Neuron"]
+
+                                   
+    saveTable("ObjectiveData",np.array(dataTable),header=table_header)
+
 
     # print "distanceError = ", distanceError
     # print "orders",orders
