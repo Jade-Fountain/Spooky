@@ -12,3 +12,4 @@
 15, ABC, ABC, Leap seems very unstable today, Leap right hand no fingers, PN right hand not gripping (video 11:10); "Right hand didn't work; sometimes cube would be flicked away",""
 16, ACB, CAB, "dropped [cube] a lot", "thumbs unresponsive","",""
 17, ABC, BAC, "trouble grasping at first", "started grasping differently", "kept flying out of control" "elbows were crazy",""
+18, BAC, BCA, "Didnt work for picking up at first but I learned a better approach","Picking up better" "Could move around a lot more", "Lots of dropping",""
