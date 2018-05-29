@@ -251,7 +251,25 @@ def drawThrowingBG(ax):
     ax.add_patch(ball_stand)
     ax.add_patch(ball)
 
-def plotThrowingData(folders,saveNames=[]):
+def drawThrowingBGSolid(ax):
+    ax.set_aspect(1)
+    outer = patches.Circle([0,0], radius=FIELD["TARGET"]["OUTER_R"], color='w',linewidth=1,linestyle='solid',ec='k')
+    outmiddle = patches.Circle([0,0], radius=FIELD["TARGET"]["BLUE_R"], color='b')
+    middle = patches.Circle([0,0], radius=FIELD["TARGET"]["RED_R"], color='r')
+    inner = patches.Circle([0,0], radius=FIELD["TARGET"]["CENTRE_R"], color='k')
+    player = patches.Rectangle(FIELD["PLAYER"]["POS"], width=FIELD["PLAYER"]["SIZE"][0], height=FIELD["PLAYER"]["SIZE"][1], color='k')
+    standsize = 40.0
+    ball_stand = patches.Rectangle(FIELD["BALL"]["POS"]-np.array(FIELD["BALL"]["STAND"]["SIZE"])/2, width=FIELD["BALL"]["STAND"]["SIZE"][0], height=FIELD["BALL"]["STAND"]["SIZE"][1], color='w',linestyle='solid',ec='k',linewidth=1)
+    ball = patches.Circle(FIELD["BALL"]["POS"], radius=FIELD["BALL"]["RADIUS"], color='w',linestyle='solid',ec='k',linewidth=1)
+    ax.add_patch(outer)
+    ax.add_patch(outmiddle)
+    ax.add_patch(middle)
+    ax.add_patch(inner)
+    ax.add_patch(player)
+    ax.add_patch(ball_stand)
+    ax.add_patch(ball)
+
+def plotThrowingHeatmaps(folders,saveNames=[]):
     data = np.array([])
     for folder in folders:
         if len(data) == 0:
@@ -329,6 +347,37 @@ def plotThrowingData(folders,saveNames=[]):
         saveFigure("ThrowXPlot")
     
 
+def plotThrowingData(folders):
+    data = np.array([])
+    for folder in folders:
+        if len(data) == 0:
+            data = getRawParticipantData(folder,throw_task_file)
+        else:
+            data = np.append(data,getRawParticipantData(folder,throw_task_file))
+
+    splitData,splitOrders = split(data,0)
+
+    fig, ax = plt.subplots()
+    drawThrowingBGSolid(ax)
+
+    legend_counts = []
+    for i in splitData.keys():
+        deltaX = splitData[i]['HitPosX']
+        deltaY = splitData[i]['HitPosY']
+
+        xtest = np.abs(deltaX) < 300
+        ytest = np.abs(deltaY) < 200 
+        rtest = np.square(deltaY) + np.square(deltaX) < 130**2
+        test = np.logical_and(xtest, ytest)
+        deltaFilteredX = deltaX[test]
+        deltaFilteredY = -deltaY[test]
+        plt.plot(deltaFilteredX,deltaFilteredY,markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1,markeredgecolor='black')
+        # plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=20,markeredgewidth=1,markeredgecolor='black')
+        legend_counts += [len(deltaFilteredX)]
+    plt.legend(['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% of ' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
+                'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% of ' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
+                'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% of ' + str(len(splitData[2]['HitPosX'])) + ' valid throws)'])
+    
 def boxPlotColumns(data,data_subclasses=None):
     plt.figure()
     
@@ -722,9 +771,10 @@ def performanceAnalysis():
     saveFigure("Orders")
 
     #All Participants
-    plotThrowingData(parNames,["ThrowsLP","ThrowsPN","ThrowsFT"])
-    # plt.title("All Throws")    
-    # saveFigure("AllThrows")
+    plotThrowingHeatmaps(parNames,["ThrowsLP","ThrowsPN","ThrowsFT"])
+    plotThrowingData(parNames)
+    plt.title("All Throws")    
+    saveFigure("AllThrows")
 
     #This participant
     plotThrowingData(["Participant22"])
