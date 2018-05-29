@@ -11,3 +11,4 @@
 14, BAC, ABC, "","","","Keyboard too close - hard to judge angle - thumb brushed against it"
 15, BAC,BAC, "","","Hand wouldn't show up; Palm would hit [wrong] key",Leap seemed unusually noisy
 16,BCA,BCA,"","I seem to have broken my left arm" (leap elbow was glitching),"","Left tracked better"
+17, ACB, ACB, "",ghost collisions "model seemed unreliable", "Is everything still plugged in?" "Weird phantom appendage movements",""

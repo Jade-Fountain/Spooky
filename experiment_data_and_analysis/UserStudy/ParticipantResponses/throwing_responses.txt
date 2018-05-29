@@ -10,3 +10,4 @@
 14, ABC,ABC, Tried overarm, Shotput technique used, Shotput technique again,"Hard to throw ball - couldn't generate power"; perhaps people who use fused first use a more natural technique
 15, ABC, BAC, Right hand difficulty picking up ball, ,,"Picking up ball difficult. Throwing ball difficult." Rankings seem mistaken he did better in C but ranked it last
 16, BCA, CBA, "Had to throw to right to hit target", "Ball dropped from hand at peripheral","Ball dropped from hand at peripheral",""
+17, ABC, ABC, figured out overarm with PN, , PN drifted a lot and threw out fused tracking, "Ball dropped a lot and it was hard to gain height"
