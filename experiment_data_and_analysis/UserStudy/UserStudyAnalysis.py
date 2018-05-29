@@ -212,18 +212,7 @@ def getParticipantDataThrow(folder):
         responseTimes[int(i)] = splitData[i]['ResponseTime'][success].mean()
     return scores, drops, responseTimes,orders,error_distances
 
-def plotThrowingData(folders):
-    data = np.array([])
-    for folder in folders:
-        if len(data) == 0:
-            data = getRawParticipantData(folder,throw_task_file)
-        else:
-            data = np.append(data,getRawParticipantData(folder,throw_task_file))
-
-    splitData,splitOrders = split(data,0)
-
-    fig, ax = plt.subplots()
-
+def drawThrowingBG(ax):
     ax.set_aspect(1)
     outer = patches.Circle([0,0], radius=130, color='w',linewidth=1,linestyle='solid',ec='k')
     outmiddle = patches.Circle([0,0], radius=80, color='b')
@@ -242,7 +231,17 @@ def plotThrowingData(folders):
     ax.add_patch(ball_stand)
     ax.add_patch(ball)
 
-    legend_counts = []
+def plotThrowingData(folders,saveNames=[]):
+    data = np.array([])
+    for folder in folders:
+        if len(data) == 0:
+            data = getRawParticipantData(folder,throw_task_file)
+        else:
+            data = np.append(data,getRawParticipantData(folder,throw_task_file))
+
+    splitData,splitOrders = split(data,0)
+
+    legend_counts,deltaFilteredX,deltaFilteredY = [],[],[]
     for i in splitData.keys():
         deltaX = splitData[i]['HitPosX']
         deltaY = splitData[i]['HitPosY']
@@ -251,14 +250,23 @@ def plotThrowingData(folders):
         ytest = np.abs(deltaY) < 200 
         rtest = np.square(deltaY) + np.square(deltaX) < 130**2
         test = np.logical_and(xtest, ytest)
-        deltaFilteredX = deltaX[test]
-        deltaFilteredY = -deltaY[test]
-        plt.plot(deltaFilteredX,deltaFilteredY,markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1,markeredgecolor='black')
+        deltaFilteredX += [deltaX[test]]
+        deltaFilteredY += [-deltaY[test]]
+        legend_counts += [len(deltaFilteredX[int(i)])]
+
+    
+    titles = ['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% of ' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
+              'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% of ' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
+              'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% of ' + str(len(splitData[2]['HitPosX'])) + ' valid throws)']
+
+    for i in splitData.keys():
+        fig, ax = plt.subplots()
+        drawThrowingBG(ax)
+        plt.plot(deltaFilteredX[int(i)],deltaFilteredY[int(i)],markerMap(i),c=colourMap(2),ms=10,markeredgewidth=1,markeredgecolor='black')
         # plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=20,markeredgewidth=1,markeredgecolor='black')
-        legend_counts += [len(deltaFilteredX)]
-    plt.legend(['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% of ' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
-                'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% of ' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
-                'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% of ' + str(len(splitData[2]['HitPosX'])) + ' valid throws)'])
+        plt.title(titles[int(i)])
+        if(len(saveNames)>0):
+            saveFigure(saveNames[int(i)])
     
 
 
@@ -303,7 +311,7 @@ def boxPlotColumns(data,data_subclasses=None):
     for i in range(data.shape[0]):
         y = data[i,:]
         x = range(1,data.shape[1]+1) + ((data_subclasses[i,:] - min_subclass) * subclass_spacing - 0.5)*subclass_width  # np.random.normal(0, 0.0, size=len(y))
-        plt.plot(x, y, 'ok', alpha=1)
+        plt.plot(x, y, '-ok', alpha=1)
 
 
 def getParticipantSummaryStats(participant):
@@ -328,7 +336,8 @@ def getParticipantSummaryStats(participant):
                           s_scores[0],s_scores[1],
                           t_scores[0],t_scores[1]]).astype(float)
    
-    improvements[0] = 100 * improvements[0] / basescores
+    # improvements[0] = 100 * improvements[0] / basescores
+    improvements[0] = improvements[0]
     
     #TIME IMPROVEMENTS
     time_improvements = np.array([[b_rtimes[0]-b_rtimes[2],b_rtimes[1]-b_rtimes[2],
@@ -338,7 +347,8 @@ def getParticipantSummaryStats(participant):
     basetimes = np.array([b_rtimes[0],b_rtimes[1],
                           s_rtimes[0],s_rtimes[1],
                           t_rtimes[0],t_rtimes[1]]).astype(float)
-    time_improvements[0] = 100 * time_improvements[0]/basetimes
+    # time_improvements[0] = 100 * time_improvements[0]/basetimes
+    time_improvements[0] = time_improvements[0]
    
     #MISTAKE IMPROVEMENTS
     error_improvements = np.array([[b_errors[0]-b_errors[2],b_errors[1]-b_errors[2],
@@ -347,14 +357,16 @@ def getParticipantSummaryStats(participant):
     baseerror = np.array([b_errors[0],b_errors[1],
                           s_errors[0],s_errors[1],
                           t_errors[0],t_errors[1]]).astype(float)
-    error_improvements[0] = 100 * error_improvements[0] / baseerror
+    # error_improvements[0] = 100 * error_improvements[0] / baseerror
+    error_improvements[0] = error_improvements[0]
 
     #Distance Error Improvements
     d_error_improvements = np.array([d_error[2]-d_error[0],d_error[2]-d_error[1]])
 
     base_d_error = d_error[0:1]
 
-    d_error_improvements = 100 * d_error_improvements / base_d_error
+    # d_error_improvements = 100 * d_error_improvements / base_d_error
+    d_error_improvements = d_error_improvements
 
     scores = np.array([np.append(b_scores,[s_scores,t_scores])])
     times = np.array([np.append(b_rtimes,[s_rtimes,t_rtimes])])
@@ -651,24 +663,24 @@ def performanceAnalysis():
     saveFigure("Orders")
 
     #All Participants
-    plotThrowingData(parNames)
-    plt.title("All Throws")    
-    saveFigure("AllThrows")
+    plotThrowingData(parNames,["ThrowsLP","ThrowsPN","ThrowsFT"])
+    # plt.title("All Throws")    
+    # saveFigure("AllThrows")
 
     #This participant
     plotThrowingData(["Participant22"])
     plt.title("Participant 22 Throws")    
-    saveFigure("Participant22Throws")
+    # saveFigure("Participant22Throws")
 
     #Improvements
     boxPlotColumns(improvements,deltaOrders)
-    plt.title("% Change in Score (Fusion vs. X)")
+    plt.title("Change in Score (Fusion vs. X)")
     saveFigure("ImprovementsScore")
     boxPlotColumns(-time_improvements, deltaOrders)
-    plt.title("% Change in Time (Fusion vs. X)")
+    plt.title("Change in Time (Fusion vs. X)")
     saveFigure("ImprovementsTime")
     boxPlotColumns(-error_improvements, deltaOrders)
-    plt.title("% Change in Mistakes (Fusion vs. X)")    
+    plt.title("Change in Mistakes (Fusion vs. X)")    
     saveFigure("ImprovementsError")
 
     # print scores, orders
@@ -696,7 +708,7 @@ def performanceAnalysis():
     saveFigure("MeanThrowingErrorDistance")
     
     boxPlotColumns(-distanceErrorImprovements, deltaOrders[:,4:5])
-    plt.title("% Change in Mean Throwing Error (Fusion vs. X)")
+    plt.title("Change in Mean Throwing Error (Fusion vs. X)")
     saveFigure("ImprovementsMeanThrowingError")
 
     #test with repeated same measurements
@@ -721,4 +733,4 @@ def performanceAnalysis():
     print "getPValueNormGT0(error_improvements) "
     print getPValueNormGT0(error_improvements) < 0.05
 performanceAnalysis()
-# plt.show()
+plt.show()
