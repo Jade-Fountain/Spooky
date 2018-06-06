@@ -16,3 +16,4 @@
 20, BCA, CBA, ,,,"They were all terrible"
 21, BCA, BCA, ,,,"Dropping the ball despite clenched fist was annoying" "Most throws directly in front"
 22, CBA, CBA, "Fingers bent backwards" "Grabbing ball difficult" "Release was slow", "Release was slow" "Left arm was tracking at position of right but it started out the best","","Basketball style throw was easiest"
+23, BCA, BCA, ,Struggled at first and learned shotput,,"Fingers jumpy in all"

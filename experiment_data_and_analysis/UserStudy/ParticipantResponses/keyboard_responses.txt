@@ -17,3 +17,4 @@
 20, CAB, CAB, "Required large motions", "Shaking" "Hand rotations noisy", "Hands dissappearing and shaky" "Hand rotations noisy",
 21, ACB, ACB, "","This is really hard to use", "","All were difficult but I learned"
 22, ACB, CAB, "Best camera angle but fingers worse than B (Leap)", "Hand got stuck and moved jarringly","best finger movement" "hand moved strangely" "struggled a lot" "higher latency", "knuckles touching keys was a challenge"
+23, CAB, CBA, "","Hands accidentally hit buttons most","",""

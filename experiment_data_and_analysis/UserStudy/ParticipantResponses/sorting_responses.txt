@@ -17,3 +17,4 @@
 20, BAC, ABC, "Rotation dropped cube",,, "Difficult to rotate w/o dropping" "got stuck on box" Participant had trouble remembering and seemed discontent - A was definitely his worst trial (see video)
 21, CBA, BCA, "hands are gone again" - said when hands dissappeared, "","",had trouble grasping so they were directed to make a fist "hard to grab object but closing fist worked"
 22, BCA, CBA, "[tracking] couldnt figure out what I was doing","Less responsive but more accurate with fingers","Lots faster even though a bit glitchy", Note: participant had difficulty getting into calib poses
+23, CAB, BAC, "","","Quick tracking speed but arms were not good",""

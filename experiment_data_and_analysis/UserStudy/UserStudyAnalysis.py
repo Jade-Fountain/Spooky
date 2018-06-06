@@ -739,7 +739,7 @@ saveFigure("UtilitySumResponses")
 
 
 def performanceAnalysis():
-    participants = [5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
+    participants = [5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
     # improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
     # scores, times, errors = np.array([]),np.array([]),np.array([])
     parNames = []
@@ -829,7 +829,7 @@ def performanceAnalysis():
     saveFigure("AllThrows")
 
     #This participant
-    plotThrowingData(["Participant22"])
+    plotThrowingData(["Participant23"])
     plt.title("Participant 22 Throws")    
     # saveFigure("Participant22Throws")
 
@@ -894,4 +894,4 @@ def performanceAnalysis():
     print "getPValueNormGT0(error_improvements) "
     print getPValueNormGT0(error_improvements) < 0.05
 performanceAnalysis()
-# plt.show()
+plt.show()
