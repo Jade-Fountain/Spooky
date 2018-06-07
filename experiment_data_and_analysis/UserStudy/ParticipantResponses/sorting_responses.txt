@@ -2,7 +2,7 @@
 5, CBA,CBA,"Calibration out of sync","Calibration out of sync","Grip wouldnt trigger",Didnt understand grasping at first
 6, CBA,CBA,,,,"Hard to rotate cube;wanted to grab with both hands at the same time"
 7,CAB,CAB,"","cube was letting go; hand was rotating without movement","",""
-#TODO: decide what to do about contradiction with participant 8, ACB,ACB, "felt rigid","left hand unresponsive; cube thrown away","cubes also thrown away"
+8, ACB,ACB, "felt rigid but best overall","left hand unresponsive; cube thrown away","cubes also thrown away; close to arm movements and more responsive",
 9, ACB,ACB, "Cleanest","Hand had no fingers; grab too easy to let go","Lost sight of hand",
 10, ABC,ABC, "","cube was flicked away","tracking didnt pick up; arms didnt load; cube was flicked away",""
 11, ACB,ACB, "","Struggled; fingers curling and hand spinning","Sensitivity low but I got used to it"; participant seemed to lean to control arm a lot, ""
