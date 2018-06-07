@@ -30,7 +30,11 @@ def saveTable(name,data,header=[]):
     writer = csv.writer(file,delimiter=',')
     writer.writerow(header)
     for row in data:
-        writer.writerow(row.tolist())
+        try:
+            writer.writerow(row.tolist())
+        except AttributeError:
+            #If already a list
+            writer.writerow(row)
 
 def boolFromString(s):
     if(s.lower() == "true"):
@@ -625,11 +629,14 @@ def printTechOrders():
         print message
 # printTechOrders()
 
-#Returns vector of preferences for 1st,2nd,3rd tasks
-def parsePref(pref):
+#Returns vector of preferences for 1st,2nd,3rd attempts
+# prefs = A rank (0-2), B rank (0-2), C rank (0-2)
+# so 0,2,1 => ACB
+# or 1,2,0 => CAB
+def parsePref(pref_string):
     rankings = [0,0,0]
     i = 0
-    for c in pref.strip():
+    for c in pref_string.strip():
         n = getNumber(c)
         rankings[n] = i
         i+=1
@@ -673,6 +680,49 @@ def decodePreferences(participantIDs,preferences,task):
             rank_counts[tech_id][rank] += 1
     return rank_counts
 
+def decodeRanks(prefs,taskID,pID):
+    # prefs = A rank (0-2), B rank (0-2), C rank (0-2)
+    # t order = 
+    t_order = techOrder(pID,taskID)
+    best_attempt = prefs.index(0)
+    second_best_attempt = prefs.index(1)
+    first_choice_id = t_order[best_attempt]
+    second_choice_id = t_order[second_best_attempt]
+    return [stringFromTechID(first_choice_id),stringFromTechID(second_choice_id)]
+
+def saveOutPreferenceTable(filename,k_pref,s_pref,t_pref):
+    pref_table = []
+    p_loc = {}
+    for i in range(len(k_pref)):
+        #Set participant number
+        p = k_pref[i][0]
+        pref_table += [[p]]
+        #store participant location for later
+        p_loc[p] = i
+
+        #include keyboard prefs
+        pref = parsePref(k_pref[i][1])
+        pref_table[i] += decodeRanks(pref,taskID=taskIDFromString("keyboard"),pID=p)
+    
+    for i in range(len(s_pref)):
+        #Set participant number
+        p = s_pref[i][0]
+
+        #include sorting prefs
+        pref = parsePref(s_pref[i][1])
+        pref_table[p_loc[p]] += decodeRanks(pref,taskID=taskIDFromString("sorting"),pID=p)
+
+    for i in range(len(t_pref)):
+        #Set participant number
+        p = t_pref[i][0]
+
+        #include sorting prefs
+        pref = parsePref(t_pref[i][1])
+        pref_table[p_loc[p]] += decodeRanks(pref,taskID=taskIDFromString("throwing"),pID=p)
+
+    # print("pref_table",pref_table)
+    header = ["Participant ID","Keyboard 1st Pref","Keyboard 2nd Pref","Sorting 1st Pref","Sorting 2nd Pref","Throwing 1st Pref","Throwing 2nd Pref"]
+    saveTable(filename,pref_table,header)
 
 def getResponseData(task):
     return genfromtxt("ParticipantResponses/"+task+"_responses.txt",
@@ -744,7 +794,6 @@ def plotPreferenceAnalysis(GraphName,prefs):
 
 
 
-
 keyboard_responses = getResponseData("keyboard")
 sorting_responses = getResponseData("sorting")
 throwing_responses = getResponseData("throwing")
@@ -766,6 +815,9 @@ saveFigure("QualitySumResponses")
 plotPreferenceAnalysis("Utility",Uprefs)
 saveFigure("UtilitySumResponses")
 # plt.show()
+
+saveOutPreferenceTable("QualityPreferences",keyboard_responses[["Participant","Quality"]],sorting_responses[["Participant","Quality"]],throwing_responses[["Participant","Quality"]])
+saveOutPreferenceTable("UtilityPreferences",keyboard_responses[["Participant","Utility"]],sorting_responses[["Participant","Utility"]],throwing_responses[["Participant","Utility"]])
 
 
 def performanceAnalysis():
