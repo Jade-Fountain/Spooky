@@ -249,10 +249,10 @@ FIELD = {
 
 def drawThrowingBG(ax):
     ax.set_aspect(1)
-    outer = patches.Circle([0,0], radius=FIELD["TARGET"]["OUTER_R"], color='w',linewidth=1,linestyle='solid',ec='k',fill=False)
+    outer = patches.Circle([0,0], radius=FIELD["TARGET"]["OUTER_R"], color='w',linewidth=1,linestyle='solid',ec='w',fill=False)
     outmiddle = patches.Circle([0,0], radius=FIELD["TARGET"]["BLUE_R"], color='b',fill=False)
     middle = patches.Circle([0,0], radius=FIELD["TARGET"]["RED_R"], color='r',fill=False)
-    inner = patches.Circle([0,0], radius=FIELD["TARGET"]["CENTRE_R"], color='k',fill=False)
+    inner = patches.Circle([0,0], radius=FIELD["TARGET"]["CENTRE_R"], color='w',fill=False)
     player = patches.Rectangle(FIELD["PLAYER"]["POS"], width=FIELD["PLAYER"]["SIZE"][0], height=FIELD["PLAYER"]["SIZE"][1], color='g',fill=False)
     standsize = 40.0
     ball_stand = patches.Rectangle(FIELD["BALL"]["POS"]-np.array(FIELD["BALL"]["STAND"]["SIZE"])/2, width=FIELD["BALL"]["STAND"]["SIZE"][0], height=FIELD["BALL"]["STAND"]["SIZE"][1], color='w',linestyle='solid',ec='w',linewidth=1,fill=False)
@@ -325,22 +325,52 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
         # plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=20,markeredgewidth=1,markeredgecolor='black')
         plt.title(titles[int(i)])
         plt.clim(0,max_throw_density)
+        plt.xlabel("X (cm)")
+        plt.ylabel("Y (cm)")
         cbar = plt.colorbar()
         cbar.ax.set_ylabel('Hit Density')
         if(len(saveNames)>0):
             saveFigure(saveNames[int(i)])
+    print("Plotting projected heatmap X")
+    #Plot x projected hist
+    plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis=0)
+    if(len(saveNames)>0):
+        saveFigure("ThrowXPlot")
+
+    print("Plotting projected heatmap Y")
+    #Plot y projected hist
+    plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis=1)
+    if(len(saveNames)>0):
+        saveFigure("ThrowYPlot")
+    print("Projected Heatmapts plotted")
     
-    fig, ax = plt.subplots()
+def plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis):
+    max_y = 0
+    fig = plt.figure()
+    legends = []
+    names = ["Leap","Neuron","Fused"]
     for i in splitData.keys():
-        # plt.plot(deltaFilteredX[int(i)],deltaFilteredY[int(i)],markerMap(i),c=colourMap(2),ms=10,markeredgewidth=1,markeredgecolor='black')
+        
         
         norm_heatmap = heatmaps[int(i)]
-        x_hist = np.sum(norm_heatmap.T,axis=0)
-        x_pos = np.linspace(plot_range[0][0],plot_range[0][1],len(x_hist))
-        plt.plot(x_pos,x_hist,c=colourMap(i))
+        x_hist = np.sum(norm_heatmap.T,axis=axis)
+        x_pos = np.linspace(plot_range[axis][0],plot_range[axis][1],len(x_hist))
+        x_pos = x_pos + (x_pos[1]-x_pos[0])*0.5
+        plt.fill_between(x_pos,0,x_hist,alpha=0.5,edgecolor='k',facecolor=colourMap(i))
+        legends += [patches.Patch(color=colourMap(i),label=names[int(i)])]
+
+        max_y = np.max(np.append(x_hist,[max_y]))
     
+    max_y +=10
+
+
+    red_patch = patches.Patch(color='red', label='The red data')
+    print legends
+    plt.legend(legends)
+    plt.xlim(plot_range[axis])
+    plt.ylim(0,max_y)
+
     # plt.title("Throw Density vs. Distance")
-    max_y = 60
     # True centre
     plt.plot([0,0],[0,max_y],'-k')
     # inner circle
@@ -356,10 +386,10 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
     plt.plot([FIELD["TARGET"]["OUTER_R"],FIELD["TARGET"]["OUTER_R"]],[0,max_y],'--k')
     plt.plot([-FIELD["TARGET"]["OUTER_R"],-FIELD["TARGET"]["OUTER_R"]],[0,max_y],'--k')
     plt.ylabel("Throws")
-    plt.xlabel("X (cm)")
-    if(len(saveNames)>0):
-        saveFigure("ThrowXPlot")
-    
+    if(axis==0):
+        plt.xlabel("X (cm)")
+    elif(axis==1):
+        plt.xlabel("Y (cm)")
 
 def plotThrowingData(folders):
     data = np.array([])
@@ -749,7 +779,7 @@ def performanceAnalysis():
         participantName = "Participant"+str(p)
         parNames += [participantName]
         s,T,E,o,i,t,e,do,de,dei = getParticipantSummaryStats(participantName)
-        print "s,T,E,o,i,t,e,do,de,dei",s,T,E,o,i,t,e,do,de,dei
+        # print "s,T,E,o,i,t,e,do,de,dei",s,T,E,o,i,t,e,do,de,dei
         dataTable+=[np.concatenate([[participantName],s,T,E,o,i,t,e,do,de,dei])]
         checkOrders(o,p)
         if(first):
@@ -881,17 +911,18 @@ def performanceAnalysis():
     # time_improvements[4] = time_improvements[4]-0.1
     # error_improvements[4] = error_improvements[4]-0.1
 
-    print "improvements "
-    print improvements 
-    print "time_improvements "
-    print time_improvements
-    print "error_improvements "
-    print error_improvements
-    print "getPValueNormGT0(improvements) "
-    print getPValueNormGT0(improvements) < 0.05
-    print "getPValueNormGT0(time_improvements) "
-    print getPValueNormGT0(time_improvements) < 0.05
-    print "getPValueNormGT0(error_improvements) "
-    print getPValueNormGT0(error_improvements) < 0.05
+    #Statistical tests
+    # print "improvements "
+    # print improvements 
+    # print "time_improvements "
+    # print time_improvements
+    # print "error_improvements "
+    # print error_improvements
+    # print "getPValueNormGT0(improvements) "
+    # print getPValueNormGT0(improvements) < 0.05
+    # print "getPValueNormGT0(time_improvements) "
+    # print getPValueNormGT0(time_improvements) < 0.05
+    # print "getPValueNormGT0(error_improvements) "
+    # print getPValueNormGT0(error_improvements) < 0.05
 performanceAnalysis()
-plt.show()
+# plt.show()
