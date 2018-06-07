@@ -1,6 +1,6 @@
 # Participant, Quality, Utility, CommentsA, CommentsB, CommentsC, GeneralComments
 5, BAC,BAC,"My palm touched the keyboard","Finger not moving"-before tracking initialised,"Sorry my hand is not working; tracking [frustrating]",Participant seemed to have trouble understanding how to press buttons
-6, ACB, ACB,,,,"LP: used fists fingers too jumpy;LP: long reach didnt pick it up; slow in general" leap was very noise for this participant
+6, ACB, ACB,, used fists because fingers too jumpy; leap was very noise for this participant "at long reach didnt pick it tracking well",, "things feel a little slow in general"
 7, ACB,ACB,"","Didnt correspond accurately; required larger movements","Didnt correspond accurately; required larger movements",many accidental keypresses
 8, BCA,BCA,"Hands all over the place","Much better","Very rigid and slow" "left pinky randomly moving","Hard to tell where my fingers are"
 9, CAB, BCA, "","B was too finicky but good depth","C had good motion but slow; digits angled backwards","other digits came in contact with keys" participant seemed distracted from task by examining tracking result. also vision was not exactly normal- wears glasses for reading but could perceive stereo depth and read in rift fine
