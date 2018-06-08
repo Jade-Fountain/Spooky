@@ -157,6 +157,8 @@ def getRawParticipantData(folder,task_file):
     else:
         raise ValueError('task not found')
 
+def sumStat(data):
+    return np.median(data)
 
 
 #Specific analysis functions for each task
@@ -173,7 +175,7 @@ def getParticipantDataButton(folder):
     for i in splitData.keys():
         scores[int(i)] = splitData[i]['Correct'].sum()
         success = splitData[i]['Correct'] == 1
-        responseTimes[int(i)] = splitData[i]['ResponseTime'][success].mean()
+        responseTimes[int(i)] = sumStat(splitData[i]['ResponseTime'][success])
 
         deltaX = splitData[i]['CorrectPosX'] - splitData[i]["TouchPosX"]
         deltaY = splitData[i]['CorrectPosY'] - splitData[i]["TouchPosY"]
@@ -192,43 +194,11 @@ def getParticipantDataSort(folder):
     orders = np.array([0.0,0.0,0.0])
     for i in splitData.keys():
         scores[int(i)] = splitData[i]['Correct'].sum()
-        success = splitData[i]['Floor'] == 0
-        responseTimes[int(i)] = splitData[i]['ResponseTime'][success].mean()
+        success = splitData[i]['Floor'] == 0 #aka false
+        responseTimes[int(i)] = sumStat(splitData[i]['ResponseTime'][success])
         mistakes[int(i)] = splitData[i]['Floor'].sum()
         orders[int(i)] = splitOrders[i]
     return scores,mistakes, responseTimes,orders
-
-
-def getParticipantDataThrow(folder):
-    data = getRawParticipantData(folder,throw_task_file)
-
-    splitData, splitOrders = split(data,0)
-    scores = np.array([0,0,0])
-    responseTimes = np.array([0.0,0.0,0.0])
-    drops = np.array([0.0,0.0,0.0])
-    orders = np.array([0.0,0.0,0.0])
-    error_distances = np.array([0.0,0.0,0.0])
-    for i in splitData.keys():
-        scores[int(i)] = splitData[i]['Success'].sum()
-
-
-        deltaX = splitData[i]['HitPosX']
-        deltaY = splitData[i]['HitPosY']
-        errors = np.sqrt(deltaX**2+deltaY**2) 
-
-        xtest = np.abs(deltaX) < 300
-        ytest = np.abs(deltaY) < 200 
-        test = np.logical_and(xtest, ytest)
-
-        #Filter large errors (corresponding to ball disappearing)
-        valid_errors = errors[test]
-        success = errors < 130
-        error_distances[int(i)] = valid_errors.mean()
-        drops[int(i)] = np.logical_not(success).sum()
-        #Only count response times which are successful
-        orders[int(i)] = splitOrders[i]
-        responseTimes[int(i)] = splitData[i]['ResponseTime'][success].mean()
-    return scores, drops, responseTimes,orders,error_distances
 
 FIELD = {
     "TARGET" : {
@@ -248,8 +218,44 @@ FIELD = {
             "SIZE" : [40,40],
             "POS" : [-240,-70]
         }
-    }
+    },
+    "VALID_RANGE" : [[-300,150],[-150,150]]
 }
+
+def getParticipantDataThrow(folder):
+    data = getRawParticipantData(folder,throw_task_file)
+
+    splitData, splitOrders = split(data,0)
+    scores = np.array([0,0,0])
+    responseTimes = np.array([0.0,0.0,0.0])
+    drops = np.array([0.0,0.0,0.0])
+    orders = np.array([0.0,0.0,0.0])
+    error_distances = np.array([0.0,0.0,0.0])
+    for i in splitData.keys():
+        scores[int(i)] = splitData[i]['Success'].sum()
+
+
+        deltaX = splitData[i]['HitPosX']
+        deltaY = splitData[i]['HitPosY']
+        errors = np.sqrt(deltaX**2+deltaY**2) 
+
+        xtest = np.logical_and(deltaX >= FIELD["VALID_RANGE"][0][0], deltaX <= FIELD["VALID_RANGE"][0][1])
+        ytest = np.logical_and(deltaY >= FIELD["VALID_RANGE"][1][0], deltaY <= FIELD["VALID_RANGE"][1][1])
+        test = np.logical_and(xtest, ytest)
+
+        #Filter large errors (corresponding to ball disappearing)
+        valid_errors = errors[test]
+        success = errors < FIELD["TARGET"]["OUTER_R"]
+        error_distances[int(i)] = sumStat(valid_errors)
+        drops[int(i)] = np.logical_not(success).sum()
+        #Only count response times which are successful
+        orders[int(i)] = splitOrders[i]
+        if(np.any(success)):
+            responseTimes[int(i)] = sumStat(splitData[i]['ResponseTime'][success])
+        else:
+            responseTimes[int(i)] = sumStat(splitData[i]['ResponseTime'])
+    return scores, drops, responseTimes,orders,error_distances
+
 
 def drawThrowingBG(ax):
     ax.set_aspect(1)
@@ -297,7 +303,7 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
 
     splitData,splitOrders = split(data,0)
 
-    plot_range = [[-300,150],[-150,150]]
+    plot_range = FIELD["VALID_RANGE"]
     legend_counts,deltaFilteredX,deltaFilteredY,heatmaps = [],[],[],[]
     for i in splitData.keys():
         deltaX = splitData[i]['HitPosX']
@@ -467,7 +473,7 @@ def boxPlotColumns(data,data_subclasses=None):
     for i in range(data.shape[0]):
         y = data[i,:]
         x = range(1,data.shape[1]+1) + ((data_subclasses[i,:] - min_subclass) * subclass_spacing - 0.5)*subclass_width  # np.random.normal(0, 0.0, size=len(y))
-        plt.plot(x, y, '-ok', alpha=1)
+        plt.plot(x, y, 'ok', alpha=1)
 
 
 def getParticipantSummaryStats(participant):
@@ -792,6 +798,13 @@ def plotPreferenceAnalysis(GraphName,prefs):
 
     #TODO: I thought it might be a good idea to plot preferences against order of tech seen - is it worth the effort?
 
+def plotPValues(improvements_p):
+    plt.figure()
+    horiz = np.arange(6)
+    ticks = ("FT>LP","FT>PN","FT>LP","FT>PN","FT>LP","FT>PN")
+    plt.bar(horiz, improvements_p)
+    plt.plot([0,6],[0.05,0.05],"--r")
+    plt.xticks(horiz+0.5, ticks)
 
 
 keyboard_responses = getResponseData("keyboard")
@@ -964,17 +977,30 @@ def performanceAnalysis():
     # error_improvements[4] = error_improvements[4]-0.1
 
     #Statistical tests
-    # print "improvements "
-    # print improvements 
-    # print "time_improvements "
-    # print time_improvements
-    # print "error_improvements "
-    # print error_improvements
-    # print "getPValueNormGT0(improvements) "
-    # print getPValueNormGT0(improvements) < 0.05
-    # print "getPValueNormGT0(time_improvements) "
-    # print getPValueNormGT0(time_improvements) < 0.05
-    # print "getPValueNormGT0(error_improvements) "
-    # print getPValueNormGT0(error_improvements) < 0.05
+    print "improvements "
+    print improvements 
+    print "time_improvements "
+    print time_improvements
+    print "error_improvements "
+    print error_improvements
+    
+    print "getPValueNormGT0(improvements) "
+    print getPValueNormGT0(improvements) 
+    improvements_p = getPValueNormGT0(improvements) #< 0.05
+    plotPValues(improvements_p)
+    saveFigure("PValuesImprovements")
+
+    print "getPValueNormGT0(time_improvements) "
+    print getPValueNormGT0(time_improvements) 
+    time_improvements_p = getPValueNormGT0(time_improvements) #< 0.05
+    plotPValues(time_improvements_p)
+    saveFigure("PValuesTimes")
+
+    print "getPValueNormGT0(error_improvements) "
+    print getPValueNormGT0(error_improvements) 
+    error_improvements_p = getPValueNormGT0(error_improvements) #< 0.05
+    plotPValues(error_improvements_p)
+    saveFigure("PValuesErrors")
+
 performanceAnalysis()
 # plt.show()
