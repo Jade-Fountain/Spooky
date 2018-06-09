@@ -8,6 +8,7 @@ import scipy.stats
 from numpy import genfromtxt
 import os
 import csv
+from matplotlib2tikz import save as tikz_save
 # from sets import Sets
 
 button_task_file = "ButtonBoard.csv"
@@ -17,6 +18,9 @@ throw_task_file = "ThrowingTask.csv"
 thesis_folder = "/Users/jake/MEGA/PhD/Documents/Thesis/chapters/user_study/figure/"
 
 def saveFigure(name):
+    tikz_save("figure/"+name+".tex")
+    if(os.name=='posix'):
+        tikz_save(thesis_folder+name+".tex")
     plt.savefig("figure/"+name+".pdf")
     if(os.name=='posix'):
         plt.savefig(thesis_folder+name+".pdf")
@@ -37,9 +41,9 @@ def saveTable(name,data,header=[]):
             writer.writerow(row)
 
 def boolFromString(s):
-    if(s.lower() == "true"):
+    if(s.lower() == "true" or s.lower() == b"true"):
         return 1
-    elif(s.lower() == "false"):
+    elif(s.lower() == "false" or s.lower() == b"false"):
         return 0
     else:
         raise ValueError('Failed to read boolean value')
@@ -48,11 +52,11 @@ def techFromString(s):
     #LP = 0 = Leap Motion
     #PN = 1 = Perception Neuron
     #FT = 2 = Fused Tracking
-    if(s.upper() == "LP"):
+    if(s.upper() == "LP" or s.upper() == b"LP"):
         return 0
-    elif(s.upper() == "PN"):
+    elif(s.upper() == "PN" or s.upper() == b"PN"):
         return 1
-    elif(s.upper() == "FT"):
+    elif(s.upper() == "FT" or s.upper() == b"FT"):
         return 2
     else:
         raise ValueError("String " + s + " doesnt correspond to a tracking technology")
@@ -97,11 +101,11 @@ def stringFromTaskID(i):
         raise ValueError("ID " + i + " doesnt correspond to a tracking technology")
 
 def colourFromString(s):
-    if(s.lower() == "red"):
+    if(s.lower() == "red" or s.lower() == b"red"):
         return 0
-    elif(s.lower() == "green"):
+    elif(s.lower() == "green" or s.lower() == b"green"):
         return 1
-    elif(s.lower() == "blue"):
+    elif(s.lower() == "blue" or s.lower() == b"blue"):
         return 2
     else:
         raise ValueError("String " + s + " doesnt correspond to a colour")
@@ -166,8 +170,8 @@ def getParticipantDataButton(folder):
     data = getRawParticipantData(folder,button_task_file)
     
     splitData, splitOrders = split(data,0)
-    # print "data", data
-    # print "splitOrders", splitOrders
+    print("data", data)
+    # print("splitOrders", splitOrders)
     scores = np.array([0,0,0])
     responseTimes = np.array([0.0,0.0,0.0])
     mean_errors = np.array([0.0,0.0,0.0])
@@ -375,7 +379,7 @@ def plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis):
 
 
     red_patch = patches.Patch(color='red', label='The red data')
-    print legends
+    print(legends)
     plt.legend(legends)
     plt.xlim(plot_range[axis])
     plt.ylim(0,max_y)
@@ -568,19 +572,21 @@ def techOrder(pID,taskID):
 
     
 def getNumber(c):
-    if(c == 'A'):
+    if(c == ord('A')):
         return 0
-    if(c == 'B'):
+    if(c == ord('B')):
         return 1
-    if(c == 'C'):
+    if(c == ord('C')):
         return 2
+    else:
+        raise ValueError(c+" is not a valid preference!")
 
 
 
 def inversePermutation(p):
     p_inv = np.zeros(len(p))
     for i in range(len(p)):
-        # print p[i]," -> ", i
+        # print(p[i]," -> ", i)
         p_inv[p[i]] = i
     return p_inv
 
@@ -594,7 +600,7 @@ def plotRowFrequencies(data):
         counts_row = {e:0 for e in setOfTypes}
         for element in data[:,row]:
             counts_row[element] += 1
-        result[row*n_types:(row+1)*n_types] = counts_row.values()
+        result[row*n_types:(row+1)*n_types] = list(counts_row.values())
     
     plt.figure()
     width = 1
@@ -617,7 +623,7 @@ def plotTestTechOrders():
             order = inversePermutation(techOrder(pID,taskID))
             participant_orders = np.append(participant_orders,order)
         orders += [participant_orders]
-    print orders
+    print(orders)
     plotRowFrequencies(np.array(orders))
     plt.title("Predicted Order Frequencies "+str(len(participants)) + "\n" + str(participants))
 # plotTestTechOrders()
@@ -632,7 +638,7 @@ def printTechOrders():
             order = techOrder(pID,taskID)
             for i in order:
                 message += stringFromTechID(i) + " "
-        print message
+        print(message)
 # printTechOrders()
 
 #Returns vector of preferences for 1st,2nd,3rd attempts
@@ -650,17 +656,17 @@ def parsePref(pref_string):
 
 
 def checkOrders(orders,pID):
-        # print "orders ",orders
+        # print("orders ",orders)
     for taskID in range(3):
-        # print techOrder(pID,taskID) 
+        # print(techOrder(pID,taskID) )
         #inverse because techOrder returns which tech given the task, attempt
         # the actual order returns which order a given task was performed
         predicted_order = inversePermutation(techOrder(pID,taskID))
         actual_order = orders[taskID*3:taskID*3+3] - 1
         if (predicted_order != actual_order).any():
-            print "Order wrong!!"
-            print "predicted_order = ", predicted_order        
-            print "actual_order = ", actual_order  
+            print("Order wrong!!")
+            print("predicted_order = ", predicted_order        )
+            print("actual_order = ", actual_order  )
             raise ValueError("Something has gone wrong with the orders!")      
 
 
@@ -690,11 +696,20 @@ def decodeRanks(prefs,taskID,pID):
     # prefs = A rank (0-2), B rank (0-2), C rank (0-2)
     # t order = 
     t_order = techOrder(pID,taskID)
+    
     best_attempt = prefs.index(0)
     second_best_attempt = prefs.index(1)
-    first_choice_id = t_order[best_attempt]
-    second_choice_id = t_order[second_best_attempt]
-    return [stringFromTechID(first_choice_id),stringFromTechID(second_choice_id)]
+    third_best_attempt = prefs.index(2)
+
+    first_choice_tech_id = t_order[best_attempt]
+    second_choice_tech_id = t_order[second_best_attempt]
+    third_choice_tech_id = t_order[third_best_attempt]
+
+    result = [0,0,0]
+    result[first_choice_tech_id] = 3
+    result[second_choice_tech_id] = 2
+    result[third_choice_tech_id] = 1
+    return result
 
 def saveOutPreferenceTable(filename,k_pref,s_pref,t_pref):
     pref_table = []
@@ -727,7 +742,9 @@ def saveOutPreferenceTable(filename,k_pref,s_pref,t_pref):
         pref_table[p_loc[p]] += decodeRanks(pref,taskID=taskIDFromString("throwing"),pID=p)
 
     # print("pref_table",pref_table)
-    header = ["Participant ID","Keyboard 1st Pref","Keyboard 2nd Pref","Sorting 1st Pref","Sorting 2nd Pref","Throwing 1st Pref","Throwing 2nd Pref"]
+    header = ["Participant ID","Keyboard LP Ranks","Keyboard PN Ranks","Keyboard FT Ranks",
+                               "Sorting LP Ranks","Sorting PN Ranks","Sorting FT Ranks",
+                               "Throwing LP Ranks","Throwing PN Ranks","Throwing FT Ranks"]
     saveTable(filename,pref_table,header)
 
 def getResponseData(task):
@@ -742,9 +759,9 @@ def plotPreferenceAnalysis(GraphName,prefs):
     #Preferences totalled over all tasks
     prefsTotal = np.sum(prefs,axis=0)
 
-    # print "prefs"
-    # print prefs
-    # print "prefsTotal",prefsTotal
+    # print("prefs")
+    # print(prefs)
+    # print("prefsTotal",prefsTotal)
     width = 0.2
     tick_pos = width*3/2
     #-----------------------------
@@ -766,7 +783,7 @@ def plotPreferenceAnalysis(GraphName,prefs):
     #-----------------------------
     plt.figure()
     #points per ranking
-    weight_vector = [1,0.5,0]
+    weight_vector = [3,2,1]
 
     techIDs = np.array([0,1,2])
     techID_widths = width * np.array([0,1,2])
@@ -777,7 +794,8 @@ def plotPreferenceAnalysis(GraphName,prefs):
         #Vector of tech scores
         tech_scores = np.dot(prefs[taskID],weight_vector)
         total_tech_scores += tech_scores
-        plt.bar(techID_widths + taskID, tech_scores, width, color=map(colourMap,techIDs))
+        print(map(colourMap,techIDs))
+        plt.bar(techID_widths + taskID, tech_scores, width, color=list(map(colourMap,techIDs)))
 
     x = np.array([0,1,2]) + tick_pos
     labels = ['Keyboard', 'Sorting', 'Throwing']
@@ -789,7 +807,7 @@ def plotPreferenceAnalysis(GraphName,prefs):
     #-----------------------------
     plt.figure()
     plt.title(GraphName + " - Sum Preference Scores")
-    plt.bar(np.array([0,1,2]), total_tech_scores, 1, color=map(colourMap,techIDs))
+    plt.bar(np.array([0,1,2]), total_tech_scores, 1, color=list(map(colourMap,techIDs)))
     
     x = np.array([0,1,2])
     labels = ['Leap Motion', 'Perception Neuron', 'Fused Tracking']
@@ -810,9 +828,9 @@ def plotPValues(improvements_p):
 keyboard_responses = getResponseData("keyboard")
 sorting_responses = getResponseData("sorting")
 throwing_responses = getResponseData("throwing")
-# print keyboard_responses
-# print sorting_responses
-# print throwing_responses
+print(keyboard_responses)
+print(sorting_responses)
+print(throwing_responses)
 # prefs[taskid][techid][rank] gives the number of times that task ranked that tech as rank rank
 Qprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"keyboard") 
     , decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"sorting")
@@ -844,7 +862,7 @@ def performanceAnalysis():
         participantName = "Participant"+str(p)
         parNames += [participantName]
         s,T,E,o,i,t,e,do,de,dei = getParticipantSummaryStats(participantName)
-        # print "s,T,E,o,i,t,e,do,de,dei",s,T,E,o,i,t,e,do,de,dei
+        # print("s,T,E,o,i,t,e,do,de,dei",s,T,E,o,i,t,e,do,de,dei)
         dataTable+=[np.concatenate([[participantName],s,T,E,o,i,t,e,do,de,dei])]
         checkOrders(o,p)
         if(first):
@@ -871,7 +889,7 @@ def performanceAnalysis():
             deltaOrders = np.append(deltaOrders,[do],axis=0)
             distanceError = np.append(distanceError,[de],axis=0)
             distanceErrorImprovements = np.append(distanceErrorImprovements,[dei],axis=0)
-    # print "dataTable",dataTable
+    # print("dataTable",dataTable)
     table_header = ["#Participant","Score Leap Keyboard", "Score Neuron Keyboard","Score Fused Keyboard",
                                    "Score Leap Sorting", "Score Neuron Sorting","Score Fused Sorting",
                                    "Score Leap Throwing", "Score Neuron Throwing","Score Fused Throwing",
@@ -911,8 +929,8 @@ def performanceAnalysis():
     saveTable("ObjectiveData",np.array(dataTable),header=table_header)
 
 
-    # print "distanceError = ", distanceError
-    # print "orders",orders
+    # print("distanceError = ", distanceError)
+    # print("orders",orders)
     plotRowFrequencies(orders)
     plt.title("Actual Orders")
     saveFigure("Orders")
@@ -939,7 +957,7 @@ def performanceAnalysis():
     plt.title("Change in Mistakes (Fusion vs. X)")    
     saveFigure("ImprovementsError")
 
-    # print scores, orders
+    # print(scores, orders)
     boxPlotColumns(scores, orders)
     fig = plt.gcf()
     fig.set_size_inches(20,10)
@@ -977,27 +995,27 @@ def performanceAnalysis():
     # error_improvements[4] = error_improvements[4]-0.1
 
     #Statistical tests
-    print "improvements "
-    print improvements 
-    print "time_improvements "
-    print time_improvements
-    print "error_improvements "
-    print error_improvements
+    print("improvements ")
+    print(improvements )
+    print("time_improvements ")
+    print(time_improvements)
+    print("error_improvements ")
+    print(error_improvements)
     
-    print "getPValueNormGT0(improvements) "
-    print getPValueNormGT0(improvements) 
+    print("getPValueNormGT0(improvements) ")
+    print(getPValueNormGT0(improvements) )
     improvements_p = getPValueNormGT0(improvements) #< 0.05
     plotPValues(improvements_p)
     saveFigure("PValuesImprovements")
 
-    print "getPValueNormGT0(time_improvements) "
-    print getPValueNormGT0(time_improvements) 
+    print("getPValueNormGT0(time_improvements) ")
+    print(getPValueNormGT0(time_improvements) )
     time_improvements_p = getPValueNormGT0(time_improvements) #< 0.05
     plotPValues(time_improvements_p)
     saveFigure("PValuesTimes")
 
-    print "getPValueNormGT0(error_improvements) "
-    print getPValueNormGT0(error_improvements) 
+    print("getPValueNormGT0(error_improvements) ")
+    print(getPValueNormGT0(error_improvements) )
     error_improvements_p = getPValueNormGT0(error_improvements) #< 0.05
     plotPValues(error_improvements_p)
     saveFigure("PValuesErrors")
