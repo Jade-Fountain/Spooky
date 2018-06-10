@@ -325,9 +325,9 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
         hm, xedges, yedges = np.histogram2d(deltaFilteredX[int(i)], deltaFilteredY[int(i)],range=plot_range, bins=20)
         heatmaps += [hm]
 
-    titles = ['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% valid of' + str(len(splitData[0]['HitPosX'])) + ' throws)',
-              'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% valid of ' + str(len(splitData[1]['HitPosX'])) + ' throws)',
-              'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% valid of ' + str(len(splitData[2]['HitPosX'])) + ' throws)']
+    titles = ['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% valid / ' + str(len(splitData[0]['HitPosX'])) + ' throws)',
+              'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% valid / ' + str(len(splitData[1]['HitPosX'])) + ' throws)',
+              'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% valid / ' + str(len(splitData[2]['HitPosX'])) + ' throws)']
     max_throw_density = np.max(heatmaps)
     
     for i in splitData.keys():
@@ -351,13 +351,13 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
     #Plot x projected hist
     plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis=0)
     if(len(saveNames)>0):
-        saveFigure("ThrowXPlot",pgf=False)
+        saveFigure("ThrowXPlot")
 
     print("Plotting projected heatmap Y")
     #Plot y projected hist
     plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis=1)
     if(len(saveNames)>0):
-        saveFigure("ThrowYPlot",pgf=False)
+        saveFigure("ThrowYPlot")
     print("Projected Heatmapts plotted")
     
 def plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis):
@@ -372,8 +372,8 @@ def plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis):
         x_hist = np.sum(norm_heatmap.T,axis=axis)
         x_pos = np.linspace(plot_range[axis][0],plot_range[axis][1],len(x_hist))
         x_pos = x_pos + (x_pos[1]-x_pos[0])*0.5
+        plt.plot(x_pos,x_hist,alpha=1,color=colourMap(i),label="{:s}".format(names[int(i)]))
         plt.fill_between(x_pos,0,x_hist,alpha=0.5,edgecolor='k',facecolor=colourMap(i))
-        legends += [patches.Patch(color=colourMap(i),label=names[int(i)])]
 
         max_y = np.max(np.append(x_hist,[max_y]))
     
@@ -382,7 +382,9 @@ def plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis):
 
     red_patch = patches.Patch(color='red', label='The red data')
     print(legends)
-    plt.legend(legends)
+    leg = plt.legend(names)
+    for legobj in leg.legendHandles:
+        legobj.set_linewidth(5)
     plt.xlim(plot_range[axis])
     plt.ylim(0,max_y)
 
