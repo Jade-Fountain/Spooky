@@ -1,0 +1,148 @@
+% This file was created by matplotlib2tikz v0.6.17.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{0.4,0.76078431372549,0.647058823529412}
+\definecolor{color1}{rgb}{0.552941176470588,0.627450980392157,0.796078431372549}
+\definecolor{color2}{rgb}{1,0.498039215686275,0.0549019607843137}
+
+\begin{groupplot}[group style={group size=1 by 2}]
+\nextgroupplot[
+ylabel={FT vs. LP},
+xmin=-7.6, xmax=5.6,
+ymin=0, ymax=7.35,
+tick align=outside,
+tick pos=left,
+x grid style={white!69.019607843137251!black},
+y grid style={white!69.019607843137251!black}
+]
+\draw[fill=color0,draw opacity=0] (axis cs:-7,0) rectangle (axis cs:-6.1,1);
+\draw[fill=color0,draw opacity=0] (axis cs:-6.1,0) rectangle (axis cs:-5.2,1);
+\draw[fill=color0,draw opacity=0] (axis cs:-5.2,0) rectangle (axis cs:-4.3,2);
+\draw[fill=color0,draw opacity=0] (axis cs:-4.3,0) rectangle (axis cs:-3.4,1);
+\draw[fill=color0,draw opacity=0] (axis cs:-3.4,0) rectangle (axis cs:-2.5,7);
+\draw[fill=color0,draw opacity=0] (axis cs:-2.5,0) rectangle (axis cs:-1.6,2);
+\draw[fill=color0,draw opacity=0] (axis cs:-1.6,0) rectangle (axis cs:-0.7,0);
+\draw[fill=color0,draw opacity=0] (axis cs:-0.7,0) rectangle (axis cs:0.2,2);
+\draw[fill=color0,draw opacity=0] (axis cs:0.2,0) rectangle (axis cs:1.1,0);
+\draw[fill=color0,draw opacity=0] (axis cs:1.1,0) rectangle (axis cs:2,3);
+\nextgroupplot[
+ylabel={FT vs. PN},
+xmin=-7.6, xmax=5.6,
+ymin=0, ymax=7.35,
+tick align=outside,
+tick pos=left,
+x grid style={white!69.019607843137251!black},
+y grid style={white!69.019607843137251!black}
+]
+\draw[fill=color1,draw opacity=0] (axis cs:0,0) rectangle (axis cs:0.5,6);
+\draw[fill=color1,draw opacity=0] (axis cs:0.5,0) rectangle (axis cs:1,0);
+\draw[fill=color1,draw opacity=0] (axis cs:1,0) rectangle (axis cs:1.5,6);
+\draw[fill=color1,draw opacity=0] (axis cs:1.5,0) rectangle (axis cs:2,0);
+\draw[fill=color1,draw opacity=0] (axis cs:2,0) rectangle (axis cs:2.5,3);
+\draw[fill=color1,draw opacity=0] (axis cs:2.5,0) rectangle (axis cs:3,0);
+\draw[fill=color1,draw opacity=0] (axis cs:3,0) rectangle (axis cs:3.5,2);
+\draw[fill=color1,draw opacity=0] (axis cs:3.5,0) rectangle (axis cs:4,0);
+\draw[fill=color1,draw opacity=0] (axis cs:4,0) rectangle (axis cs:4.5,1);
+\draw[fill=color1,draw opacity=0] (axis cs:4.5,0) rectangle (axis cs:5,1);
+\end{groupplot}
+
+\begin{groupplot}[group style={group size=1 by 2}]
+\nextgroupplot[
+xmin=-7.6, xmax=5.6,
+ymin=0.5, ymax=1.5,
+axis y line=right,
+tick align=outside,
+xtick pos=left,
+ymajorticks=false,
+x grid style={white!69.019607843137251!black},
+y grid style={white!69.019607843137251!black}
+]
+\addplot [black, forget plot]
+table {%
+-3.5 0.625
+-3.5 1.375
+-1 1.375
+-1 0.625
+-3.5 0.625
+};
+\addplot [black, forget plot]
+table {%
+-3.5 1
+-7 1
+};
+\addplot [black, forget plot]
+table {%
+-1 1
+2 1
+};
+\addplot [black, forget plot]
+table {%
+-7 0.8125
+-7 1.1875
+};
+\addplot [black, forget plot]
+table {%
+2 0.8125
+2 1.1875
+};
+\addplot [semithick, black, dashed, forget plot]
+table {%
+0 0
+0 7.35
+};
+\addplot [color2, forget plot]
+table {%
+-3 0.625
+-3 1.375
+};
+\nextgroupplot[
+xmin=-7.6, xmax=5.6,
+ymin=0.5, ymax=1.5,
+axis y line=right,
+tick align=outside,
+xtick pos=left,
+ymajorticks=false,
+x grid style={white!69.019607843137251!black},
+y grid style={white!69.019607843137251!black}
+]
+\addplot [black, forget plot]
+table {%
+-0 0.625
+-0 1.375
+2 1.375
+2 0.625
+-0 0.625
+};
+\addplot [black, forget plot]
+table {%
+-0 1
+-0 1
+};
+\addplot [black, forget plot]
+table {%
+2 1
+5 1
+};
+\addplot [black, forget plot]
+table {%
+-0 0.8125
+-0 1.1875
+};
+\addplot [black, forget plot]
+table {%
+5 0.8125
+5 1.1875
+};
+\addplot [semithick, black, dashed, forget plot]
+table {%
+0 0
+0 7.35
+};
+\addplot [color2, forget plot]
+table {%
+1 0.625
+1 1.375
+};
+\end{groupplot}
+
+\end{tikzpicture}

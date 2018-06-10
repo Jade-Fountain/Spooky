@@ -17,11 +17,12 @@ throw_task_file = "ThrowingTask.csv"
 
 thesis_folder = "/Users/jake/MEGA/PhD/Documents/Thesis/chapters/user_study/figure/"
 
-def saveFigure(name):
+def saveFigure(name,pgf=True):
     print("Saving ",name)
-    tikz_save("figure/"+name+".tex")
-    if(os.name=='posix'):
-        tikz_save(thesis_folder+name+".tex")
+    if(pgf):
+        tikz_save("figure/"+name+".tex")
+        if(os.name=='posix'):
+            tikz_save(thesis_folder+name+".tex")
     plt.savefig("figure/"+name+".pdf")
     if(os.name=='posix'):
         plt.savefig(thesis_folder+name+".pdf")
@@ -126,10 +127,11 @@ def split(X, column):
     return splitX, orders
 
 def colourMap(i):
+    #colour brewer http://colorbrewer2.org/#type=qualitative&scheme=Set2&n=3
     return {
-        0 : 'palegreen',
-        1 : 'lightskyblue',
-        2 : 'gold'
+        0 : '#66c2a5',
+        1 : '#8da0cb',
+        2 : '#fc8d62'
     }[int(i)]
 
 def markerMap(i):
@@ -323,9 +325,9 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
         hm, xedges, yedges = np.histogram2d(deltaFilteredX[int(i)], deltaFilteredY[int(i)],range=plot_range, bins=20)
         heatmaps += [hm]
 
-    titles = ['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '\% of ' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
-              'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '\% of ' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
-              'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '\% of ' + str(len(splitData[2]['HitPosX'])) + ' valid throws)']
+    titles = ['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% valid of' + str(len(splitData[0]['HitPosX'])) + ' throws)',
+              'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% valid of ' + str(len(splitData[1]['HitPosX'])) + ' throws)',
+              'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% valid of ' + str(len(splitData[2]['HitPosX'])) + ' throws)']
     max_throw_density = np.max(heatmaps)
     
     for i in splitData.keys():
@@ -344,18 +346,18 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
         cbar = plt.colorbar()
         cbar.ax.set_ylabel('Hit Density')
         if(len(saveNames)>0):
-            saveFigure(saveNames[int(i)])
+            saveFigure(saveNames[int(i)],pgf=False)
     print("Plotting projected heatmap X")
     #Plot x projected hist
     plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis=0)
     if(len(saveNames)>0):
-        saveFigure("ThrowXPlot")
+        saveFigure("ThrowXPlot",pgf=False)
 
     print("Plotting projected heatmap Y")
     #Plot y projected hist
     plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis=1)
     if(len(saveNames)>0):
-        saveFigure("ThrowYPlot")
+        saveFigure("ThrowYPlot",pgf=False)
     print("Projected Heatmapts plotted")
     
 def plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis):
@@ -432,9 +434,9 @@ def plotThrowingData(folders):
         plt.plot(deltaFilteredX,deltaFilteredY,markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1,markeredgecolor='black')
         # plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=20,markeredgewidth=1,markeredgecolor='black')
         legend_counts += [len(deltaFilteredX)]
-    plt.legend(['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '\% of ' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
-                'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '\% of ' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
-                'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '\% of ' + str(len(splitData[2]['HitPosX'])) + ' valid throws)'])
+    plt.legend(['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% valid / ' + str(len(splitData[0]['HitPosX'])) + ' throws)',
+                'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% valid / ' + str(len(splitData[1]['HitPosX'])) + ' throws)',
+                'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% valid / ' + str(len(splitData[2]['HitPosX'])) + ' throws)'])
     
 def boxPlotColumns(data,data_subclasses=None):
     plt.figure()
@@ -501,7 +503,7 @@ def histogramPlotColumns(data,labels,title,bins = 5):
         x = data[:,i]
         y = ax.get_ylim()[1]
         ax2 = ax.twinx()
-        ax2.boxplot(x,vert=False)
+        ax2.boxplot(x,vert=False,widths=[0.75])
         ax2.tick_params(
             axis='y',          # changes apply to the y-axis
             which='both',      # both major and minor ticks are affected
@@ -980,27 +982,42 @@ def performanceAnalysis():
     plt.title("Participant 22 Throws")    
     # saveFigure("Participant22Throws")
 
-    #Improvements
+    #===============
+    # Delta data
+    #===============
+    #Score Improvements
     labels = ["FT vs. LP","FT vs. PN"]
     histogramPlotColumns(improvements[:,0:2],labels,title=None)
     # histogramPlotColumns(np.sum(improvements[:,0:2],axis=1),labels=["Total Fused Improvement"],title=None)
-    saveFigure("ImprovementsScoreKeyboard")
+    saveFigure("DeltaScoreKeyboard")
     histogramPlotColumns(improvements[:,2:4],labels,title=None)
-    saveFigure("ImprovementsScoreSorting")
+    saveFigure("DeltaScoreSorting")
     histogramPlotColumns(improvements[:,4:6],labels,title=None)
-    saveFigure("ImprovementsScoreThrowing")
+    saveFigure("DeltaScoreThrowing")
 
+    #Mistake change
+    histogramPlotColumns(-error_improvements[:,0:2],labels,title=None)
+    # histogramPlotColumns(np.sum(error_improvements,axis=1),labels=["Total Fused Improvement"],title=None)
+    saveFigure("DeltaErrorsKeyboard")
+    histogramPlotColumns(-error_improvements[:,2:4],labels,title=None)
+    saveFigure("DeltaErrorsSorting")
+    histogramPlotColumns(-error_improvements[:,4:6],labels,title=None)
+    saveFigure("DeltaErrorsThrowing")
 
+    #Old box plots:
     # plt.title("Change in Score (Fusion vs. X)")
-    boxPlotColumns(-time_improvements, deltaOrders)
-    plt.title("Change in Time (Fusion vs. X)")
-    saveFigure("ImprovementsTime")
-    boxPlotColumns(-error_improvements, deltaOrders)
-    plt.title("Change in Mistakes (Fusion vs. X)")    
-    saveFigure("ImprovementsError")
-
+    # boxPlotColumns(-time_improvements, deltaOrders)
+    # plt.title("Change in Time (Fusion vs. X)")
+    # saveFigure("ImprovementsTime")
+    # boxPlotColumns(-error_improvements, deltaOrders)
+    # plt.title("Change in Mistakes (Fusion vs. X)")    
+    # saveFigure("ImprovementsError")
+    
+    #===============
+    # Raw data
+    #===============
     # print(scores, orders)
-    tech_labels=["Leap Motion","PerceptionNeuron","Fused Tracking"]
+    tech_labels=["Leap Msotion","PerceptionNeuron","Fused Tracking"]
     # boxPlotColumns(scores, orders)
     histogramPlotColumns(scores[:,0:3],tech_labels,title=None)
     fig = plt.gcf()
