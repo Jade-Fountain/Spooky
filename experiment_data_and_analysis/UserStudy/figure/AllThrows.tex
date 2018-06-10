@@ -1,7 +1,9 @@
 % This file was created by matplotlib2tikz v0.6.17.
 \begin{tikzpicture}
 
-\definecolor{color0}{rgb}{1,0.647058823529412,0}
+\definecolor{color0}{rgb}{0.596078431372549,0.984313725490196,0.596078431372549}
+\definecolor{color1}{rgb}{0.529411764705882,0.807843137254902,0.980392156862745}
+\definecolor{color2}{rgb}{1,0.843137254901961,0}
 
 \begin{axis}[
 title={All Throws},
@@ -11,19 +13,19 @@ tick align=outside,
 tick pos=left,
 x grid style={white!69.019607843137251!black},
 y grid style={white!69.019607843137251!black},
+legend entries={{Leap Motion (75.9\% of 477 valid throws)},{Perception Neuron (89.1\% of 384 valid throws)},{Fused Tracking (87.1\% of 387 valid throws)}},
 legend cell align={left},
-legend style={at={(0.97,0.03)}, anchor=south east, draw=white!80.0!black},
-legend entries={{Leap Motion (75.9% of 477 valid throws)},{Perception Neuron (89.1% of 384 valid throws)},{Fused Tracking (87.1% of 387 valid throws)}}
+legend style={at={(0.97,0.03)}, anchor=south east, draw=white!80.0!black}
 ]
-\addlegendimage{no markers, green!50.196078431372548!black}
-\addlegendimage{no markers, blue}
 \addlegendimage{no markers, color0}
+\addlegendimage{no markers, color1}
+\addlegendimage{no markers, color2}
 \draw[draw=black,fill=white] (axis cs:0,0) circle (130);
 \draw[draw=blue,fill=blue] (axis cs:0,0) circle (80);
 \draw[draw=red,fill=red] (axis cs:0,0) circle (28);
 \draw[draw=black,fill=black] (axis cs:0,0) circle (5);
 \draw[draw=black,fill=white] (axis cs:-220,-50) circle (5);
-\addplot [semithick, green!50.196078431372548!black, mark=square*, mark size=5, mark options={solid,draw=black}, only marks]
+\addplot [semithick, color0, mark=square*, mark size=5, mark options={solid,draw=black}, only marks]
 table {%
 -236.152328 -17.676434
 -266.886108 -117.004822
@@ -388,7 +390,7 @@ table {%
 -35.823593 -9.086236
 -87.654572 -5.757375
 };
-\addplot [semithick, blue, mark=*, mark size=5, mark options={solid,draw=black}, only marks]
+\addplot [semithick, color1, mark=*, mark size=5, mark options={solid,draw=black}, only marks]
 table {%
 -153.328064 73.754616
 -139.903656 45.150204
@@ -733,7 +735,7 @@ table {%
 -146.841354 -3.383319
 -33.595673 -74.348434
 };
-\addplot [semithick, color0, mark=asterisk*, mark size=5, mark options={solid,draw=black}, only marks]
+\addplot [semithick, color2, mark=asterisk*, mark size=5, mark options={solid,draw=black}, only marks]
 table {%
 -215.526123 -13.088312
 -172.695313 -8.241838

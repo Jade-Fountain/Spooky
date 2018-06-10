@@ -1,0 +1,221 @@
+% This file was created by matplotlib2tikz v0.6.17.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{0.596078431372549,0.984313725490196,0.596078431372549}
+\definecolor{color1}{rgb}{0.529411764705882,0.807843137254902,0.980392156862745}
+\definecolor{color2}{rgb}{1,0.843137254901961,0}
+\definecolor{color3}{rgb}{1,0.498039215686275,0.0549019607843137}
+
+\begin{groupplot}[group style={group size=1 by 3}]
+\nextgroupplot[
+ylabel={Leap Motion},
+xmin=-0.9, xmax=18.9,
+ymin=0, ymax=5.25,
+tick align=outside,
+tick pos=left,
+x grid style={white!69.019607843137251!black},
+y grid style={white!69.019607843137251!black}
+]
+\draw[fill=color0,draw opacity=0] (axis cs:1,0) rectangle (axis cs:2.5,4);
+\draw[fill=color0,draw opacity=0] (axis cs:2.5,0) rectangle (axis cs:4,0);
+\draw[fill=color0,draw opacity=0] (axis cs:4,0) rectangle (axis cs:5.5,5);
+\draw[fill=color0,draw opacity=0] (axis cs:5.5,0) rectangle (axis cs:7,2);
+\draw[fill=color0,draw opacity=0] (axis cs:7,0) rectangle (axis cs:8.5,5);
+\draw[fill=color0,draw opacity=0] (axis cs:8.5,0) rectangle (axis cs:10,0);
+\draw[fill=color0,draw opacity=0] (axis cs:10,0) rectangle (axis cs:11.5,1);
+\draw[fill=color0,draw opacity=0] (axis cs:11.5,0) rectangle (axis cs:13,0);
+\draw[fill=color0,draw opacity=0] (axis cs:13,0) rectangle (axis cs:14.5,1);
+\draw[fill=color0,draw opacity=0] (axis cs:14.5,0) rectangle (axis cs:16,1);
+\nextgroupplot[
+ylabel={PerceptionNeuron},
+xmin=-0.9, xmax=18.9,
+ymin=0, ymax=5.25,
+tick align=outside,
+tick pos=left,
+x grid style={white!69.019607843137251!black},
+y grid style={white!69.019607843137251!black}
+]
+\draw[fill=color1,draw opacity=0] (axis cs:5,0) rectangle (axis cs:5.9,3);
+\draw[fill=color1,draw opacity=0] (axis cs:5.9,0) rectangle (axis cs:6.8,0);
+\draw[fill=color1,draw opacity=0] (axis cs:6.8,0) rectangle (axis cs:7.7,2);
+\draw[fill=color1,draw opacity=0] (axis cs:7.7,0) rectangle (axis cs:8.6,2);
+\draw[fill=color1,draw opacity=0] (axis cs:8.6,0) rectangle (axis cs:9.5,2);
+\draw[fill=color1,draw opacity=0] (axis cs:9.5,0) rectangle (axis cs:10.4,2);
+\draw[fill=color1,draw opacity=0] (axis cs:10.4,0) rectangle (axis cs:11.3,4);
+\draw[fill=color1,draw opacity=0] (axis cs:11.3,0) rectangle (axis cs:12.2,1);
+\draw[fill=color1,draw opacity=0] (axis cs:12.2,0) rectangle (axis cs:13.1,2);
+\draw[fill=color1,draw opacity=0] (axis cs:13.1,0) rectangle (axis cs:14,1);
+\nextgroupplot[
+ylabel={Fused Tracking},
+xmin=-0.9, xmax=18.9,
+ymin=0, ymax=5.25,
+tick align=outside,
+tick pos=left,
+x grid style={white!69.019607843137251!black},
+y grid style={white!69.019607843137251!black}
+]
+\draw[fill=color2,draw opacity=0] (axis cs:2,0) rectangle (axis cs:3.6,3);
+\draw[fill=color2,draw opacity=0] (axis cs:3.6,0) rectangle (axis cs:5.2,4);
+\draw[fill=color2,draw opacity=0] (axis cs:5.2,0) rectangle (axis cs:6.8,0);
+\draw[fill=color2,draw opacity=0] (axis cs:6.8,0) rectangle (axis cs:8.4,4);
+\draw[fill=color2,draw opacity=0] (axis cs:8.4,0) rectangle (axis cs:10,2);
+\draw[fill=color2,draw opacity=0] (axis cs:10,0) rectangle (axis cs:11.6,4);
+\draw[fill=color2,draw opacity=0] (axis cs:11.6,0) rectangle (axis cs:13.2,1);
+\draw[fill=color2,draw opacity=0] (axis cs:13.2,0) rectangle (axis cs:14.8,0);
+\draw[fill=color2,draw opacity=0] (axis cs:14.8,0) rectangle (axis cs:16.4,0);
+\draw[fill=color2,draw opacity=0] (axis cs:16.4,0) rectangle (axis cs:18,1);
+\end{groupplot}
+
+\begin{groupplot}[group style={group size=1 by 3}]
+\nextgroupplot[
+xmin=-0.9, xmax=18.9,
+ymin=0.5, ymax=1.5,
+axis y line=right,
+tick align=outside,
+xtick pos=left,
+ymajorticks=false,
+x grid style={white!69.019607843137251!black},
+y grid style={white!69.019607843137251!black}
+]
+\addplot [black, forget plot]
+table {%
+4 0.925
+4 1.075
+7 1.075
+7 0.925
+4 0.925
+};
+\addplot [black, forget plot]
+table {%
+4 1
+1 1
+};
+\addplot [black, forget plot]
+table {%
+7 1
+10 1
+};
+\addplot [black, forget plot]
+table {%
+1 0.9625
+1 1.0375
+};
+\addplot [black, forget plot]
+table {%
+10 0.9625
+10 1.0375
+};
+\addplot [black, mark=*, mark size=3, mark options={solid,fill opacity=0}, only marks, forget plot]
+table {%
+13 1
+16 1
+};
+\addplot [semithick, black, dashed, forget plot]
+table {%
+0 0
+0 5.25
+};
+\addplot [color3, forget plot]
+table {%
+6 0.925
+6 1.075
+};
+\nextgroupplot[
+xmin=-0.9, xmax=18.9,
+ymin=0.5, ymax=1.5,
+axis y line=right,
+tick align=outside,
+xtick pos=left,
+ymajorticks=false,
+x grid style={white!69.019607843137251!black},
+y grid style={white!69.019607843137251!black}
+]
+\addplot [black, forget plot]
+table {%
+7.5 0.925
+7.5 1.075
+11 1.075
+11 0.925
+7.5 0.925
+};
+\addplot [black, forget plot]
+table {%
+7.5 1
+5 1
+};
+\addplot [black, forget plot]
+table {%
+11 1
+14 1
+};
+\addplot [black, forget plot]
+table {%
+5 0.9625
+5 1.0375
+};
+\addplot [black, forget plot]
+table {%
+14 0.9625
+14 1.0375
+};
+\addplot [semithick, black, dashed, forget plot]
+table {%
+0 0
+0 5.25
+};
+\addplot [color3, forget plot]
+table {%
+10 0.925
+10 1.075
+};
+\nextgroupplot[
+xmin=-0.9, xmax=18.9,
+ymin=0.5, ymax=1.5,
+axis y line=right,
+tick align=outside,
+xtick pos=left,
+ymajorticks=false,
+x grid style={white!69.019607843137251!black},
+y grid style={white!69.019607843137251!black}
+]
+\addplot [black, forget plot]
+table {%
+4.5 0.925
+4.5 1.075
+11 1.075
+11 0.925
+4.5 0.925
+};
+\addplot [black, forget plot]
+table {%
+4.5 1
+2 1
+};
+\addplot [black, forget plot]
+table {%
+11 1
+18 1
+};
+\addplot [black, forget plot]
+table {%
+2 0.9625
+2 1.0375
+};
+\addplot [black, forget plot]
+table {%
+18 0.9625
+18 1.0375
+};
+\addplot [semithick, black, dashed, forget plot]
+table {%
+0 0
+0 5.25
+};
+\addplot [color3, forget plot]
+table {%
+7 0.925
+7 1.075
+};
+\end{groupplot}
+
+\end{tikzpicture}

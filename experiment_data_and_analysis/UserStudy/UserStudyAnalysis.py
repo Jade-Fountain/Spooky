@@ -18,6 +18,7 @@ throw_task_file = "ThrowingTask.csv"
 thesis_folder = "/Users/jake/MEGA/PhD/Documents/Thesis/chapters/user_study/figure/"
 
 def saveFigure(name):
+    print("Saving ",name)
     tikz_save("figure/"+name+".tex")
     if(os.name=='posix'):
         tikz_save(thesis_folder+name+".tex")
@@ -126,9 +127,9 @@ def split(X, column):
 
 def colourMap(i):
     return {
-        0 : 'green',
-        1 : 'blue',
-        2 : 'orange'
+        0 : 'palegreen',
+        1 : 'lightskyblue',
+        2 : 'gold'
     }[int(i)]
 
 def markerMap(i):
@@ -170,7 +171,6 @@ def getParticipantDataButton(folder):
     data = getRawParticipantData(folder,button_task_file)
     
     splitData, splitOrders = split(data,0)
-    print("data", data)
     # print("splitOrders", splitOrders)
     scores = np.array([0,0,0])
     responseTimes = np.array([0.0,0.0,0.0])
@@ -323,9 +323,9 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
         hm, xedges, yedges = np.histogram2d(deltaFilteredX[int(i)], deltaFilteredY[int(i)],range=plot_range, bins=20)
         heatmaps += [hm]
 
-    titles = ['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% of ' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
-              'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% of ' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
-              'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% of ' + str(len(splitData[2]['HitPosX'])) + ' valid throws)']
+    titles = ['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '\% of ' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
+              'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '\% of ' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
+              'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '\% of ' + str(len(splitData[2]['HitPosX'])) + ' valid throws)']
     max_throw_density = np.max(heatmaps)
     
     for i in splitData.keys():
@@ -432,9 +432,9 @@ def plotThrowingData(folders):
         plt.plot(deltaFilteredX,deltaFilteredY,markerMap(i),c=colourMap(i),ms=10,markeredgewidth=1,markeredgecolor='black')
         # plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=20,markeredgewidth=1,markeredgecolor='black')
         legend_counts += [len(deltaFilteredX)]
-    plt.legend(['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% of ' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
-                'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% of ' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
-                'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% of ' + str(len(splitData[2]['HitPosX'])) + ' valid throws)'])
+    plt.legend(['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '\% of ' + str(len(splitData[0]['HitPosX'])) + ' valid throws)',
+                'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '\% of ' + str(len(splitData[1]['HitPosX'])) + ' valid throws)',
+                'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '\% of ' + str(len(splitData[2]['HitPosX'])) + ' valid throws)'])
     
 def boxPlotColumns(data,data_subclasses=None):
     plt.figure()
@@ -478,6 +478,40 @@ def boxPlotColumns(data,data_subclasses=None):
         y = data[i,:]
         x = range(1,data.shape[1]+1) + ((data_subclasses[i,:] - min_subclass) * subclass_spacing - 0.5)*subclass_width  # np.random.normal(0, 0.0, size=len(y))
         plt.plot(x, y, 'ok', alpha=1)
+
+def histogramPlotColumns(data,labels,title,bins = 5):
+    #One plot for each column
+    try:
+        fig, axes = plt.subplots(data.shape[1], sharey=True,sharex=True)
+    except(IndexError):
+        fig, ax = plt.subplots()
+        axes = [ax]
+        data = np.transpose([data])
+    if(title):
+        plt.title(title)
+
+    # Scatter points
+    for i,ax in enumerate(axes):
+        x = data[:,i]
+        print(x)
+        ax.hist(x, bins=10, color=colourMap(i))
+        ax.set_ylabel(labels[i])
+
+    for i,ax in enumerate(axes):
+        x = data[:,i]
+        y = ax.get_ylim()[1]
+        ax2 = ax.twinx()
+        ax2.boxplot(x,vert=False)
+        ax2.tick_params(
+            axis='y',          # changes apply to the y-axis
+            which='both',      # both major and minor ticks are affected
+            right=False,      # ticks along the bottom edge are off
+            left=False,        # ticks along the top edge are off
+            labelright=False,
+            labelbottom=False) # labels along the bottom edge are off
+        ax2.spines['right'].set_visible(False)
+        # ax2.set_ylim(ax.get_ylim())
+        ax2.plot([0,0],[0,y],'--k')
 
 
 def getParticipantSummaryStats(participant):
@@ -947,9 +981,17 @@ def performanceAnalysis():
     # saveFigure("Participant22Throws")
 
     #Improvements
-    boxPlotColumns(improvements,deltaOrders)
-    plt.title("Change in Score (Fusion vs. X)")
-    saveFigure("ImprovementsScore")
+    labels = ["FT vs. LP","FT vs. PN"]
+    histogramPlotColumns(improvements[:,0:2],labels,title=None)
+    # histogramPlotColumns(np.sum(improvements[:,0:2],axis=1),labels=["Total Fused Improvement"],title=None)
+    saveFigure("ImprovementsScoreKeyboard")
+    histogramPlotColumns(improvements[:,2:4],labels,title=None)
+    saveFigure("ImprovementsScoreSorting")
+    histogramPlotColumns(improvements[:,4:6],labels,title=None)
+    saveFigure("ImprovementsScoreThrowing")
+
+
+    # plt.title("Change in Score (Fusion vs. X)")
     boxPlotColumns(-time_improvements, deltaOrders)
     plt.title("Change in Time (Fusion vs. X)")
     saveFigure("ImprovementsTime")
@@ -958,11 +1000,20 @@ def performanceAnalysis():
     saveFigure("ImprovementsError")
 
     # print(scores, orders)
-    boxPlotColumns(scores, orders)
+    tech_labels=["Leap Motion","PerceptionNeuron","Fused Tracking"]
+    # boxPlotColumns(scores, orders)
+    histogramPlotColumns(scores[:,0:3],tech_labels,title=None)
     fig = plt.gcf()
     fig.set_size_inches(20,10)
-    plt.title("Raw Scores")
-    saveFigure("RawScores")
+    saveFigure("RawScoresKeyboard")
+    histogramPlotColumns(scores[:,3:6],tech_labels,title=None)
+    fig = plt.gcf()
+    fig.set_size_inches(20,10)
+    saveFigure("RawScoresSorting")
+    histogramPlotColumns(scores[:,6:9],tech_labels,title=None)
+    fig = plt.gcf()
+    fig.set_size_inches(20,10)
+    saveFigure("RawScoresThrowing")
 
     boxPlotColumns(errors, orders)
     fig = plt.gcf()
