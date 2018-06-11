@@ -11,7 +11,7 @@ import csv
 from matplotlib2tikz import save as tikz_save
 # from sets import Sets
 
-plt.rc('font', family='serif', serif='Times')
+plt.rc('font', family='serif')
 
 button_task_file = "ButtonBoard.csv"
 sorting_task_file = "SortingTask.csv"
@@ -327,9 +327,9 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
         hm, xedges, yedges = np.histogram2d(deltaFilteredX[int(i)], deltaFilteredY[int(i)],range=plot_range, bins=20)
         heatmaps += [hm]
 
-    titles = ['Leap Motion',# (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% valid / ' + str(len(splitData[0]['HitPosX'])) + ' throws)',
-              'Perception Neuron',# (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% valid / ' + str(len(splitData[1]['HitPosX'])) + ' throws)',
-              'Fused Tracking']# (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% valid / ' + str(len(splitData[2]['HitPosX'])) + ' throws)']
+    titles = ['Leap Motion ('+str(len(splitData[0]['HitPosX'])) + ' throws)',
+              'Perception Neuron ('+str(len(splitData[1]['HitPosX'])) + ' throws)',# (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% valid / ' + str(len(splitData[1]['HitPosX'])) + ' throws)',
+              'Fused Tracking ('+str(len(splitData[2]['HitPosX'])) + ' throws)']# (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% valid / ' + str(len(splitData[2]['HitPosX'])) + ' throws)']
     max_throw_density = np.max(heatmaps)
     
     fig, axes = plt.subplots(3,1,sharex=True, sharey=True)
