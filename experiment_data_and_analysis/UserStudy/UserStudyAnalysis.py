@@ -11,6 +11,8 @@ import csv
 from matplotlib2tikz import save as tikz_save
 # from sets import Sets
 
+plt.rc('font', family='serif', serif='Times')
+
 button_task_file = "ButtonBoard.csv"
 sorting_task_file = "SortingTask.csv"
 throw_task_file = "ThrowingTask.csv"
@@ -325,29 +327,34 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
         hm, xedges, yedges = np.histogram2d(deltaFilteredX[int(i)], deltaFilteredY[int(i)],range=plot_range, bins=20)
         heatmaps += [hm]
 
-    titles = ['Leap Motion (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% valid / ' + str(len(splitData[0]['HitPosX'])) + ' throws)',
-              'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% valid / ' + str(len(splitData[1]['HitPosX'])) + ' throws)',
-              'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% valid / ' + str(len(splitData[2]['HitPosX'])) + ' throws)']
+    titles = ['Leap Motion',# (' + "{:3.1f}".format(100 * legend_counts[0]/float(len(splitData[0]['HitPosX']))) + '% valid / ' + str(len(splitData[0]['HitPosX'])) + ' throws)',
+              'Perception Neuron',# (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% valid / ' + str(len(splitData[1]['HitPosX'])) + ' throws)',
+              'Fused Tracking']# (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% valid / ' + str(len(splitData[2]['HitPosX'])) + ' throws)']
     max_throw_density = np.max(heatmaps)
     
-    for i in splitData.keys():
-        fig, ax = plt.subplots()
+    fig, axes = plt.subplots(3,1,sharex=True, sharey=True)
+    fig.set_figheight(8)
+    fig.set_figwidth(5)
+    cbar_ax = fig.add_axes([.85, 0.1, .03, 0.8])
+    cbar_ax.set_ylabel('Hit Density')
+    
+    for i,ax in enumerate(axes.flat):
         # plt.plot(deltaFilteredX[int(i)],deltaFilteredY[int(i)],markerMap(i),c=colourMap(2),ms=10,markeredgewidth=1,markeredgecolor='black')
         
-        norm_heatmap = heatmaps[int(i)]
+        norm_heatmap = heatmaps[i]
         extent = [plot_range[0][0],plot_range[0][1],plot_range[1][0],plot_range[1][1]]
-        plt.imshow(norm_heatmap.T, extent=extent, origin='lower',interpolation='nearest')
+        im = ax.imshow(norm_heatmap.T, extent=extent, origin='lower',interpolation='nearest')
         drawThrowingBG(ax)
+        if(i==0):
+            fig.colorbar(im, cax=cbar_ax)
+        im.set_clim(0,max_throw_density)
         # plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=20,markeredgewidth=1,markeredgecolor='black')
-        plt.title(titles[int(i)])
-        plt.clim(0,max_throw_density)
-        plt.xlabel("X (cm)")
-        plt.ylabel("Y (cm)")
-        cbar = plt.colorbar()
-        cbar.ax.set_ylabel('Hit Density')
-        plt.tight_layout()
-        if(len(saveNames)>0):
-            saveFigure(saveNames[int(i)],pgf=False)
+        ax.set_title(titles[i])
+        ax.set_ylabel("Y (cm)")
+        if(i==2):
+            ax.set_xlabel("X (cm)")
+
+    saveFigure("ThrowingHeatmaps",pgf=False)
     print("Plotting projected heatmap X")
     #Plot x projected hist
     plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis=0)
