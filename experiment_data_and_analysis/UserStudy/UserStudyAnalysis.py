@@ -345,6 +345,7 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
         plt.ylabel("Y (cm)")
         cbar = plt.colorbar()
         cbar.ax.set_ylabel('Hit Density')
+        plt.tight_layout()
         if(len(saveNames)>0):
             saveFigure(saveNames[int(i)],pgf=False)
     print("Plotting projected heatmap X")
@@ -801,7 +802,7 @@ def plotPreferenceAnalysis(GraphName,prefs):
     # print(prefs)
     # print("prefsTotal",prefsTotal)
     width = 0.2
-    tick_pos = width*3/2
+    tick_pos = width*1
     #-----------------------------
     # Number of times each system was ranked 1st, 2nd, and 3rd
     #-----------------------------
@@ -821,11 +822,15 @@ def plotPreferenceAnalysis(GraphName,prefs):
     #-----------------------------
     plt.figure()
     #points per ranking
-    weight_vector = [3,2,1]
+    n_participants = np.sum(prefs[0][0])
+    print("n_participants",n_participants)
+    weight_vector = np.array([3,2,1]) / n_participants
+    print("prefs",prefs)
 
     techIDs = np.array([0,1,2])
     techID_widths = width * np.array([0,1,2])
-    plt.title(GraphName + " - Task Preference Scores")
+    plt.title(GraphName+" Preferences")
+    plt.ylabel("Mean Preference Rank")
 
     total_tech_scores = 0
     for taskID in range(len(prefs)):
@@ -833,22 +838,26 @@ def plotPreferenceAnalysis(GraphName,prefs):
         tech_scores = np.dot(prefs[taskID],weight_vector)
         total_tech_scores += tech_scores
         print(map(colourMap,techIDs))
-        plt.bar(techID_widths + taskID, tech_scores, width, color=list(map(colourMap,techIDs)))
-
+        rects = plt.bar(techID_widths + taskID, tech_scores, width, color=list(map(colourMap,techIDs)))
+    
+    # plt.legend((rects[0], rects[1], rects[2]), ('LP', 'PN', 'FT'))
     x = np.array([0,1,2]) + tick_pos
     labels = ['Keyboard', 'Sorting', 'Throwing']
     plt.xticks(x,labels)
+    plt.ylim([1,3])
     saveFigure(GraphName+"Responses")
     #-----------------------------
     #-----------------------------
     # Plotting sum scores 
     #-----------------------------
     plt.figure()
-    plt.title(GraphName + " - Sum Preference Scores")
-    plt.bar(np.array([0,1,2]), total_tech_scores, 1, color=list(map(colourMap,techIDs)))
+    plt.title(GraphName + " (All Tasks)")
+    plt.bar(np.array([0,1,2]), total_tech_scores / 3, 1, color=list(map(colourMap,techIDs)))
+    plt.ylim([1,3])
     
     x = np.array([0,1,2])
-    labels = ['Leap Motion', 'Perception Neuron', 'Fused Tracking']
+    labels = ['LP', 'PN', 'FT']
+    plt.ylabel("Mean Preference Rank")
     plt.xticks(x,labels)
     #-----------------------------
 
