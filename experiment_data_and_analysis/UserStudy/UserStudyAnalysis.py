@@ -9,6 +9,8 @@ from numpy import genfromtxt
 import os
 import csv
 from matplotlib2tikz import save as tikz_save
+from collections import Counter
+from wordcloud import WordCloud
 # from sets import Sets
 
 plt.rc('font', family='serif')
@@ -719,7 +721,6 @@ def checkOrders(orders,pID):
 def decodePreferences(participantIDs,preferences,task):
     # Preference counts for each tech
     taskID = taskIDFromString(task)
-
     # rankings[Tech][N] = number of times Tech was ranked Nth best
     #               Frequency
     #           1st,   2nd,   3rd
@@ -737,6 +738,26 @@ def decodePreferences(participantIDs,preferences,task):
             tech_id = t_order[j]
             rank_counts[tech_id][rank] += 1
     return rank_counts
+
+def decodeComments(participantIDs,verbals,task):
+     # Preference counts for each tech
+    taskID = taskIDFromString(task)
+    # rankings[Tech][N] = number of times Tech was ranked Nth best
+    #               Frequency
+    #           1st,   2nd,   3rd
+    # Tech1     0,     1,     1
+    # Tech2     ....
+    # Tech3
+    comments = [[],[],[]]
+    for i in range(len(verbals)):
+        pID = participantIDs[i]
+        vs = verbals[i]
+        t_order = techOrder(pID,taskID)
+        for j in range(len(vs)):
+            v = vs[j]
+            tech_id = t_order[j]
+            comments[tech_id] += [v]
+    return comments
 
 def decodeRanks(prefs,taskID,pID):
     # prefs = A rank (0-2), B rank (0-2), C rank (0-2)
@@ -882,9 +903,10 @@ def plotPValues(improvements_p):
 keyboard_responses = getResponseData("keyboard")
 sorting_responses = getResponseData("sorting")
 throwing_responses = getResponseData("throwing")
-print(keyboard_responses)
-print(sorting_responses)
-print(throwing_responses)
+# print(keyboard_responses)
+# print(sorting_responses)
+# print(throwing_responses)
+
 # prefs[taskid][techid][rank] gives the number of times that task ranked that tech as rank rank
 Qprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses["Quality"],"keyboard") 
     , decodePreferences(sorting_responses["Participant"],sorting_responses["Quality"],"sorting")
@@ -893,6 +915,45 @@ Qprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses
 Uprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses["Utility"],"keyboard") 
     , decodePreferences(sorting_responses["Participant"],sorting_responses["Utility"],"sorting")
     , decodePreferences(throwing_responses["Participant"],throwing_responses["Utility"],"throwing")]
+
+comments = [decodeComments(keyboard_responses["Participant"],keyboard_responses[["CommentsA","CommentsB","CommentsC"]],"keyboard") 
+    , decodeComments(sorting_responses["Participant"],sorting_responses[["CommentsA","CommentsB","CommentsC"]],"sorting")
+    , decodeComments(throwing_responses["Participant"],throwing_responses[["CommentsA","CommentsB","CommentsC"]],"throwing")]
+
+sumComments = ["","",""]
+for i in range(len(comments)):
+    for j in range(len(comments[i])):
+        for s in comments[i][j]:
+            sumComments[i] += " " + str(s)
+
+counters = []
+titles = ["Leap","Neuron","Fused"]
+for i,comm in enumerate(sumComments):
+    comm = comm.replace("b\'", " ")
+    comm = comm.replace('\"', " ")
+    comm = comm.replace('\'', " ")
+    comm = comm.replace('hand', " ")
+    comm = comm.replace('Hand', " ")
+    comm = comm.replace('right', " ")
+    comm = comm.replace('left', " ")
+    comm = comm.replace('finger', " ")
+    comm = comm.replace('fingers', " ")
+    counters += [Counter(comm.split())]
+    plt.figure()
+    plt.title(titles[i])
+    word_cloud = WordCloud().generate(comm)
+    plt.imshow(word_cloud)
+    plt.axis("off")
+
+# Generate a word cloud image
+# The Symbola font includes most emoji
+# font_path = path.join(d, 'Symbola.ttf')
+
+# Display the generated image:
+plt.show()
+print("sumComments",counters)
+
+# print("sumComments",sumComments)
 
 
 plotPreferenceAnalysis("Quality",Qprefs)
