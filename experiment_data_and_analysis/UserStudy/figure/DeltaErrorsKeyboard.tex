@@ -1,158 +1,99 @@
 % This file was created by matplotlib2tikz v0.6.17.
 \begin{tikzpicture}
 
-\definecolor{color0}{rgb}{0.4,0.76078431372549,0.647058823529412}
-\definecolor{color1}{rgb}{0.552941176470588,0.627450980392157,0.796078431372549}
-\definecolor{color2}{rgb}{1,0.498039215686275,0.0549019607843137}
+\definecolor{color0}{rgb}{1,0.498039215686275,0.0549019607843137}
 
-\begin{groupplot}[group style={group size=1 by 2}]
-\nextgroupplot[
-ylabel={FT vs. LP},
-xmin=-28.35, xmax=23.35,
-ymin=0, ymax=6.3,
+\begin{axis}[
+xmin=0.5, xmax=2.5,
+ymin=-28.35, ymax=23.35,
+xtick={1,2},
+xticklabels={FT vs. LP,FT vs. PN},
 tick align=outside,
 tick pos=left,
 x grid style={white!69.019607843137251!black},
 y grid style={white!69.019607843137251!black}
 ]
-\draw[fill=color0,draw opacity=0] (axis cs:-8,0) rectangle (axis cs:-5.3,1);
-\draw[fill=color0,draw opacity=0] (axis cs:-5.3,0) rectangle (axis cs:-2.6,2);
-\draw[fill=color0,draw opacity=0] (axis cs:-2.6,0) rectangle (axis cs:0.100000000000001,1);
-\draw[fill=color0,draw opacity=0] (axis cs:0.100000000000001,0) rectangle (axis cs:2.8,2);
-\draw[fill=color0,draw opacity=0] (axis cs:2.8,0) rectangle (axis cs:5.5,6);
-\draw[fill=color0,draw opacity=0] (axis cs:5.5,0) rectangle (axis cs:8.2,3);
-\draw[fill=color0,draw opacity=0] (axis cs:8.2,0) rectangle (axis cs:10.9,1);
-\draw[fill=color0,draw opacity=0] (axis cs:10.9,0) rectangle (axis cs:13.6,0);
-\draw[fill=color0,draw opacity=0] (axis cs:13.6,0) rectangle (axis cs:16.3,1);
-\draw[fill=color0,draw opacity=0] (axis cs:16.3,0) rectangle (axis cs:19,2);
-\nextgroupplot[
-ylabel={FT vs. PN},
-xmin=-28.35, xmax=23.35,
-ymin=0, ymax=6.3,
-tick align=outside,
-tick pos=left,
-x grid style={white!69.019607843137251!black},
-y grid style={white!69.019607843137251!black}
-]
-\draw[fill=color1,draw opacity=0] (axis cs:-26,0) rectangle (axis cs:-21.3,1);
-\draw[fill=color1,draw opacity=0] (axis cs:-21.3,0) rectangle (axis cs:-16.6,0);
-\draw[fill=color1,draw opacity=0] (axis cs:-16.6,0) rectangle (axis cs:-11.9,1);
-\draw[fill=color1,draw opacity=0] (axis cs:-11.9,0) rectangle (axis cs:-7.2,0);
-\draw[fill=color1,draw opacity=0] (axis cs:-7.2,0) rectangle (axis cs:-2.5,1);
-\draw[fill=color1,draw opacity=0] (axis cs:-2.5,0) rectangle (axis cs:2.2,5);
-\draw[fill=color1,draw opacity=0] (axis cs:2.2,0) rectangle (axis cs:6.9,3);
-\draw[fill=color1,draw opacity=0] (axis cs:6.9,0) rectangle (axis cs:11.6,4);
-\draw[fill=color1,draw opacity=0] (axis cs:11.6,0) rectangle (axis cs:16.3,3);
-\draw[fill=color1,draw opacity=0] (axis cs:16.3,0) rectangle (axis cs:21,1);
-\end{groupplot}
-
-\begin{groupplot}[group style={group size=1 by 2}]
-\nextgroupplot[
-xmin=-28.35, xmax=23.35,
-ymin=0.5, ymax=1.5,
-axis y line=right,
-tick align=outside,
-xtick pos=left,
-ymajorticks=false,
-x grid style={white!69.019607843137251!black},
-y grid style={white!69.019607843137251!black}
-]
 \addplot [black, forget plot]
 table {%
-1.5 0.625
-1.5 1.375
-7.5 1.375
-7.5 0.625
-1.5 0.625
+0.5 1.5
+1.5 1.5
+1.5 7.5
+0.5 7.5
+0.5 1.5
 };
 \addplot [black, forget plot]
 table {%
-1.5 1
--5 1
+1 1.5
+1 -5
 };
 \addplot [black, forget plot]
 table {%
-7.5 1
-16 1
+1 7.5
+1 16
 };
 \addplot [black, forget plot]
 table {%
--5 0.8125
--5 1.1875
+0.75 -5
+1.25 -5
 };
 \addplot [black, forget plot]
 table {%
-16 0.8125
-16 1.1875
+0.75 16
+1.25 16
 };
 \addplot [black, mark=*, mark size=3, mark options={solid,fill opacity=0}, only marks, forget plot]
 table {%
--8 1
-19 1
-17 1
-};
-\addplot [semithick, black, dashed, forget plot]
-table {%
-0 0
-0 6.3
-};
-\addplot [color2, forget plot]
-table {%
-5 0.625
-5 1.375
-};
-\nextgroupplot[
-xmin=-28.35, xmax=23.35,
-ymin=0.5, ymax=1.5,
-axis y line=right,
-tick align=outside,
-xtick pos=left,
-ymajorticks=false,
-x grid style={white!69.019607843137251!black},
-y grid style={white!69.019607843137251!black}
-]
-\addplot [black, forget plot]
-table {%
-0.5 0.625
-0.5 1.375
-9.5 1.375
-9.5 0.625
-0.5 0.625
+1 -8
+1 19
+1 17
 };
 \addplot [black, forget plot]
 table {%
-0.5 1
--13 1
+1.5 0.5
+2.5 0.5
+2.5 9.5
+1.5 9.5
+1.5 0.5
 };
 \addplot [black, forget plot]
 table {%
-9.5 1
-21 1
+2 0.5
+2 -13
 };
 \addplot [black, forget plot]
 table {%
--13 0.8125
--13 1.1875
+2 9.5
+2 21
 };
 \addplot [black, forget plot]
 table {%
-21 0.8125
-21 1.1875
+1.75 -13
+2.25 -13
+};
+\addplot [black, forget plot]
+table {%
+1.75 21
+2.25 21
 };
 \addplot [black, mark=*, mark size=3, mark options={solid,fill opacity=0}, only marks, forget plot]
 table {%
--26 1
+2 -26
 };
-\addplot [semithick, black, dashed, forget plot]
+\addplot [black, dashed, forget plot]
 table {%
 0 0
-0 6.3
+3 0
 };
-\addplot [color2, forget plot]
+\addplot [color0, forget plot]
 table {%
-3 0.625
-3 1.375
+0.5 5
+1.5 5
 };
-\end{groupplot}
+\addplot [color0, forget plot]
+table {%
+1.5 3
+2.5 3
+};
+\end{axis}
 
 \end{tikzpicture}

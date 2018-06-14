@@ -2,6 +2,7 @@
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import matplotlib.lines as mlines
 import numpy as np
 import math
 import scipy.stats
@@ -10,8 +11,12 @@ import os
 import csv
 from matplotlib2tikz import save as tikz_save
 from collections import Counter
+from textblob import TextBlob
 from wordcloud import WordCloud
+import colorcet as cc
 # from sets import Sets
+#Regex
+import re
 
 plt.rc('font', family='serif')
 
@@ -273,7 +278,12 @@ def drawThrowingBG(ax):
     outmiddle = patches.Circle([0,0], radius=FIELD["TARGET"]["BLUE_R"], color='b',fill=False)
     middle = patches.Circle([0,0], radius=FIELD["TARGET"]["RED_R"], color='r',fill=False)
     inner = patches.Circle([0,0], radius=FIELD["TARGET"]["CENTRE_R"], color='w',fill=False)
-    player = patches.Rectangle(FIELD["PLAYER"]["POS"], width=FIELD["PLAYER"]["SIZE"][0], height=FIELD["PLAYER"]["SIZE"][1], color='g',fill=False)
+    # player = patches.Rectangle(FIELD["PLAYER"]["POS"], width=FIELD["PLAYER"]["SIZE"][0], height=FIELD["PLAYER"]["SIZE"][1], color='g',fill=False)
+    player_1 = mlines.Line2D([FIELD["PLAYER"]["POS"][0],FIELD["PLAYER"]["POS"][0]+FIELD["PLAYER"]["SIZE"][0]], [FIELD["PLAYER"]["POS"][1],FIELD["PLAYER"]["POS"][1]+FIELD["PLAYER"]["SIZE"][1]],color='green')
+    player_2 = mlines.Line2D([FIELD["PLAYER"]["POS"][0],FIELD["PLAYER"]["POS"][0]+FIELD["PLAYER"]["SIZE"][0]], [FIELD["PLAYER"]["POS"][1]+FIELD["PLAYER"]["SIZE"][1],FIELD["PLAYER"]["POS"][1]],color='green')
+    ax.add_line(player_1)
+    ax.add_line(player_2)
+
     standsize = 40.0
     ball_stand = patches.Rectangle(FIELD["BALL"]["POS"]-np.array(FIELD["BALL"]["STAND"]["SIZE"])/2, width=FIELD["BALL"]["STAND"]["SIZE"][0], height=FIELD["BALL"]["STAND"]["SIZE"][1], color='w',linestyle='solid',ec='w',linewidth=1,fill=False)
     ball = patches.Circle(FIELD["BALL"]["POS"], radius=FIELD["BALL"]["RADIUS"], color='w',linestyle='solid',ec='w',linewidth=1)
@@ -281,7 +291,7 @@ def drawThrowingBG(ax):
     ax.add_patch(outmiddle)
     ax.add_patch(middle)
     ax.add_patch(inner)
-    ax.add_patch(player)
+    # ax.add_patch(player)
     ax.add_patch(ball_stand)
     ax.add_patch(ball)
 
@@ -291,7 +301,12 @@ def drawThrowingBGSolid(ax):
     outmiddle = patches.Circle([0,0], radius=FIELD["TARGET"]["BLUE_R"], color='b')
     middle = patches.Circle([0,0], radius=FIELD["TARGET"]["RED_R"], color='r')
     inner = patches.Circle([0,0], radius=FIELD["TARGET"]["CENTRE_R"], color='k')
-    player = patches.Rectangle(FIELD["PLAYER"]["POS"], width=FIELD["PLAYER"]["SIZE"][0], height=FIELD["PLAYER"]["SIZE"][1], color='k')
+    # player = patches.Rectangle(FIELD["PLAYER"]["POS"], width=FIELD["PLAYER"]["SIZE"][0], height=FIELD["PLAYER"]["SIZE"][1], color='k')
+    player_1 = mlines.Line2D([FIELD["PLAYER"]["POS"][0],FIELD["PLAYER"]["POS"][0]+FIELD["PLAYER"]["SIZE"][0]], [FIELD["PLAYER"]["POS"][1],FIELD["PLAYER"]["POS"][1]+FIELD["PLAYER"]["SIZE"][1]],color='green')
+    player_2 = mlines.Line2D([FIELD["PLAYER"]["POS"][0],FIELD["PLAYER"]["POS"][0]+FIELD["PLAYER"]["SIZE"][0]], [FIELD["PLAYER"]["POS"][1]+FIELD["PLAYER"]["SIZE"][1],FIELD["PLAYER"]["POS"][1]],color='green')
+    ax.add_line(player_1)
+    ax.add_line(player_2)
+
     standsize = 40.0
     ball_stand = patches.Rectangle(FIELD["BALL"]["POS"]-np.array(FIELD["BALL"]["STAND"]["SIZE"])/2, width=FIELD["BALL"]["STAND"]["SIZE"][0], height=FIELD["BALL"]["STAND"]["SIZE"][1], color='w',linestyle='solid',ec='k',linewidth=1)
     ball = patches.Circle(FIELD["BALL"]["POS"], radius=FIELD["BALL"]["RADIUS"], color='w',linestyle='solid',ec='k',linewidth=1)
@@ -299,7 +314,7 @@ def drawThrowingBGSolid(ax):
     ax.add_patch(outmiddle)
     ax.add_patch(middle)
     ax.add_patch(inner)
-    ax.add_patch(player)
+    # ax.add_patch(player)
     ax.add_patch(ball_stand)
     ax.add_patch(ball)
 
@@ -329,32 +344,42 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
         hm, xedges, yedges = np.histogram2d(deltaFilteredX[int(i)], deltaFilteredY[int(i)],range=plot_range, bins=20)
         heatmaps += [hm]
 
-    titles = ['Leap Motion ('+str(len(splitData[0]['HitPosX'])) + ' throws)',
-              'Perception Neuron ('+str(len(splitData[1]['HitPosX'])) + ' throws)',# (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% valid / ' + str(len(splitData[1]['HitPosX'])) + ' throws)',
-              'Fused Tracking ('+str(len(splitData[2]['HitPosX'])) + ' throws)']# (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% valid / ' + str(len(splitData[2]['HitPosX'])) + ' throws)']
+    titles = ['Leap Motion\n('+str(len(splitData[0]['HitPosX'])) + ' throws)',
+              'Perception Neuron\n('+str(len(splitData[1]['HitPosX'])) + ' throws)',# (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% valid / ' + str(len(splitData[1]['HitPosX'])) + ' throws)',
+              'Fused Tracking\n('+str(len(splitData[2]['HitPosX'])) + ' throws)']# (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% valid / ' + str(len(splitData[2]['HitPosX'])) + ' throws)']
     max_throw_density = np.max(heatmaps)
     
-    fig, axes = plt.subplots(3,1,sharex=True, sharey=True)
-    fig.set_figheight(8)
-    fig.set_figwidth(5)
-    cbar_ax = fig.add_axes([.85, 0.1, .03, 0.8])
-    cbar_ax.set_ylabel('Hit Density')
+    fig, axes = plt.subplots(2,2,sharex=True, sharey=True)
+    fig.set_figheight(4.5)
+    fig.set_figwidth(5.7)
+    cbar_ax = fig.add_axes([0.1, 0.05, 0.8, 0.03])
+    cbar_ax.set_xlabel('Hit Density')
     
     for i,ax in enumerate(axes.flat):
         # plt.plot(deltaFilteredX[int(i)],deltaFilteredY[int(i)],markerMap(i),c=colourMap(2),ms=10,markeredgewidth=1,markeredgecolor='black')
         
-        norm_heatmap = heatmaps[i]
-        extent = [plot_range[0][0],plot_range[0][1],plot_range[1][0],plot_range[1][1]]
-        im = ax.imshow(norm_heatmap.T, extent=extent, origin='lower',interpolation='nearest')
-        drawThrowingBG(ax)
-        if(i==0):
-            fig.colorbar(im, cax=cbar_ax)
-        im.set_clim(0,max_throw_density)
-        # plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=20,markeredgewidth=1,markeredgecolor='black')
-        ax.set_title(titles[i])
-        ax.set_ylabel("Y (cm)")
-        if(i==2):
-            ax.set_xlabel("X (cm)")
+        if(i>0):
+            i=i-1
+            norm_heatmap = heatmaps[i]
+            extent = [plot_range[0][0],plot_range[0][1],plot_range[1][0],plot_range[1][1]]
+            #colorcet for perceptually stable colour mapping
+            im = ax.imshow(norm_heatmap.T, extent=extent, origin='lower',interpolation='nearest',cmap=cc.m_fire)
+            drawThrowingBG(ax)
+            if(i==0):
+                fig.colorbar(im, cax=cbar_ax,orientation='horizontal')
+            im.set_clim(0,max_throw_density)
+            # plt.plot(deltaFilteredX.mean(),deltaFilteredY.mean(),markerMap(i),c=colourMap(i),ms=20,markeredgewidth=1,markeredgecolor='black')
+            ax.set_title(titles[i])
+            ax.set_ylabel("Y (cm)")
+            ax.axis('off')
+            if(i==2):
+                ax.set_xlabel("X (cm)")
+        else:
+            ax.set_title("Task Diagram")
+            drawThrowingBGSolid(ax)
+            # ax.ticks('off')
+            ax.set_xticks([], [])
+            ax.set_yticks([], [])
 
     saveFigure("ThrowingHeatmaps",pgf=False)
     print("Plotting projected heatmap X")
@@ -450,48 +475,41 @@ def plotThrowingData(folders):
                 'Perception Neuron (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% valid / ' + str(len(splitData[1]['HitPosX'])) + ' throws)',
                 'Fused Tracking (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% valid / ' + str(len(splitData[2]['HitPosX'])) + ' throws)'])
     
-def boxPlotColumns(data,data_subclasses=None):
+def boxPlotColumns(data,data_subclasses=None,labels=None,scatter=False):
     plt.figure()
+    bp = plt.boxplot(data,widths=1)# patch_artist=True)
+    
     
     #X axis 
     x = [0,data.shape[1]+1]
     y = [0,0]
-    plt.plot(x,y,'k',linewidth=1)
-
-    bp = plt.boxplot(data)
+    plt.plot(x,y,'--k',linewidth=1)
     
     # Labels
-    if(data.shape[1] == 6):
-        x = [1,2,3,4,5,6]
-        labels = ['Leap\nKeyboard', 'PN\nKeyboard', 'Leap\nSorting', 'PN\nSorting','Leap\nThrowing', 'PN\nThrowing']
+    if(labels):
+        x = range(1,len(labels)+1)
         plt.xticks(x,labels)
-    elif(data.shape[1]==9):
-        x = [1,2,3,4,5,6,7,8,9]
-        labels = ['Leap\nKeyboard', 'PN\nKeyboard','Fused\nKeyboard', 'Leap\nSorting', 'PN\nSorting','Fused\nSorting','Leap\nThrowing', 'PN\nThrowing','Fused\nThrowing']
-        plt.xticks(x,labels)
-
+    
     #Colours
-    colors = ["red","blue"]
-    i = 0
-    for patch in bp['boxes']:
-        # patch.set(facecolor=colors[i%2])
-        patch.set(color=colors[i%2])
-        i+=1
+    # for i,patch in enumerate(bp['boxes']):
+    #     # patch.set(facecolor=colors[i%2])
+    #     patch.set(facecolor=colourMap(i%3))
 
-    if(data_subclasses is None):        
-        data_subclasses = np.zeros(data.shape)
-    max_subclass = data_subclasses.max()
-    min_subclass = data_subclasses.min()
-    centre_subclass = (max_subclass - min_subclass)/ 0.5
-    subclass_spacing = 1
-    if(max_subclass!=min_subclass):
-        subclass_spacing = 1/(max_subclass-min_subclass)
-    subclass_width = 0.5
-    # Scatter points
-    for i in range(data.shape[0]):
-        y = data[i,:]
-        x = range(1,data.shape[1]+1) + ((data_subclasses[i,:] - min_subclass) * subclass_spacing - 0.5)*subclass_width  # np.random.normal(0, 0.0, size=len(y))
-        plt.plot(x, y, 'ok', alpha=1)
+    if(scatter):
+        # Scatter points
+        if(data_subclasses is None):        
+            data_subclasses = np.zeros(data.shape)
+        max_subclass = data_subclasses.max()
+        min_subclass = data_subclasses.min()
+        centre_subclass = (max_subclass - min_subclass)/ 0.5
+        subclass_spacing = 1
+        if(max_subclass!=min_subclass):
+            subclass_spacing = 1/(max_subclass-min_subclass)
+        subclass_width = 0.5
+        for i in range(data.shape[0]):
+            y = data[i,:]
+            x = range(1,data.shape[1]+1) + ((data_subclasses[i,:] - min_subclass) * subclass_spacing - 0.5)*subclass_width  # np.random.normal(0, 0.0, size=len(y))
+            plt.plot(x, y, 'ok', alpha=1)
 
 def histogramPlotColumns(data,labels,title,bins = 5):
     #One plot for each column
@@ -742,12 +760,7 @@ def decodePreferences(participantIDs,preferences,task):
 def decodeComments(participantIDs,verbals,task):
      # Preference counts for each tech
     taskID = taskIDFromString(task)
-    # rankings[Tech][N] = number of times Tech was ranked Nth best
-    #               Frequency
-    #           1st,   2nd,   3rd
-    # Tech1     0,     1,     1
-    # Tech2     ....
-    # Tech3
+
     comments = [[],[],[]]
     for i in range(len(verbals)):
         pID = participantIDs[i]
@@ -899,6 +912,76 @@ def plotPValues(improvements_p):
     plt.plot([0,6],[0.05,0.05],"--r")
     plt.xticks(horiz+0.5, ticks)
 
+def commentWordCloud(comments):
+
+    sumComments = ["","",""]
+    for i in range(len(comments)):
+        for j in range(len(comments[i])):
+            sumComments[i] += " " + str(comments[i][j])
+
+    counters = []
+    titles = ["Leap","Neuron","Fused"]
+    for i,comm in enumerate(sumComments):
+        comm = comm.replace("b\'", " ")
+        comm = comm.replace('\"', " ")
+        comm = comm.replace('\'', " ")
+        comm = comm.replace('hand', " ")
+        comm = comm.replace('Hand', " ")
+        comm = comm.replace('right', " ")
+        comm = comm.replace('left', " ")
+        comm = comm.replace('finger', " ")
+        comm = comm.replace('fingers', " ")
+        counters += [Counter(comm.split())]
+        plt.figure()
+        plt.title(titles[i])
+        word_cloud = WordCloud().generate(comm)
+        plt.imshow(word_cloud)
+        plt.axis("off")
+    return counters
+
+def combineComments(comments_by_task):
+    combinedComments = [[],[],[]]
+    for task,comments_by_tech in enumerate(comments_by_task):
+        for tech,comment_list in enumerate(comments_by_tech):
+            combinedComments[tech] += comment_list
+    return combinedComments
+
+def extractParticipantComments(text):      
+  matches=re.findall(r'\"(.+?)\"',str(text))
+  # matches is now ['String 1', 'String 2', 'String3']
+  return ",".join(matches)
+
+def anylize_sentiment(statement):
+    '''
+    Utility function to classify the polarity of a statement
+    using textblob.
+    '''
+    analysis = TextBlob(str(statement))
+    print(analysis.sentiment.subjectivity)
+    if analysis.sentiment.polarity > 0:
+        return 1
+    elif analysis.sentiment.polarity == 0:
+        return 0
+    else:
+        return -1
+
+def getSumSentiment(comments_by_tech):
+    #           neg,   neutral,   positive
+    # Tech1     0,     1,          1
+    # Tech2     ....
+    # Tech3
+    result = np.zeros([3,3])
+    for i,comments in enumerate(comments_by_tech):
+        for j,c in enumerate(comments_by_tech[i]):
+            if(len(c) < 2):
+                continue
+            print("Comment:",c)
+            sentiment = anylize_sentiment(c)
+            print("Sentiment:",sentiment)
+            index = 1 + sentiment
+            result[i][index] += 1
+    return result
+
 
 keyboard_responses = getResponseData("keyboard")
 sorting_responses = getResponseData("sorting")
@@ -916,44 +999,32 @@ Uprefs = [decodePreferences(keyboard_responses["Participant"],keyboard_responses
     , decodePreferences(sorting_responses["Participant"],sorting_responses["Utility"],"sorting")
     , decodePreferences(throwing_responses["Participant"],throwing_responses["Utility"],"throwing")]
 
-comments = [decodeComments(keyboard_responses["Participant"],keyboard_responses[["CommentsA","CommentsB","CommentsC"]],"keyboard") 
+comments_by_task = [decodeComments(keyboard_responses["Participant"],keyboard_responses[["CommentsA","CommentsB","CommentsC"]],"keyboard") 
     , decodeComments(sorting_responses["Participant"],sorting_responses[["CommentsA","CommentsB","CommentsC"]],"sorting")
     , decodeComments(throwing_responses["Participant"],throwing_responses[["CommentsA","CommentsB","CommentsC"]],"throwing")]
 
-sumComments = ["","",""]
-for i in range(len(comments)):
-    for j in range(len(comments[i])):
-        for s in comments[i][j]:
-            sumComments[i] += " " + str(s)
 
-counters = []
-titles = ["Leap","Neuron","Fused"]
-for i,comm in enumerate(sumComments):
-    comm = comm.replace("b\'", " ")
-    comm = comm.replace('\"', " ")
-    comm = comm.replace('\'', " ")
-    comm = comm.replace('hand', " ")
-    comm = comm.replace('Hand', " ")
-    comm = comm.replace('right', " ")
-    comm = comm.replace('left', " ")
-    comm = comm.replace('finger', " ")
-    comm = comm.replace('fingers', " ")
-    counters += [Counter(comm.split())]
-    plt.figure()
-    plt.title(titles[i])
-    word_cloud = WordCloud().generate(comm)
-    plt.imshow(word_cloud)
-    plt.axis("off")
+comments_by_tech = combineComments(comments_by_task)
 
-# Generate a word cloud image
-# The Symbola font includes most emoji
-# font_path = path.join(d, 'Symbola.ttf')
+#Filter for just participant comments in quotes
+participantUtterances = comments_by_tech
+for i,utterances in enumerate(participantUtterances):
+    print("Adding utterances for tech=",i, " length = ", len(utterances))
+    for j,utt in enumerate(utterances):
+        utt = extractParticipantComments(utt)
+        print(utt)
 
-# Display the generated image:
-plt.show()
-print("sumComments",counters)
+# commentWordCloud(participantUtterances)
+# plt.show()
 
-# print("sumComments",sumComments)
+sumSent = getSumSentiment(participantUtterances)
+print(sumSent)
+
+print(comments_by_tech)
+# Wordcloud:
+# word_counters = commentWordCloud(comments_by_task)
+# print("word_counters",word_counters)
+
 
 
 plotPreferenceAnalysis("Quality",Qprefs)
@@ -1066,21 +1137,21 @@ def performanceAnalysis():
     #===============
     #Score Improvements
     labels = ["FT vs. LP","FT vs. PN"]
-    histogramPlotColumns(improvements[:,0:2],labels,title=None)
-    # histogramPlotColumns(np.sum(improvements[:,0:2],axis=1),labels=["Total Fused Improvement"],title=None)
+    boxPlotColumns(improvements[:,0:2],labels=labels)
+    # histogramPlotColumns(np.sum(improvements[:,0:2],axis=1),labels=["Total Fused Improvement"])
     saveFigure("DeltaScoreKeyboard")
-    histogramPlotColumns(improvements[:,2:4],labels,title=None)
+    boxPlotColumns(improvements[:,2:4],labels=labels)
     saveFigure("DeltaScoreSorting")
-    histogramPlotColumns(improvements[:,4:6],labels,title=None)
+    boxPlotColumns(improvements[:,4:6],labels=labels)
     saveFigure("DeltaScoreThrowing")
 
     #Mistake change
-    histogramPlotColumns(-error_improvements[:,0:2],labels,title=None)
-    # histogramPlotColumns(np.sum(error_improvements,axis=1),labels=["Total Fused Improvement"],title=None)
+    boxPlotColumns(-error_improvements[:,0:2],labels=labels)
+    # boxPlotColumns(np.sum(error_improvements,axis=1),labels=["Total Fused Improvement"])
     saveFigure("DeltaErrorsKeyboard")
-    histogramPlotColumns(-error_improvements[:,2:4],labels,title=None)
+    boxPlotColumns(-error_improvements[:,2:4],labels=labels)
     saveFigure("DeltaErrorsSorting")
-    histogramPlotColumns(-error_improvements[:,4:6],labels,title=None)
+    boxPlotColumns(-error_improvements[:,4:6],labels=labels)
     saveFigure("DeltaErrorsThrowing")
 
     #Old box plots:
@@ -1096,19 +1167,22 @@ def performanceAnalysis():
     # Raw data
     #===============
     # print(scores, orders)
-    tech_labels=["Leap Msotion","PerceptionNeuron","Fused Tracking"]
+    tech_labels=["Leap Motion","PerceptionNeuron","Fused Tracking"]
     # boxPlotColumns(scores, orders)
-    histogramPlotColumns(scores[:,0:3],tech_labels,title=None)
-    fig = plt.gcf()
-    fig.set_size_inches(20,10)
+    boxPlotColumns(scores[:,0:3],labels=tech_labels)
+    plt.ylim([0,np.max(scores[:,0:3])+5])
+    # fig = plt.gcf()
+    # fig.set_size_inches(20,10)
     saveFigure("RawScoresKeyboard")
-    histogramPlotColumns(scores[:,3:6],tech_labels,title=None)
-    fig = plt.gcf()
-    fig.set_size_inches(20,10)
+    boxPlotColumns(scores[:,3:6],labels=tech_labels)
+    plt.ylim([0,np.max(scores[:,3:6])+5])
+    # fig = plt.gcf()
+    # fig.set_size_inches(20,10)
     saveFigure("RawScoresSorting")
-    histogramPlotColumns(scores[:,6:9],tech_labels,title=None)
-    fig = plt.gcf()
-    fig.set_size_inches(20,10)
+    boxPlotColumns(scores[:,6:9],labels=tech_labels)
+    plt.ylim([0,np.max(scores[:,6:9])+5])
+    # fig = plt.gcf()
+    # fig.set_size_inches(20,10)
     saveFigure("RawScoresThrowing")
 
     boxPlotColumns(errors, orders)
