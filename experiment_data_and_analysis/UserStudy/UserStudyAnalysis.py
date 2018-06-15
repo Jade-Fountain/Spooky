@@ -1154,6 +1154,13 @@ def performanceAnalysis():
     saveFigure("DeltaErrorsSorting")
     boxPlotColumns(-error_improvements[:,4:6],labels=labels)
     saveFigure("DeltaErrorsThrowing")
+    
+    # boxPlotColumns(np.sum(error_improvements,axis=1),labels=["Total Fused Improvement"])
+    # saveFigure("SuccessRateKeyboard")
+    # boxPlotColumns(success_rate[:,2:4],labels=labels)
+    # saveFigure("SuccessRateSorting")
+    # boxPlotColumns(success_rate[:,4:6],labels=labels)
+    # saveFigure("SuccessRateThrowing")
 
     #Old box plots:
     # plt.title("Change in Score (Fusion vs. X)")
@@ -1167,8 +1174,15 @@ def performanceAnalysis():
     #===============
     # Raw data
     #===============
+
+    success_rate = scores / (scores+errors)
+    # labels = ["$M_{FT}- M_{LP}$","$M_{FT}- M_{PN}$"]
+    tech_labels=["LP","PN","FT"]
+    #Success rate
+    boxPlotColumns(success_rate,labels=[tech_labels,tech_labels,tech_labels])
+    saveFigure("SuccessRates")
+
     # print(scores, orders)
-    tech_labels=["Leap Motion","PerceptionNeuron","Fused Tracking"]
     # boxPlotColumns(scores, orders)
     boxPlotColumns(scores[:,0:3],labels=tech_labels)
     plt.ylim([0,np.max(scores[:,0:3])+5])
