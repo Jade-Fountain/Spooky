@@ -329,7 +329,7 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
     splitData,splitOrders = split(data,0)
 
     plot_range = FIELD["VALID_RANGE"]
-    legend_counts,deltaFilteredX,deltaFilteredY,heatmaps = [],[],[],[]
+    legend_counts,deltaFilteredX,deltaFilteredY,heatmaps,xstddev,ystddev = [],[],[],[],[],[]
     for i in splitData.keys():
         deltaX = splitData[i]['HitPosX']
         deltaY = splitData[i]['HitPosY']
@@ -344,9 +344,12 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
         hm, xedges, yedges = np.histogram2d(deltaFilteredX[int(i)], deltaFilteredY[int(i)],range=plot_range, bins=20)
         heatmaps += [hm]
 
-    titles = ['Leap Motion\n('+str(len(splitData[0]['HitPosX'])) + ' throws)',
-              'Perception Neuron\n('+str(len(splitData[1]['HitPosX'])) + ' throws)',# (' + "{:3.1f}".format(100 * legend_counts[1]/float(len(splitData[1]['HitPosX']))) + '% valid / ' + str(len(splitData[1]['HitPosX'])) + ' throws)',
-              'Fused Tracking\n('+str(len(splitData[2]['HitPosX'])) + ' throws)']# (' + "{:3.1f}".format(100 * legend_counts[2]/float(len(splitData[2]['HitPosX']))) + '% valid / ' + str(len(splitData[2]['HitPosX'])) + ' throws)']
+        xstddev += [np.std(deltaFilteredX[int(i)])]
+        ystddev += [np.std(deltaFilteredY[int(i)])]
+
+    titles = ['Leap Motion\n(Valid throws: '+ str(legend_counts[0]) + '/'+ str(len(splitData[0]['HitPosX'])) + ')',
+              'Perception Neuron\n(Valid throws: '+ str(legend_counts[1]) + '/'+ str(len(splitData[1]['HitPosX'])) + ')',
+              'Fused Tracking\n(Valid throws: '+ str(legend_counts[2])+  '/'+ str(len(splitData[2]['HitPosX'])) + ')']
     max_throw_density = np.max(heatmaps)
     
     fig, axes = plt.subplots(2,2,sharex=True, sharey=True)
@@ -354,7 +357,14 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
     fig.set_figwidth(5.7)
     cbar_ax = fig.add_axes([0.1, 0.05, 0.8, 0.03])
     cbar_ax.set_xlabel('Hit Density')
-    
+        
+    #Test variances are different:
+    result = scipy.stats.levene(deltaFilteredX[0],deltaFilteredX[1],deltaFilteredX[2],center='mean')
+    print("Levenes test X: result = ",scipy.stats.levene(deltaFilteredX[0],deltaFilteredX[1]))
+    print("Levenes test X: result = ",scipy.stats.levene(deltaFilteredX[0],deltaFilteredX[2]))
+    print("Levenes test X: result = ",scipy.stats.levene(deltaFilteredX[1],deltaFilteredX[2]))
+    exit()
+
     for i,ax in enumerate(axes.flat):
         # plt.plot(deltaFilteredX[int(i)],deltaFilteredY[int(i)],markerMap(i),c=colourMap(2),ms=10,markeredgewidth=1,markeredgecolor='black')
         
@@ -384,24 +394,23 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
     saveFigure("ThrowingHeatmaps",pgf=False)
     print("Plotting projected heatmap X")
     #Plot x projected hist
-    plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis=0)
+    plotProjectedHeatmaps(splitData,heatmaps,plot_range,stddev=xstddev,axis=0)
     if(len(saveNames)>0):
         saveFigure("ThrowXPlot")
 
     print("Plotting projected heatmap Y")
     #Plot y projected hist
-    plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis=1)
+    plotProjectedHeatmaps(splitData,heatmaps,plot_range,stddev=ystddev,axis=1)
     if(len(saveNames)>0):
         saveFigure("ThrowYPlot")
     print("Projected Heatmapts plotted")
     
-def plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis):
+def plotProjectedHeatmaps(splitData,heatmaps,plot_range,stddev,axis):
     max_y = 0
     fig = plt.figure()
     legends = []
-    names = ["Leap","Neuron","Fused"]
+    names = ["Leap ($\sigma=$"+str(stddev[0])+')',"Neuron ($\sigma=$"+str(stddev[1])+')',"Fused ($\sigma=$"+str(stddev[2])+')']
     for i in splitData.keys():
-        
         
         norm_heatmap = heatmaps[int(i)]
         x_hist = np.sum(norm_heatmap.T,axis=axis)
@@ -409,7 +418,6 @@ def plotProjectedHeatmaps(splitData,heatmaps,plot_range,axis):
         x_pos = x_pos + (x_pos[1]-x_pos[0])*0.5
         plt.plot(x_pos,x_hist,alpha=1,color=colourMap(i),label="{:s}".format(names[int(i)]))
         plt.fill_between(x_pos,0,x_hist,alpha=0.5,edgecolor='k',facecolor=colourMap(i))
-
         max_y = np.max(np.append(x_hist,[max_y]))
     
     max_y +=10
@@ -1136,7 +1144,7 @@ def performanceAnalysis():
     # Delta data
     #===============
     #Score Improvements
-    labels = ["$S_{FT}- S_{LP}$","$S_{FT}- S_{PN}$"]
+    labels = ["FT$-$LP","FT$-$PN"]
     boxPlotColumns(improvements[:,0:2],labels=labels)
     # histogramPlotColumns(np.sum(improvements[:,0:2],axis=1),labels=["Total Fused Improvement"])
     saveFigure("DeltaScoreKeyboard")
@@ -1145,7 +1153,7 @@ def performanceAnalysis():
     boxPlotColumns(improvements[:,4:6],labels=labels)
     saveFigure("DeltaScoreThrowing")
 
-    labels = ["$M_{FT}- M_{LP}$","$M_{FT}- M_{PN}$"]
+    labels = ["FT$-$LP","FT$-$PN"]
     #Mistake change
     boxPlotColumns(-error_improvements[:,0:2],labels=labels)
     # boxPlotColumns(np.sum(error_improvements,axis=1),labels=["Total Fused Improvement"])
@@ -1188,16 +1196,19 @@ def performanceAnalysis():
     plt.ylim([0,np.max(scores[:,0:3])+5])
     # fig = plt.gcf()
     # fig.set_size_inches(20,10)
+    plt.title('Keyboard')
     saveFigure("RawScoresKeyboard")
     boxPlotColumns(scores[:,3:6],labels=tech_labels)
     plt.ylim([0,np.max(scores[:,3:6])+5])
     # fig = plt.gcf()
     # fig.set_size_inches(20,10)
+    plt.title('Sorting')
     saveFigure("RawScoresSorting")
     boxPlotColumns(scores[:,6:9],labels=tech_labels)
     plt.ylim([0,np.max(scores[:,6:9])+5])
     # fig = plt.gcf()
     # fig.set_size_inches(20,10)
+    plt.title('Throwing')
     saveFigure("RawScoresThrowing")
 
     boxPlotColumns(errors, orders)
