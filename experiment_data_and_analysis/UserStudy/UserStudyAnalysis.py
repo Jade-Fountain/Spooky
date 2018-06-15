@@ -185,7 +185,7 @@ def getParticipantDataButton(folder):
     # print("splitOrders", splitOrders)
     scores = np.array([0,0,0])
     responseTimes = np.array([0.0,0.0,0.0])
-    mean_errors = np.array([0.0,0.0,0.0])
+    mistakes = np.array([0.0,0.0,0.0])
     orders = np.array([0.0,0.0,0.0])
     for i in splitData.keys():
         scores[int(i)] = splitData[i]['Correct'].sum()
@@ -196,9 +196,9 @@ def getParticipantDataButton(folder):
         deltaY = splitData[i]['CorrectPosY'] - splitData[i]["TouchPosY"]
         deltaZ = splitData[i]['CorrectPosZ'] - splitData[i]["TouchPosZ"]
         errors = np.sqrt(deltaX**2+deltaY**2+deltaZ**2)
-        mean_errors[int(i)] = np.logical_not(success).sum()
+        mistakes[int(i)] = np.logical_not(success).sum()
         orders[int(i)] = splitOrders[i]
-    return scores,mean_errors,responseTimes,orders
+    return scores,mistakes,responseTimes,orders
 
 def getParticipantDataSort(folder):
     data = getRawParticipantData(folder,sorting_task_file)
@@ -1136,7 +1136,7 @@ def performanceAnalysis():
     # Delta data
     #===============
     #Score Improvements
-    labels = ["FT vs. LP","FT vs. PN"]
+    labels = ["$S_{FT}- S_{LP}$","$S_{FT}- S_{PN}$"]
     boxPlotColumns(improvements[:,0:2],labels=labels)
     # histogramPlotColumns(np.sum(improvements[:,0:2],axis=1),labels=["Total Fused Improvement"])
     saveFigure("DeltaScoreKeyboard")
@@ -1145,6 +1145,7 @@ def performanceAnalysis():
     boxPlotColumns(improvements[:,4:6],labels=labels)
     saveFigure("DeltaScoreThrowing")
 
+    labels = ["$M_{FT}- M_{LP}$","$M_{FT}- M_{PN}$"]
     #Mistake change
     boxPlotColumns(-error_improvements[:,0:2],labels=labels)
     # boxPlotColumns(np.sum(error_improvements,axis=1),labels=["Total Fused Improvement"])
@@ -1242,4 +1243,34 @@ def performanceAnalysis():
     saveFigure("PValuesErrors")
 
 performanceAnalysis()
+
+def plotResponsesPieChart(vals):
+    def make_autopct(values):
+        def my_autopct(pct):
+            total = sum(values)
+            val = int(round(pct*total/100.0))
+            return '{p:.0f}\%  ({v:d})'.format(p=pct,v=val)
+        return my_autopct
+
+    plt.figure()
+    labels = None#'Positive', 'No Mention', 'Mixed','Negative',
+    colors = 'xkcd:green', 'lightgreen', 'xkcd:gold', 'xkcd:coral'
+    # explode = (0, 0.05, 0, 0)
+
+    plt.pie(vals, labels=labels, colors = colors, explode=[0,0,0,0.05], autopct=make_autopct(vals))
+    plt.axis("off")
+
+leap_resp_count = [2,18,2,35]
+neuron_resp_count = [5,23,6,23]
+fused_resp_count = [5,28,4,20]
+
+plotResponsesPieChart(leap_resp_count)
+saveFigure("ResponsePieLeap")
+
+plotResponsesPieChart(neuron_resp_count)
+saveFigure("ResponsePieNeuron")
+
+plotResponsesPieChart(fused_resp_count)
+saveFigure("ResponsePieFused")
+
 # plt.show()
