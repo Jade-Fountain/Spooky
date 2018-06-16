@@ -363,6 +363,7 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
     print("Levenes test X: result = ",scipy.stats.levene(deltaFilteredX[0],deltaFilteredX[1]))
     print("Levenes test X: result = ",scipy.stats.levene(deltaFilteredX[0],deltaFilteredX[2]))
     print("Levenes test X: result = ",scipy.stats.levene(deltaFilteredX[1],deltaFilteredX[2]))
+    print("stddev = ", xstddev)
     exit()
 
     for i,ax in enumerate(axes.flat):
