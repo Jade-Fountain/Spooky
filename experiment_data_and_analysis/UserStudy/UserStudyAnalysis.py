@@ -410,7 +410,7 @@ def plotProjectedHeatmaps(splitData,heatmaps,plot_range,stddev,axis):
     max_y = 0
     fig = plt.figure()
     legends = []
-    names = ["Leap ($\sigma=$"+str(stddev[0])+')',"Neuron ($\sigma=$"+str(stddev[1])+')',"Fused ($\sigma=$"+str(stddev[2])+')']
+    names = ["Leap","Neuron","Fused"]
     for i in splitData.keys():
         
         norm_heatmap = heatmaps[int(i)]
