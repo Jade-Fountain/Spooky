@@ -356,7 +356,7 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
     fig.set_figheight(4.5)
     fig.set_figwidth(5.7)
     cbar_ax = fig.add_axes([0.1, 0.05, 0.8, 0.03])
-    cbar_ax.set_xlabel('Hit Density')
+    cbar_ax.set_xlabel('Hit Count')
         
     #Test variances are different:
     result = scipy.stats.levene(deltaFilteredX[0],deltaFilteredX[1],deltaFilteredX[2],center='mean')
@@ -364,7 +364,7 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
     print("Levenes test X: result = ",scipy.stats.levene(deltaFilteredX[0],deltaFilteredX[2]))
     print("Levenes test X: result = ",scipy.stats.levene(deltaFilteredX[1],deltaFilteredX[2]))
     print("stddev = ", xstddev)
-    exit()
+    # exit()
 
     for i,ax in enumerate(axes.flat):
         # plt.plot(deltaFilteredX[int(i)],deltaFilteredY[int(i)],markerMap(i),c=colourMap(2),ms=10,markeredgewidth=1,markeredgecolor='black')
@@ -486,13 +486,8 @@ def plotThrowingData(folders):
     
 def boxPlotColumns(data,data_subclasses=None,labels=None,scatter=False):
     plt.figure()
-    bp = plt.boxplot(data,widths=1)# patch_artist=True)
+    bp = plt.boxplot(data,widths=0.9,zorder=1)# patch_artist=True)
     
-    
-    #X axis 
-    x = [0,data.shape[1]+1]
-    y = [0,0]
-    plt.plot(x,y,'--k',linewidth=1)
     
     # Labels
     if(labels):
@@ -520,6 +515,11 @@ def boxPlotColumns(data,data_subclasses=None,labels=None,scatter=False):
             x = range(1,data.shape[1]+1) + ((data_subclasses[i,:] - min_subclass) * subclass_spacing - 0.5)*subclass_width  # np.random.normal(0, 0.0, size=len(y))
             plt.plot(x, y, 'ok', alpha=1)
 
+    #X axis 
+    x = [0,data.shape[1]+1]
+    y = [0,0]
+    plt.plot(x,y,'--k',linewidth=1,zorder=2)
+    
 def histogramPlotColumns(data,labels,title,bins = 5):
     #One plot for each column
     try:
@@ -800,7 +800,7 @@ def decodeRanks(prefs,taskID,pID):
     result[third_choice_tech_id] = 1
     return result
 
-def saveOutPreferenceTable(filename,k_pref,s_pref,t_pref):
+def saveOutPreferenceTable(filename,k_pref,s_pref,t_pref,sum=False):
     pref_table = []
     p_loc = {}
     for i in range(len(k_pref)):
@@ -820,7 +820,13 @@ def saveOutPreferenceTable(filename,k_pref,s_pref,t_pref):
 
         #include sorting prefs
         pref = parsePref(s_pref[i][1])
-        pref_table[p_loc[p]] += decodeRanks(pref,taskID=taskIDFromString("sorting"),pID=p)
+        if(sum):
+            ranks = decodeRanks(pref,taskID=taskIDFromString("sorting"),pID=p)
+            pref_table[p_loc[p]][0+1] += ranks[0]
+            pref_table[p_loc[p]][1+1] += ranks[1]
+            pref_table[p_loc[p]][2+1] += ranks[2]
+        else:
+            pref_table[p_loc[p]] += decodeRanks(pref,taskID=taskIDFromString("sorting"),pID=p)
 
     for i in range(len(t_pref)):
         #Set participant number
@@ -828,12 +834,21 @@ def saveOutPreferenceTable(filename,k_pref,s_pref,t_pref):
 
         #include sorting prefs
         pref = parsePref(t_pref[i][1])
-        pref_table[p_loc[p]] += decodeRanks(pref,taskID=taskIDFromString("throwing"),pID=p)
+        if(sum):
+            ranks = decodeRanks(pref,taskID=taskIDFromString("throwing"),pID=p)
+            pref_table[p_loc[p]][0+1] += ranks[0]
+            pref_table[p_loc[p]][1+1] += ranks[1]
+            pref_table[p_loc[p]][2+1] += ranks[2]
+        else:
+            pref_table[p_loc[p]] += decodeRanks(pref,taskID=taskIDFromString("throwing"),pID=p)
 
     # print("pref_table",pref_table)
-    header = ["Participant ID","Keyboard LP Ranks","Keyboard PN Ranks","Keyboard FT Ranks",
-                               "Sorting LP Ranks","Sorting PN Ranks","Sorting FT Ranks",
-                               "Throwing LP Ranks","Throwing PN Ranks","Throwing FT Ranks"]
+    if(sum):
+        header = ["Participant ID","LP Ranks","PN Ranks","FT Ranks"]
+    else:
+        header = ["Participant ID","Keyboard LP Ranks","Keyboard PN Ranks","Keyboard FT Ranks",
+                                   "Sorting LP Ranks","Sorting PN Ranks","Sorting FT Ranks",
+                                   "Throwing LP Ranks","Throwing PN Ranks","Throwing FT Ranks"]
     saveTable(filename,pref_table,header)
 
 def getResponseData(task):
@@ -904,6 +919,7 @@ def plotPreferenceAnalysis(GraphName,prefs):
     plt.title(GraphName + " (All Tasks)")
     plt.bar(np.array([0,1,2]), total_tech_scores / 3, 1, color=list(map(colourMap,techIDs)))
     plt.ylim([1,3])
+    print(GraphName + " total_tech_scores",total_tech_scores/3)
     
     x = np.array([0,1,2])
     labels = ['LP', 'PN', 'FT']
@@ -1043,7 +1059,9 @@ saveFigure("UtilitySumResponses")
 # plt.show()
 
 saveOutPreferenceTable("QualityPreferences",keyboard_responses[["Participant","Quality"]],sorting_responses[["Participant","Quality"]],throwing_responses[["Participant","Quality"]])
+saveOutPreferenceTable("QualityPreferencesSummed",keyboard_responses[["Participant","Quality"]],sorting_responses[["Participant","Quality"]],throwing_responses[["Participant","Quality"]],sum=True)
 saveOutPreferenceTable("UtilityPreferences",keyboard_responses[["Participant","Utility"]],sorting_responses[["Participant","Utility"]],throwing_responses[["Participant","Utility"]])
+saveOutPreferenceTable("UtilityPreferencesSummed",keyboard_responses[["Participant","Utility"]],sorting_responses[["Participant","Utility"]],throwing_responses[["Participant","Utility"]],sum=True)
 
 
 def performanceAnalysis():
@@ -1197,18 +1215,21 @@ def performanceAnalysis():
     plt.ylim([0,np.max(scores[:,0:3])+5])
     # fig = plt.gcf()
     # fig.set_size_inches(20,10)
+    plt.ylabel("Score")
     plt.title('Keyboard')
     saveFigure("RawScoresKeyboard")
     boxPlotColumns(scores[:,3:6],labels=tech_labels)
     plt.ylim([0,np.max(scores[:,3:6])+5])
     # fig = plt.gcf()
     # fig.set_size_inches(20,10)
+    # plt.ylabel("Score")
     plt.title('Sorting')
     saveFigure("RawScoresSorting")
     boxPlotColumns(scores[:,6:9],labels=tech_labels)
     plt.ylim([0,np.max(scores[:,6:9])+5])
     # fig = plt.gcf()
     # fig.set_size_inches(20,10)
+    # plt.ylabel("Score")
     plt.title('Throwing')
     saveFigure("RawScoresThrowing")
 

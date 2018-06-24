@@ -13,7 +13,7 @@
 17, ABC, ABC, figured out overarm with PN, , PN drifted a lot and threw out fused tracking, "Ball dropped a lot and it was hard to gain height"
 18, BAC, BAC, "","Definitely easier could actually hit red target", "Hands very wonky" "Fingers bad" "Couldnt let go [of ball]", Really good footage showing fused tracking working well
 19, BAC, BCA, "Why is it sticky?",,[Laughs at hand pose] "Why is...[my pinky up]" "Spawned hand in weird [place]" "Tracking more consistent than A",
-20, BCA, CBA, ,,,"They were all terrible"
+#20, BCA, CBA, ,,,"They were all terrible"
 21, BCA, BCA, ,,,"Dropping the ball despite clenched fist was annoying" "Most throws directly in front"
 22, CBA, CBA, "Fingers bent backwards" "Grabbing ball difficult" "Release was slow", "Release was slow" "Left arm was tracking at position of right but it started out the best","","Basketball style throw was easiest"
 23, BCA, BCA, ,Struggled at first and learned shotput,,"Fingers jumpy in all"

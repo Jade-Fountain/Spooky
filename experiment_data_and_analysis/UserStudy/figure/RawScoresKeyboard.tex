@@ -5,6 +5,7 @@
 
 \begin{axis}[
 title={Keyboard},
+ylabel={Score},
 xmin=0.5, xmax=3.5,
 ymin=0, ymax=43,
 xtick={1,2,3},
@@ -16,11 +17,11 @@ y grid style={white!69.019607843137251!black}
 ]
 \addplot [black, forget plot]
 table {%
-0.5 18.5
-1.5 18.5
-1.5 28
-0.5 28
-0.5 18.5
+0.55 18.5
+1.45 18.5
+1.45 28
+0.55 28
+0.55 18.5
 };
 \addplot [black, forget plot]
 table {%
@@ -34,21 +35,21 @@ table {%
 };
 \addplot [black, forget plot]
 table {%
-0.75 11
-1.25 11
+0.775 11
+1.225 11
 };
 \addplot [black, forget plot]
 table {%
-0.75 38
-1.25 38
+0.775 38
+1.225 38
 };
 \addplot [black, forget plot]
 table {%
-1.5 16.5
-2.5 16.5
-2.5 25.5
-1.5 25.5
-1.5 16.5
+1.55 16.5
+2.45 16.5
+2.45 25.5
+1.55 25.5
+1.55 16.5
 };
 \addplot [black, forget plot]
 table {%
@@ -62,21 +63,21 @@ table {%
 };
 \addplot [black, forget plot]
 table {%
-1.75 14
-2.25 14
+1.775 14
+2.225 14
 };
 \addplot [black, forget plot]
 table {%
-1.75 37
-2.25 37
+1.775 37
+2.225 37
 };
 \addplot [black, forget plot]
 table {%
-2.5 17
-3.5 17
-3.5 24
-2.5 24
-2.5 17
+2.55 17
+3.45 17
+3.45 24
+2.55 24
+2.55 17
 };
 \addplot [black, forget plot]
 table {%
@@ -90,37 +91,37 @@ table {%
 };
 \addplot [black, forget plot]
 table {%
-2.75 10
-3.25 10
+2.775 10
+3.225 10
 };
 \addplot [black, forget plot]
 table {%
-2.75 33
-3.25 33
+2.775 33
+3.225 33
 };
 \addplot [black, mark=*, mark size=3, mark options={solid,fill opacity=0}, only marks, forget plot]
 table {%
 3 35
 };
+\addplot [color0, forget plot]
+table {%
+0.55 24
+1.45 24
+};
+\addplot [color0, forget plot]
+table {%
+1.55 24
+2.45 24
+};
+\addplot [color0, forget plot]
+table {%
+2.55 22
+3.45 22
+};
 \addplot [black, dashed, forget plot]
 table {%
 0 0
 4 0
-};
-\addplot [color0, forget plot]
-table {%
-0.5 24
-1.5 24
-};
-\addplot [color0, forget plot]
-table {%
-1.5 24
-2.5 24
-};
-\addplot [color0, forget plot]
-table {%
-2.5 22
-3.5 22
 };
 \end{axis}
 
