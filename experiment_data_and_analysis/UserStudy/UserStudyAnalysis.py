@@ -29,12 +29,14 @@ table_folder = "/Users/jake/MEGA/PhD/Documents/Thesis/chapters/user_study/table/
 
 def shorten_float(x):
     try:
-        result = round(x,2)
+        result = round(x,3)
         return result
     except TypeError:
         return x
+
 def list_transpose(l):
     return list(map(list, zip(*l)))
+
 def saveFigure(name,pgf=True):
     print("Saving ",name)
     if(pgf):
@@ -385,9 +387,9 @@ def plotThrowingHeatmaps(folders,saveNames=[]):
         
     #Test variances are different:
     result = scipy.stats.levene(deltaFilteredX[0],deltaFilteredX[1],deltaFilteredX[2],center='mean')
-    print("Levenes test X: result = ",scipy.stats.levene(deltaFilteredX[0],deltaFilteredX[1]))
-    print("Levenes test X: result = ",scipy.stats.levene(deltaFilteredX[0],deltaFilteredX[2]))
-    print("Levenes test X: result = ",scipy.stats.levene(deltaFilteredX[1],deltaFilteredX[2]))
+    print("Levenes test X: result Leap vs PN = ",scipy.stats.levene(deltaFilteredX[0],deltaFilteredX[1]))
+    print("Levenes test X: result Leap vs FT = ",scipy.stats.levene(deltaFilteredX[0],deltaFilteredX[2]))
+    print("Levenes test X: result FT vs PN= ",scipy.stats.levene(deltaFilteredX[1],deltaFilteredX[2]))
     print("stddev = ", xstddev)
     # exit()
 
@@ -588,7 +590,7 @@ def wilcoxonAnalysisCols(data):
         z_score = scipy.stats.norm.ppf(wilcoxon.pvalue/2) 
         effect_r = z_score / np.sqrt(2*len(col)) #*2 because each participant was measured twice
         results += [[median,wilcoxon.statistic,wilcoxon.pvalue,effect_r]]
-    print("results size = ",len(results),"x",len(results[0]))
+    # print("results size = ",len(results),"x",len(results[0]))
     results += [["\\\\\\hline","\\\\\\hline","\\\\\\hline","\\\\\\hline"]]
     return results
 
@@ -1206,7 +1208,7 @@ def performanceAnalysis():
     # wilcoxonHeader = ["Median","Min Sum Rank $T$", "Sig. $p$ (2-tailed)", "Effect $r$"]
     installTexTable("DeltaScoreWilcoxonResults",wilcoxonScore)
     installTexTable("DeltaMistakesWilcoxonResults",wilcoxonMistakes)
-    exit()
+
     #===============
     # Delta data
     #===============
@@ -1349,16 +1351,17 @@ def plotResponsesPieChart(vals):
         return my_autopct
 
     plt.figure()
-    labels = None#'Positive', 'No Mention', 'Mixed','Negative',
+    labels = None
     colors = 'xkcd:green', 'lightgreen', 'xkcd:gold', 'xkcd:coral'
     # explode = (0, 0.05, 0, 0)
 
     plt.pie(vals, labels=labels, colors = colors, explode=[0,0,0,0.05], autopct=make_autopct(vals))
     plt.axis("off")
-
-leap_resp_count = [2,18,2,35]
-neuron_resp_count = [5,23,6,23]
-fused_resp_count = [5,28,4,20]
+#'Positive', 'No Mention', 'Mixed','Negative',
+#Subtractions are from participant 20
+leap_resp_count = [2,18-1,2,35-2]
+neuron_resp_count = [5,23-2,6,23-1]
+fused_resp_count = [5,28-2,4,20-1]
 
 plotResponsesPieChart(leap_resp_count)
 saveFigure("ResponsePieLeap")
@@ -1369,4 +1372,5 @@ saveFigure("ResponsePieNeuron")
 plotResponsesPieChart(fused_resp_count)
 saveFigure("ResponsePieFused")
 
+print("END OF CODE REACHED SUCCESSFULLY!")
 # plt.show()
