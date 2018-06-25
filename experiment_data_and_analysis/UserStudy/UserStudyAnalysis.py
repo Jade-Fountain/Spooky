@@ -25,7 +25,16 @@ sorting_task_file = "SortingTask.csv"
 throw_task_file = "ThrowingTask.csv"
 
 thesis_folder = "/Users/jake/MEGA/PhD/Documents/Thesis/chapters/user_study/figure/"
+table_folder = "/Users/jake/MEGA/PhD/Documents/Thesis/chapters/user_study/table/"
 
+def shorten_float(x):
+    try:
+        result = round(x,2)
+        return result
+    except TypeError:
+        return x
+def list_transpose(l):
+    return list(map(list, zip(*l)))
 def saveFigure(name,pgf=True):
     print("Saving ",name)
     if(pgf):
@@ -36,20 +45,36 @@ def saveFigure(name,pgf=True):
     if(os.name=='posix'):
         plt.savefig(thesis_folder+name+".pdf")
 
-def saveTable(name,data,header=[]):
+def saveTable(name,data,header=[],delim=',',shorten_floats=False):
     if(len(header) > 0 and len(data[0]) != len(header)):
         raise ValueError("Header doesnt match data")
-
-    fname = "data/"+name+".csv"
+    print(data)
+    fname = name
     file = open(fname,'w')
-    writer = csv.writer(file,delimiter=',')
+    writer = csv.writer(file,delimiter=delim,quoting=csv.QUOTE_NONE)
     writer.writerow(header)
     for row in data:
         try:
-            writer.writerow(row.tolist())
+            if(shorten_floats):
+                shortened = [shorten_float(x) for x in row]
+                print(shortened)
+                writer.writerow(shortened)
+            else:
+                writer.writerow(row.tolist())
         except AttributeError:
             #If already a list
-            writer.writerow(row)
+            if(shorten_floats):
+                writer.writerow([shorten_float(x) for x in row])
+                print(['{0:.2f}'.format(x) for x in row])
+            else:
+                writer.writerow(row)
+
+def installTexTable(name,data):
+    filename_local = "data/"+name+".tex"
+    saveTable(filename_local,data,delim="&",shorten_floats=True)
+    # if(os.name=='posix'):
+        # thesis_filename = table_folder+name+".tex"
+        # saveTable(thesis_filename,data,delim="&",shorten_floats=True)
 
 def boolFromString(s):
     if(s.lower() == "true" or s.lower() == b"true"):
@@ -553,6 +578,20 @@ def histogramPlotColumns(data,labels,title,bins = 5):
         ax2.spines['right'].set_visible(False)
         # ax2.set_ylim(ax.get_ylim())
         ax2.plot([0,0],[0,y],'--k')
+
+def wilcoxonAnalysisCols(data):
+    results = [["Median","Min Sum Rank $T$", "Sig. $p$ (2-tailed)", "Effect $r$"]]
+    for col_i in range(data.shape[1]):
+        col = data[:,col_i]
+        median = np.median(col)
+        wilcoxon = scipy.stats.wilcoxon(col)
+        z_score = scipy.stats.norm.ppf(wilcoxon.pvalue/2) 
+        effect_r = z_score / np.sqrt(2*len(col)) #*2 because each participant was measured twice
+        results += [[median,wilcoxon.statistic,wilcoxon.pvalue,effect_r]]
+    print("results size = ",len(results),"x",len(results[0]))
+    results += [["\\\\\\hline","\\\\\\hline","\\\\\\hline","\\\\\\hline"]]
+    return results
+
 
 
 def getParticipantSummaryStats(participant):
@@ -1058,14 +1097,14 @@ plotPreferenceAnalysis("Utility",Uprefs)
 saveFigure("UtilitySumResponses")
 # plt.show()
 
-saveOutPreferenceTable("QualityPreferences",keyboard_responses[["Participant","Quality"]],sorting_responses[["Participant","Quality"]],throwing_responses[["Participant","Quality"]])
-saveOutPreferenceTable("QualityPreferencesSummed",keyboard_responses[["Participant","Quality"]],sorting_responses[["Participant","Quality"]],throwing_responses[["Participant","Quality"]],sum=True)
-saveOutPreferenceTable("UtilityPreferences",keyboard_responses[["Participant","Utility"]],sorting_responses[["Participant","Utility"]],throwing_responses[["Participant","Utility"]])
-saveOutPreferenceTable("UtilityPreferencesSummed",keyboard_responses[["Participant","Utility"]],sorting_responses[["Participant","Utility"]],throwing_responses[["Participant","Utility"]],sum=True)
+saveOutPreferenceTable("data/QualityPreferences.csv",keyboard_responses[["Participant","Quality"]],sorting_responses[["Participant","Quality"]],throwing_responses[["Participant","Quality"]])
+saveOutPreferenceTable("data/QualityPreferencesSummed.csv",keyboard_responses[["Participant","Quality"]],sorting_responses[["Participant","Quality"]],throwing_responses[["Participant","Quality"]],sum=True)
+saveOutPreferenceTable("data/UtilityPreferences.csv",keyboard_responses[["Participant","Utility"]],sorting_responses[["Participant","Utility"]],throwing_responses[["Participant","Utility"]])
+saveOutPreferenceTable("data/UtilityPreferencesSummed.csv",keyboard_responses[["Participant","Utility"]],sorting_responses[["Participant","Utility"]],throwing_responses[["Participant","Utility"]],sum=True)
 
 
 def performanceAnalysis():
-    participants = [5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
+    participants = [5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23]
     # improvements, time_improvements, error_improvements = np.array([]),np.array([]),np.array([])
     # scores, times, errors = np.array([]),np.array([]),np.array([])
     parNames = []
@@ -1139,7 +1178,7 @@ def performanceAnalysis():
                                    "Throwing Error Improvement Leap", "Throwing Error Improvement Neuron"]
 
                                    
-    saveTable("ObjectiveData",np.array(dataTable),header=table_header)
+    saveTable("data/ObjectiveData.csv",np.array(dataTable),header=table_header)
 
 
     # print("distanceError = ", distanceError)
@@ -1160,11 +1199,21 @@ def performanceAnalysis():
     # saveFigure("Participant22Throws")
 
     #===============
+    # Wilcoxon analysis
+    #===============
+    wilcoxonScore = list_transpose(wilcoxonAnalysisCols(improvements))
+    wilcoxonMistakes = list_transpose(wilcoxonAnalysisCols(-error_improvements))
+    # wilcoxonHeader = ["Median","Min Sum Rank $T$", "Sig. $p$ (2-tailed)", "Effect $r$"]
+    installTexTable("DeltaScoreWilcoxonResults",wilcoxonScore)
+    installTexTable("DeltaMistakesWilcoxonResults",wilcoxonMistakes)
+    exit()
+    #===============
     # Delta data
     #===============
     #Score Improvements
     labels = ["FT$-$LP","FT$-$PN"]
     boxPlotColumns(improvements[:,0:2],labels=labels)
+    
     # histogramPlotColumns(np.sum(improvements[:,0:2],axis=1),labels=["Total Fused Improvement"])
     saveFigure("DeltaScoreKeyboard")
     boxPlotColumns(improvements[:,2:4],labels=labels)
