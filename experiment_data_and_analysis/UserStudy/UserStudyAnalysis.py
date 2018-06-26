@@ -900,7 +900,7 @@ def getResponseData(task):
                       dtype=None)
 
 
-def plotPreferenceAnalysis(GraphName,prefs):
+def plotPreferenceAnalysis(GraphName,prefs,labels = ['Keyboard', 'Sorting', 'Throwing']):
     #Preferences totalled over all tasks
     prefsTotal = np.sum(prefs,axis=0)
 
@@ -948,7 +948,6 @@ def plotPreferenceAnalysis(GraphName,prefs):
     
     # plt.legend((rects[0], rects[1], rects[2]), ('LP', 'PN', 'FT'))
     x = np.array([0,1,2]) + tick_pos
-    labels = ['Keyboard', 'Sorting', 'Throwing']
     plt.xticks(x,labels)
     plt.ylim([1,3])
     saveFigure(GraphName+"Responses")
@@ -1092,10 +1091,11 @@ print(comments_by_tech)
 # print("word_counters",word_counters)
 
 
-
-plotPreferenceAnalysis("Quality",Qprefs)
+labels = ['Keyboard', 'Sorting*', 'Throwing*']
+plotPreferenceAnalysis("Quality",Qprefs,labels=labels)
 saveFigure("QualitySumResponses")
-plotPreferenceAnalysis("Utility",Uprefs)
+labels = ['Keyboard', 'Sorting*', 'Throwing']
+plotPreferenceAnalysis("Utility",Uprefs,labels=labels)
 saveFigure("UtilitySumResponses")
 # plt.show()
 
@@ -1215,21 +1215,24 @@ def performanceAnalysis():
     #Score Improvements
     labels = ["FT$-$LP","FT$-$PN"]
     boxPlotColumns(improvements[:,0:2],labels=labels)
-    
     # histogramPlotColumns(np.sum(improvements[:,0:2],axis=1),labels=["Total Fused Improvement"])
     saveFigure("DeltaScoreKeyboard")
+    labels = ["FT$-$LP$^\\dagger$","FT$-$PN*"]
     boxPlotColumns(improvements[:,2:4],labels=labels)
     saveFigure("DeltaScoreSorting")
+    labels = ["FT$-$LP","FT$-$PN"]
     boxPlotColumns(improvements[:,4:6],labels=labels)
     saveFigure("DeltaScoreThrowing")
 
-    labels = ["FT$-$LP","FT$-$PN"]
+    labels = ["FT$-$LP*","FT$-$PN$^\\dagger$"]
     #Mistake change
     boxPlotColumns(-error_improvements[:,0:2],labels=labels)
     # boxPlotColumns(np.sum(error_improvements,axis=1),labels=["Total Fused Improvement"])
     saveFigure("DeltaErrorsKeyboard")
+    labels = ["FT$-$LP*","FT$-$PN*"]
     boxPlotColumns(-error_improvements[:,2:4],labels=labels)
     saveFigure("DeltaErrorsSorting")
+    labels = ["FT$-$LP$^\\dagger$","FT$-$PN"]
     boxPlotColumns(-error_improvements[:,4:6],labels=labels)
     saveFigure("DeltaErrorsThrowing")
     
