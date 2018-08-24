@@ -1,0 +1,61 @@
+.108: error: T-TEST: Variable Throwing_Error_Fused appears twice in variable list.
+
+.9: error: T-TEST: PAIRED was specified but the number of variables preceding WITH (2) did not match the number following (1).
+
+Table: Paired Sample Statistics
+,,Mean,N,Std. Deviation,S.E. Mean
+Pair 1,Throwing_Error_Leap,160.65,19,59.15,13.57
+,Throwing_Error_Fused,149.81,19,32.89,7.54
+
+Table: Paired Samples Correlations
+,,N,Correlation,Sig.
+Pair 1,Throwing_Error_Leap & Throwing_Error_Fused,19,.46,.049
+
+Table: Paired Samples Test
+,,Paired Differences,,,,,,,
+,,,,,95% Confidence Interval of the Difference,,,,
+,,Mean,Std. Deviation,Std. Error Mean,Lower,Upper,t,df,Sig. (2-tailed)
+Pair 1,Throwing_Error_Leap - Throwing_Error_Fused,10.84,52.96,12.15,-14.69,36.36,.89,18,.384
+
+Table: Paired Sample Statistics
+,,Mean,N,Std. Deviation,S.E. Mean
+Pair 1,Throwing_Error_Neuron,157.32,19,31.58,7.25
+,Throwing_Error_Fused,149.81,19,32.89,7.54
+
+Table: Paired Samples Correlations
+,,N,Correlation,Sig.
+Pair 1,Throwing_Error_Neuron & Throwing_Error_Fused,19,.49,.032
+
+Table: Paired Samples Test
+,,Paired Differences,,,,,,,
+,,,,,95% Confidence Interval of the Difference,,,,
+,,Mean,Std. Deviation,Std. Error Mean,Lower,Upper,t,df,Sig. (2-tailed)
+Pair 1,Throwing_Error_Neuron - Throwing_Error_Fused,7.50,32.52,7.46,-8.17,23.18,1.01,18,.328
+
+Table: Ranks
+,Mean Rank
+Throwing_Error_Leap,2.00
+Throwing_Error_Neuron,2.11
+Throwing_Error_Fused,1.89
+
+Table: Test Statistics
+N,19
+Chi-Square,.42
+df,2
+Asymp. Sig.,.810
+
+Table: Ranks
+,,N,Mean Rank,Sum of Ranks
+Throwing_Error_Leap - Throwing_Error_Fused,Negative Ranks,8,9.00,72.00
+,Positive Ranks,11,10.73,118.00
+,Ties,0,,
+,Total,19,,
+Throwing_Error_Neuron - Throwing_Error_Fused,Negative Ranks,9,7.33,66.00
+,Positive Ranks,10,12.40,124.00
+,Ties,0,,
+,Total,19,,
+
+Table: Test Statistics
+,Throwing_Error_Leap - Throwing_Error_Fused,Throwing_Error_Neuron - Throwing_Error_Fused
+Z,-.93,-1.17
+Asymp. Sig. (2-tailed),.355,.243

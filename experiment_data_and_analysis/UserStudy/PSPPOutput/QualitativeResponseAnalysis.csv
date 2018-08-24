@@ -1,0 +1,81 @@
+Table: Ranks
+,Mean Rank
+Keyboard_LP_Ranks,1.79
+Keyboard_PN_Ranks,2.16
+Keyboard_FT_Ranks,2.05
+
+Table: Test Statistics
+N,19
+Kendall's W,.04
+Chi-Square,1.37
+df,2
+Asymp. Sig.,.504
+
+Table: Ranks
+,Mean Rank
+Sorting_LP_Ranks,1.53
+Sorting_PN_Ranks,2.42
+Sorting_FT_Ranks,2.05
+
+Table: Test Statistics
+N,19
+Kendall's W,.20
+Chi-Square,7.68
+df,2
+Asymp. Sig.,.021
+
+Table: Ranks
+,Mean Rank
+Throwing_LP_Ranks,2.47
+Throwing_PN_Ranks,1.53
+Throwing_FT_Ranks,2.00
+
+Table: Test Statistics
+N,19
+Kendall's W,.22
+Chi-Square,8.53
+df,2
+Asymp. Sig.,.014
+
+error: Creating temporary file UtilityPreferences.csv.savtmp4CyPWM: Permission denied.
+
+error: Error opening `UtilityPreferences.csv.sav' for writing as a system file: Permission denied.
+
+Table: Ranks
+,Mean Rank
+Keyboard_LP_Ranks,1.84
+Keyboard_PN_Ranks,2.21
+Keyboard_FT_Ranks,1.95
+
+Table: Test Statistics
+N,19
+Kendall's W,.04
+Chi-Square,1.37
+df,2
+Asymp. Sig.,.504
+
+Table: Ranks
+,Mean Rank
+Sorting_LP_Ranks,1.47
+Sorting_PN_Ranks,2.42
+Sorting_FT_Ranks,2.11
+
+Table: Test Statistics
+N,19
+Kendall's W,.23
+Chi-Square,8.84
+df,2
+Asymp. Sig.,.012
+
+Table: Ranks
+,Mean Rank
+Throwing_LP_Ranks,2.26
+Throwing_PN_Ranks,1.79
+Throwing_FT_Ranks,1.95
+
+Table: Test Statistics
+N,19
+Kendall's W,.06
+Chi-Square,2.21
+df,2
+Asymp. Sig.,.331

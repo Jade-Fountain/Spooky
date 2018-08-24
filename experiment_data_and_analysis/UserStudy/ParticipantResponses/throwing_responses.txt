@@ -1,5 +1,5 @@
 5,CBA,CBA,"","","right arm didnt match; letting go before pushing worked a bit better","Ranked A and B equally bad"
-6, CBA,BCA,,,,"LP this is frustrating" - when hand goes outside LP FOV; "too slow too release"
+6, CBA,BCA,,,"this is frustrating" - when hand goes outside LP FOV,"too slow too release"
 7, ABC, ABC, "Aimed at right side to hit centre; hard to throw far","Right hand was doing something stange" because leap saw left in right,"Ball falling often","Difficult to aim"
 8, CAB,CAB,"","right hand felt off + left pinky stretched","C felt really good apart from right hand",""
 9, CAB,CBA,"Arm and hands and digits flipped out","fingers curled back"; B>A because "I found a way"; "thumb is inconsistent","",""
@@ -13,7 +13,7 @@
 17, ABC, ABC, figured out overarm with PN, , PN drifted a lot and threw out fused tracking, "Ball dropped a lot and it was hard to gain height"
 18, BAC, BAC, "","Definitely easier could actually hit red target", "Hands very wonky" "Fingers bad" "Couldnt let go [of ball]", Really good footage showing fused tracking working well
 19, BAC, BCA, "Why is it sticky?",,[Laughs at hand pose] "Why is...[my pinky up]" "Spawned hand in weird [place]" "Tracking more consistent than A",
-20, BCA, CBA, ,,,"They were all terrible"
+#20, BCA, CBA, ,,,"They were all terrible"
 21, BCA, BCA, ,,,"Dropping the ball despite clenched fist was annoying" "Most throws directly in front"
 22, CBA, CBA, "Fingers bent backwards" "Grabbing ball difficult" "Release was slow", "Release was slow" "Left arm was tracking at position of right but it started out the best","","Basketball style throw was easiest"
 23, BCA, BCA, ,Struggled at first and learned shotput,,"Fingers jumpy in all"

@@ -2,7 +2,7 @@
 5, CBA,CBA,"Calibration out of sync","Calibration out of sync","Grip wouldnt trigger",Didnt understand grasping at first
 6, CBA,CBA,,,,"Hard to rotate cube;wanted to grab with both hands at the same time"
 7,CAB,CAB,"","cube was letting go; hand was rotating without movement","",""
-#TODO: decide what to do about contradiction with participant 8, ACB,ACB, "felt rigid","left hand unresponsive; cube thrown away","cubes also thrown away"
+8, ACB,ACB, "felt rigid but best overall","left hand unresponsive; cube thrown away","cubes also thrown away; close to arm movements and more responsive",
 9, ACB,ACB, "Cleanest","Hand had no fingers; grab too easy to let go","Lost sight of hand",
 10, ABC,ABC, "","cube was flicked away","tracking didnt pick up; arms didnt load; cube was flicked away",""
 11, ACB,ACB, "","Struggled; fingers curling and hand spinning","Sensitivity low but I got used to it"; participant seemed to lean to control arm a lot, ""
@@ -14,7 +14,7 @@
 17, ABC, BAC, "trouble grasping at first", "started grasping differently", "kept flying out of control" "elbows were crazy",""
 18, BAC, BCA, "Didnt work for picking up at first but I learned a better approach","Picking up better" "Could move around a lot more", "Lots of dropping",""
 19, ABC, ABC, "Sometimes I lost grip","","A mess" "Glitching out!" "Rotating the wrong way",""
-20, BAC, ABC, "Rotation dropped cube",,, "Difficult to rotate w/o dropping" "got stuck on box" Participant had trouble remembering and seemed discontent - A was definitely his worst trial (see video)
+#20, BAC, ABC, "Rotation dropped cube",,, "Difficult to rotate w/o dropping" "got stuck on box" Participant had trouble remembering and seemed discontent - A was definitely his worst trial (see video)
 21, CBA, BCA, "hands are gone again" - said when hands dissappeared, "","",had trouble grasping so they were directed to make a fist "hard to grab object but closing fist worked"
 22, BCA, CBA, "[tracking] couldnt figure out what I was doing","Less responsive but more accurate with fingers","Lots faster even though a bit glitchy", Note: participant had difficulty getting into calib poses
 23, CAB, BAC, "","","Quick tracking speed but arms were not good",""

@@ -1,8 +1,8 @@
 # Participant, Quality, Utility, CommentsA, CommentsB, CommentsC, GeneralComments
 5, BAC,BAC,"My palm touched the keyboard","Finger not moving"-before tracking initialised,"Sorry my hand is not working; tracking [frustrating]",Participant seemed to have trouble understanding how to press buttons
-6, ACB, ACB,,,,"LP: used fists fingers too jumpy;LP: long reach didnt pick it up; slow in general" leap was very noise for this participant
+6, ACB, ACB,, used fists because fingers too jumpy; leap was very noise for this participant "at long reach didnt pick it tracking well",, "things feel a little slow in general"
 7, ACB,ACB,"","Didnt correspond accurately; required larger movements","Didnt correspond accurately; required larger movements",many accidental keypresses
-#TODO look up correspondences 8, BCA,BCA,
+8, BCA,BCA,"Hands all over the place","Much better","Very rigid and slow" "left pinky randomly moving","Hard to tell where my fingers are"
 9, CAB, BCA, "","B was too finicky but good depth","C had good motion but slow; digits angled backwards","other digits came in contact with keys" participant seemed distracted from task by examining tracking result. also vision was not exactly normal- wears glasses for reading but could perceive stereo depth and read in rift fine
 10,ACB,ACB,"","hand was tilted","hand was wonky" -> did gesture, ""
 11, ACB,ACB, "Perfect; hand a little above where it was", "Fingers spazzed out","Fingers spazzed out"; leap didnt track immediately, pressed wrong buttons at start when keyboard appeared; participant didnt understand random tracking selection
@@ -14,7 +14,7 @@
 17, ACB, ACB, "",ghost collisions "model seemed unreliable", "Is everything still plugged in?" "Weird phantom appendage movements",""
 18, CAB, CAB, "Fingers seem a tad wonky" "Unstable fingers at distance", "Didnt like my right arm at all" "couldnt use right arm" "hands didnt match", "seemed to match closest",""
 19, ACB, ACB, "","My hand has glitched out" "Cant get my other finger" [Laughing at hands] "Fingers doing their own thing. Tried spreading fingers", "Left hand floated away when using right and accidentally hit key",PC crashed so orders might not be correct - but it loads ok
-20, CAB, CAB, "Required large motions", "Shaking" "Hand rotations noisy", "Hands dissappearing and shaky" "Hand rotations noisy",
+#20, CAB, CAB, "Required large motions", "Shaking" "Hand rotations noisy", "Hands dissappearing and shaky" "Hand rotations noisy",
 21, ACB, ACB, "","This is really hard to use", "","All were difficult but I learned"
 22, ACB, CAB, "Best camera angle but fingers worse than B (Leap)", "Hand got stuck and moved jarringly","best finger movement" "hand moved strangely" "struggled a lot" "higher latency", "knuckles touching keys was a challenge"
 23, CAB, CBA, "","Hands accidentally hit buttons most","",""
