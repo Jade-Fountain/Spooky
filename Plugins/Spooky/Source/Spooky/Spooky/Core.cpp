@@ -229,13 +229,13 @@ namespace spooky {
 		///////////////////////
 		// CALIBRATE
 		///////////////////////
-		//utility::Profiler::getInstance().startTimer("Calibrator add");
-		//calibrator.addMeasurementGroup(sync_measurements);
-		//utility::Profiler::getInstance().endTimer("Calibrator add");
+		utility::Profiler::getInstance().startTimer("Calibrator add");
+		calibrator.addMeasurementGroup(sync_measurements);
+		utility::Profiler::getInstance().endTimer("Calibrator add");
 
-		//utility::Profiler::getInstance().startTimer("Calibrate");
-		//calibrator.calibrate();
-		//utility::Profiler::getInstance().endTimer("Calibrate");
+		utility::Profiler::getInstance().startTimer("Calibrate");
+		calibrator.calibrate();
+		utility::Profiler::getInstance().endTimer("Calibrate");
 		///////////////////////
 
 	
