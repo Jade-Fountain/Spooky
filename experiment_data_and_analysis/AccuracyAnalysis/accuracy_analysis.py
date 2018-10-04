@@ -98,5 +98,5 @@ def positionalHeadRelativeErrorAnalysis(folder):
     plotErrors("Fused Tracking",Fused_log_l,Fused_log_r,opdata_l,opdata_r)
 
 
-positionalHeadRelativeErrorAnalysis("test1")
+positionalHeadRelativeErrorAnalysis("balltest")
 plt.show()
