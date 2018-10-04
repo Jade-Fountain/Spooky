@@ -40,11 +40,13 @@ def plotPairedErrors(title,lefthand,righthand,leftref,rightref):
 
 def plotErrors(title,labels,data_streams,ref, first_frame=0):
     # print(data_streams.shape)
+    print("Error analysis ("+title+")")
     i = 0
     for labl,data in zip(labels,data_streams):
         l = np.min([len(data),len(ref)])
         errors = np.linalg.norm(data[first_frame:l]-ref[first_frame:l],axis=1)
         plt.plot(errors,label=labl,c=colourMap(i))
+        print("Mean error ("+labl+") = "+ str(np.mean(errors)));
         i=(i+1)%3
     plt.legend()
 
@@ -121,4 +123,6 @@ def positionalHeadRelativeErrorAnalysis(folder):
 
 
 positionalHeadRelativeErrorAnalysis("test1")
+positionalHeadRelativeErrorAnalysis("test2")
+positionalHeadRelativeErrorAnalysis("balltest")
 plt.show()
