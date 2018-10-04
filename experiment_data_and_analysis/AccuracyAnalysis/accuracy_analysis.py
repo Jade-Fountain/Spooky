@@ -5,6 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Analyse the accuracy of fused tracking vs individuals
+def colourMap(i):
+    #colour brewer http://colorbrewer2.org/#type=qualitative&scheme=Set2&n=3
+    return {
+        0 : '#66c2a5',
+        1 : '#8da0cb',
+        2 : '#fc8d62'
+    }[int(i)]
 
 def getDataFromFile(file,names,converters=[]):
     return np.array(genfromtxt(file,
@@ -18,18 +25,31 @@ def scatterUE4Positions(ax,data, colormap="spring",m='x',label=""):
     ax.plot(data[:,0],-data[:,1],data[:,2],label=label)#,c=t,cmap=colormap)
 
 
-def plotErrors(title,lefthand,righthand,leftref,rightref):
+def plotPairedErrors(title,lefthand,righthand,leftref,rightref):
     l = np.min([len(lefthand),len(righthand),len(leftref),len(rightref)])
     error_l = np.linalg.norm(leftref[0:l]-lefthand[0:l],axis=1)
     error_r = np.linalg.norm(rightref[0:l]-righthand[0:l],axis=1)
 
-    plt.figure()
-    plt.plot(error_r,label="Left")
-    plt.plot(error_l,label="Right")
+    plt.plot(error_r,label=title+" L")
+    plt.plot(error_l,label=title+" R")
     plt.legend()
 
-    plt.xlabel("Error (cm)")
-    plt.ylabel("Frame")
+    plt.ylabel("Error (cm)")
+    plt.xlabel("Frame")
+    # plt.title(title)
+
+def plotErrors(title,labels,data_streams,ref, first_frame=0):
+    # print(data_streams.shape)
+    i = 0
+    for labl,data in zip(labels,data_streams):
+        l = np.min([len(data),len(ref)])
+        errors = np.linalg.norm(data[first_frame:l]-ref[first_frame:l],axis=1)
+        plt.plot(errors,label=labl,c=colourMap(i))
+        i=(i+1)%3
+    plt.legend()
+
+    plt.ylabel("Error (cm)")
+    plt.xlabel("Frame")
     plt.title(title)
 
 def positionalHeadRelativeErrorAnalysis(folder):
@@ -73,6 +93,7 @@ def positionalHeadRelativeErrorAnalysis(folder):
     ax.set_ylim3d(-100,100)
     ax.set_zlim3d(-100,100)
 
+
     print("Leap shape = ",leap_log_l.shape,leap_log_r.shape)
     scatterUE4Positions(ax,leap_log_l,colormap="Purples",label="leap L")
     scatterUE4Positions(ax,leap_log_r,colormap="Oranges",label="leap R")
@@ -93,10 +114,11 @@ def positionalHeadRelativeErrorAnalysis(folder):
 
     plt.legend()
 
-    plotErrors("Leap Motion",leap_log_l,leap_log_r,opdata_l,opdata_r)
-    plotErrors("Perception Neuron",PN_log_l,PN_log_r,opdata_l,opdata_r)
-    plotErrors("Fused Tracking",Fused_log_l,Fused_log_r,opdata_l,opdata_r)
+    plt.figure()
+    plotErrors("Left Hand",["LP","PN","FT"],[leap_log_l,PN_log_l,Fused_log_l],opdata_l,first_frame=100)
+    plt.figure()
+    plotErrors("Right Hand",["LP","PN","FT"],[leap_log_r,PN_log_r,Fused_log_r],opdata_r,first_frame=100)
 
 
-positionalHeadRelativeErrorAnalysis("balltest")
+positionalHeadRelativeErrorAnalysis("test1")
 plt.show()
