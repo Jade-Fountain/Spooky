@@ -3,6 +3,7 @@ from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 
 import numpy as np
 import matplotlib.pyplot as plt
+import copy 
 
 # Analyse the accuracy of fused tracking vs individuals
 def colourMap(i):
@@ -57,7 +58,7 @@ def plotErrors(title,labels,data_streams,ref):
     plt.xlabel("Frame")
     plt.title(title)
 
-def plot2DTraces(title,left,right,refLeft=None,refRight=None):
+def plot2DTraces(title,left,right,refLeft=None,refRight=None, secL=None,secR=None):
     fig = plt.figure()
     plt.xlabel("$x$ (cm)")
     plt.ylabel("$y$ (cm)")
@@ -75,13 +76,24 @@ def plot2DTraces(title,left,right,refLeft=None,refRight=None):
         plt.plot(refLeft[:,0],-refLeft[:,1],c=CL,alpha=0.5,label="GT Left")
         plt.plot(refRight[:,0],-refRight[:,1],c=CR,alpha=0.5,label="GT Right")
 
+    if(secL is not None):
+        for i1,i2 in secL:
+            plt.plot(left[i1:i2,0],-left[i1:i2,1],c=CL,label=title+" Left")
+    else:
+        plt.plot(left[:,0],-left[:,1],c=CL,label=title+" Left")
+        
 
-    plt.plot(left[:,0],-left[:,1],c=CL,label=title+" Left")
-    plt.plot(right[:,0],-right[:,1],c=CR,label=title+" Right")
+    if(secL is not None):
+        for i1,i2 in secL:
+            plt.plot(right[i1:i2,0],-right[i1:i2,1],c=CR,label=title+" Right")
+    else:
+        plt.plot(right[:,0],-right[:,1],c=CR,label=title+" Right")
+      
 
     plt.legend()
 
 def getValidSections(valid,data):
+    print("Getting valid sections")
     validSections=[]
     lastv=False
     section=[0,0]
@@ -90,19 +102,21 @@ def getValidSections(valid,data):
         if(v and not lastv):
             section[0]=i
         if(not v and lastv):
-            # Not inclusive range
-            section[1]=i+1
-            validSections += [section]
+            # Not inclusive range, and we dont want this one
+            section[1]=i
+            print("Adding section", section)
+            validSections += [copy.deepcopy(section)]
         lastv=v
     if(lastv):
+        # non inclusive range, but we do want the last one
         section[1]=len(data)
-        validSections += [section]
+        validSections += [copy.deepcopy(section)]
     return validSections
 
 
 def positionalHeadRelativeErrorAnalysis(folder):
 
-    r = [200,250]
+    r = [100,500]
 
     def leapPointValid(p):
         offpointR = [8.720749, 56.646088, -85.070961]
@@ -111,9 +125,11 @@ def positionalHeadRelativeErrorAnalysis(folder):
 
     leap_log_l = np.genfromtxt(folder+"/LeapPosition_hand_l.csv")[r[0]:r[1]]
     leap_log_r = np.genfromtxt(folder+"/LeapPosition_hand_r.csv")[r[0]:r[1]]
-    print(getValidSections(leapPointValid,leap_log_r))
+    leap_secL = getValidSections(leapPointValid,leap_log_l)
+    leap_secR = getValidSections(leapPointValid,leap_log_r)
 
-
+    # print("Leap left sections:",leap_secL)
+    # print("Leap right sections:",leap_secR)
 
     PN_log_l = np.genfromtxt(folder+"/PN_LeftHand.csv")[r[0]:r[1]]
     PN_log_r = np.genfromtxt(folder+"/PN_RightHand.csv")[r[0]:r[1]]
@@ -121,10 +137,7 @@ def positionalHeadRelativeErrorAnalysis(folder):
     Fused_log_l = np.genfromtxt(folder+"/Fused_hand_l.csv")[r[0]:r[1]]
     Fused_log_r = np.genfromtxt(folder+"/Fused_hand_r.csv")[r[0]:r[1]]
 
-    # optitrack_rot = np.array(
-    #                 [[1,0,0],
-    #                  [0,1,0],
-    #                  [0,0,1]])
+
     optitrack_rot = np.array(
                     [[0,1,0],
                      [-1,0,0],
@@ -181,7 +194,8 @@ def positionalHeadRelativeErrorAnalysis(folder):
     # =======================
     # 2D Traces
     # =======================
-    plot2DTraces("LP",leap_log_l,leap_log_r,opdata_l,opdata_r)
+    plot2DTraces("LP",leap_log_l,leap_log_r,opdata_l,opdata_r,secL=leap_secL,secR=leap_secR)
+    # plot2DTraces("LP",leap_log_l,leap_log_r,opdata_l,opdata_r)
     plot2DTraces("PN",PN_log_l,PN_log_r,opdata_l,opdata_r)
     plot2DTraces("FT",Fused_log_l,Fused_log_r,opdata_l,opdata_r)
     plot2DTraces("GT",opdata_l,opdata_r)
