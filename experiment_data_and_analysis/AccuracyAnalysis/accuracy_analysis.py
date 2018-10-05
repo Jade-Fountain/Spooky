@@ -27,9 +27,9 @@ def saveFigure(name,pgf=True):
         tikz_save("figure/"+name+".tex")
         if(os.name=='posix'):
             tikz_save(thesis_folder+name+".tex")
-    plt.savefig("figure/"+name+".pdf")
+    plt.savefig("figure/"+name+".pdf",bbox_inches='tight')
     if(os.name=='posix'):
-        plt.savefig(thesis_folder+name+".pdf")
+        plt.savefig(thesis_folder+name+".pdf",bbox_inches='tight')
 
 def getDataFromFile(file,names,converters=[]):
     return np.array(genfromtxt(file,
@@ -74,29 +74,34 @@ def plotErrors(title,labels,data_streams,ref,sections=[[],[],[]]):
             
         print("Mean error ("+labl+") = "+ str(np.mean(errors)));
         i=(i+1)%3
-    plt.legend()
+    # plt.legend()
 
     plt.ylabel("Error (cm)")
     plt.xlabel("Frame")
     plt.title(title)
 
 def plot2DTraces(title,left,right,refLeft=None,refRight=None, secL=None,secR=None):
-    fig = plt.figure()
-    plt.xlabel("$x$ (cm)")
-    plt.ylabel("$y$ (cm)")
+    plt.figure()
+    # plt.xlabel("$x$ (cm)")
+    # plt.ylabel("$y$ (cm)")
+    fig=plt.gca()
+    fig.tick_params(length=0)
+    fig.axes.get_xaxis().set_ticklabels([])
+    fig.axes.get_yaxis().set_ticklabels([])
+    fig.set_aspect('equal')
+    plt.grid(True)
 
     # Head
     plt.plot([0,10],[0,0],c='r')
     plt.plot([0,0],[0,10],c='g')
     plt.plot([0],[0],marker="o",c='k')
 
-
     plt.xlim(-75,75)
     plt.ylim(-75,75)
 
     if(refLeft is not None and refRight is not None):
-        plt.plot(refLeft[:,0],-refLeft[:,1],c=CL,alpha=0.5,label="GT Left")
-        plt.plot(refRight[:,0],-refRight[:,1],c=CR,alpha=0.5,label="GT Right")
+        plt.plot(refLeft[:,0],-refLeft[:,1],c='grey',alpha=0.2,label="GT Left")
+        plt.plot(refRight[:,0],-refRight[:,1],c='grey',alpha=0.2,label="GT Right")
 
     if(secL is not None):
         for i1,i2 in secL:
@@ -105,22 +110,22 @@ def plot2DTraces(title,left,right,refLeft=None,refRight=None, secL=None,secR=Non
         plt.plot(left[:,0],-left[:,1],c=CL,label=title+" Left")
         
 
-    if(secL is not None):
-        for i1,i2 in secL:
+    if(secR is not None):
+        for i1,i2 in secR:
             plt.plot(right[i1:i2,0],-right[i1:i2,1],c=CR,label=title+" Right")
     else:
         plt.plot(right[:,0],-right[:,1],c=CR,label=title+" Right")
       
 
-    plt.legend()
+    # plt.legend()
 
 def getValidSections(valid,data):
-    print("Getting valid sections")
     validSections=[]
     lastv=False
     section=[0,0]
     for i in range(len(data)):
         v=valid(data[i])
+       
         if(v and not lastv):
             section[0]=i
         if(not v and lastv):
@@ -136,14 +141,14 @@ def getValidSections(valid,data):
     return validSections
 
 
-def positionalHeadRelativeErrorAnalysis(folder):
+def positionalHeadRelativeErrorAnalysis(folder,ghost_trace=False):
 
-    r = [100,200]
+    r = [100,500]
 
     def leapPointValid(p):
         offpointR = [8.720749, 56.646088, -85.070961]
         offpointL = [8.720749, -56.646088, -85.070961]
-        return np.linalg.norm(p-offpointR) > 0.1 and np.linalg.norm(p-offpointL) > 0.1
+        return np.linalg.norm(p-offpointR) > 1 and np.linalg.norm(p-offpointL) > 1
 
     leap_log_l = np.genfromtxt(folder+"/LeapPosition_hand_l.csv")[r[0]:r[1]]
     leap_log_r = np.genfromtxt(folder+"/LeapPosition_hand_r.csv")[r[0]:r[1]]
@@ -175,56 +180,69 @@ def positionalHeadRelativeErrorAnalysis(folder):
     # =======================
     # 3D
     # =======================
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
-    ax.set_zlabel("z")
+    # fig = plt.figure()
+    # ax = fig.gca(projection='3d')
+    # ax.set_xlabel("x")
+    # ax.set_ylabel("y")
+    # ax.set_zlabel("z")
 
-    ax.plot([0,10],[0,0],[0,0],c='r')
-    ax.plot([0,0],[0,10],[0,0],c='g')
-    ax.plot([0,0],[0,0],[0,10],c='b')
-    ax.plot([0],[0],[0],marker="o",c='k')
-
-
-    ax.set_xlim3d(-100,100)
-    ax.set_ylim3d(-100,100)
-    ax.set_zlim3d(-100,100)
+    # ax.plot([0,10],[0,0],[0,0],c='r')
+    # ax.plot([0,0],[0,10],[0,0],c='g')
+    # ax.plot([0,0],[0,0],[0,10],c='b')
+    # ax.plot([0],[0],[0],marker="o",c='k')
 
 
-    print("Leap shape = ",leap_log_l.shape,leap_log_r.shape)
-    scatterUE4Positions(ax,leap_log_l,colormap="hsv",label="leap L",m="o")
-    scatterUE4Positions(ax,leap_log_r,colormap="hsv",label="leap R",m="o")
-
-    # print("PN shape = ",PN_log_l.shape,PN_log_r.shape)
-    # scatterUE4Positions(ax,PN_log_l,colormap="Purples",label="PN L")
-    # scatterUE4Positions(ax,PN_log_r,colormap="Oranges",label="PN R")
+    # ax.set_xlim3d(-100,100)
+    # ax.set_ylim3d(-100,100)
+    # ax.set_zlim3d(-100,100)
 
 
-    # print("Fused shape = ",Fused_log_l.shape,Fused_log_r.shape)
-    # scatterUE4Positions(ax,Fused_log_l,colormap="Purples",label="Fused L")
-    # scatterUE4Positions(ax,Fused_log_r,colormap="Oranges",label="Fused R")
+    # print("Leap shape = ",leap_log_l.shape,leap_log_r.shape)
+    # scatterUE4Positions(ax,leap_log_l,colormap="hsv",label="leap L",m="o")
+    # scatterUE4Positions(ax,leap_log_r,colormap="hsv",label="leap R",m="o")
+
+    # # print("PN shape = ",PN_log_l.shape,PN_log_r.shape)
+    # # scatterUE4Positions(ax,PN_log_l,colormap="hsv",label="PN L",m="o")
+    # # scatterUE4Positions(ax,PN_log_r,colormap="hsv",label="PN R",m="o")
 
 
-    print("Opti shape = ",opdata_l.shape,opdata_r.shape)
-    scatterUE4Positions(ax,opdata_l,colormap="hsv",label="Ref L")    
-    scatterUE4Positions(ax,opdata_r,colormap="hsv",label="Ref R")
-    plt.legend()
+    # # print("Fused shape = ",Fused_log_l.shape,Fused_log_r.shape)
+    # # scatterUE4Positions(ax,Fused_log_l,colormap="Purples",label="Fused L")
+    # # scatterUE4Positions(ax,Fused_log_r,colormap="Oranges",label="Fused R")
+
+
+    # print("Opti shape = ",opdata_l.shape,opdata_r.shape)
+    # # scatterUE4Positions(ax,opdata_l,colormap="hsv",label="Ref L")    
+    # # scatterUE4Positions(ax,opdata_r,colormap="hsv",label="Ref R")
+    # plt.legend()
 
     # =======================
 
     # =======================
     # 2D Traces
     # =======================
-    plot2DTraces("LP",leap_log_l,leap_log_r,opdata_l,opdata_r,secL=leap_secL,secR=leap_secR)
-    saveFigure("LPWristTrace("+folder+")")
+    if(ghost_trace):
+        plot2DTraces("LP",leap_log_l,leap_log_r,opdata_l,opdata_r,secL=leap_secL,secR=leap_secR)
+        saveFigure("LPWristTrace("+folder+")")
+        # unfiltered data:
+        # plot2DTraces("LP",leap_log_l,leap_log_r,opdata_l,opdata_r)
 
-    plot2DTraces("LP",leap_log_l,leap_log_r,opdata_l,opdata_r)
-    plot2DTraces("PN",PN_log_l,PN_log_r,opdata_l,opdata_r)
-    saveFigure("PNWristTrace("+folder+")")
+        plot2DTraces("PN",PN_log_l,PN_log_r,opdata_l,opdata_r)
+        saveFigure("PNWristTrace("+folder+")")
 
-    plot2DTraces("FT",Fused_log_l,Fused_log_r,opdata_l,opdata_r)
-    saveFigure("FTWristTrace("+folder+")")
+        plot2DTraces("FT",Fused_log_l,Fused_log_r,opdata_l,opdata_r)
+        saveFigure("FTWristTrace("+folder+")")
+    else:
+        plot2DTraces("LP",leap_log_l,leap_log_r,secL=leap_secL,secR=leap_secR)
+        saveFigure("LPWristTrace("+folder+")")
+        # unfiltered data:
+        # plot2DTraces("LP",leap_log_l,leap_log_r,opdata_l,opdata_r)
+
+        plot2DTraces("PN",PN_log_l,PN_log_r)
+        saveFigure("PNWristTrace("+folder+")")
+
+        plot2DTraces("FT",Fused_log_l,Fused_log_r)
+        saveFigure("FTWristTrace("+folder+")")
 
     plot2DTraces("GT",opdata_l,opdata_r)
     saveFigure("GTWristTrace("+folder+")")
@@ -236,10 +254,14 @@ def positionalHeadRelativeErrorAnalysis(folder):
     # Errors
     # =======================
 
+    # plt.figure()
+    # plotErrors("Left Hand",["LP","PN","FT"],[leap_log_l,PN_log_l,Fused_log_l],opdata_l)
     plt.figure()
     plotErrors("Left Hand",["LP","PN","FT"],[leap_log_l,PN_log_l,Fused_log_l],opdata_l,sections=[leap_secL,[],[]])
     saveFigure("LeftHandErrors("+folder+")")
 
+    # plt.figure()
+    # plotErrors("Right Hand",["LP","PN","FT"],[leap_log_r,PN_log_r,Fused_log_r],opdata_r)
     plt.figure()
     plotErrors("Right Hand",["LP","PN","FT"],[leap_log_r,PN_log_r,Fused_log_r],opdata_r,sections=[leap_secR,[],[]])
     saveFigure("RightHandErrors("+folder+")")
@@ -247,6 +269,6 @@ def positionalHeadRelativeErrorAnalysis(folder):
 
 
 positionalHeadRelativeErrorAnalysis("test1")
-positionalHeadRelativeErrorAnalysis("test2")
-positionalHeadRelativeErrorAnalysis("balltest")
+# positionalHeadRelativeErrorAnalysis("test2")
+# positionalHeadRelativeErrorAnalysis("balltest",ghost_trace=True)
 plt.show()
