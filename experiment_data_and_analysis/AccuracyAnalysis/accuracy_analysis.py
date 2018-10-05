@@ -40,7 +40,7 @@ def getDataFromFile(file,names,converters=[]):
 # z = up
 def scatterUE4Positions(ax,data, colormap="spring",m='x',label=""):
     t = np.arange(len(data))
-    ax.plot(data[:,0],-data[:,1],data[:,2],label=label)#,c=t,cmap=colormap)
+    ax.scatter(data[:,0],-data[:,1],data[:,2],label=label,c=t,marker=m,cmap=colormap)
 
 
 def plotPairedErrors(title,lefthand,righthand,leftref,rightref):
@@ -138,7 +138,7 @@ def getValidSections(valid,data):
 
 def positionalHeadRelativeErrorAnalysis(folder):
 
-    r = [100,500]
+    r = [100,200]
 
     def leapPointValid(p):
         offpointR = [8.720749, 56.646088, -85.070961]
@@ -193,8 +193,8 @@ def positionalHeadRelativeErrorAnalysis(folder):
 
 
     print("Leap shape = ",leap_log_l.shape,leap_log_r.shape)
-    scatterUE4Positions(ax,leap_log_l,colormap="Purples",label="leap L")
-    scatterUE4Positions(ax,leap_log_r,colormap="Oranges",label="leap R")
+    scatterUE4Positions(ax,leap_log_l,colormap="hsv",label="leap L",m="o")
+    scatterUE4Positions(ax,leap_log_r,colormap="hsv",label="leap R",m="o")
 
     # print("PN shape = ",PN_log_l.shape,PN_log_r.shape)
     # scatterUE4Positions(ax,PN_log_l,colormap="Purples",label="PN L")
@@ -207,8 +207,8 @@ def positionalHeadRelativeErrorAnalysis(folder):
 
 
     print("Opti shape = ",opdata_l.shape,opdata_r.shape)
-    scatterUE4Positions(ax,opdata_l,colormap="Blues",label="Ref L")    
-    scatterUE4Positions(ax,opdata_r,colormap="Reds",label="Ref R")
+    scatterUE4Positions(ax,opdata_l,colormap="hsv",label="Ref L")    
+    scatterUE4Positions(ax,opdata_r,colormap="hsv",label="Ref R")
     plt.legend()
 
     # =======================
