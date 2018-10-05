@@ -66,13 +66,19 @@ def plotErrors(title,labels,data_streams,ref,sections=[[],[],[]]):
 
         if(len(sec)==0):
             plt.plot(errors,label=labl,c=colourMap(i))
+            print("Mean error ("+labl+") = "+ str(np.mean(errors)));
+            print("Std  error ("+labl+") = "+ str(np.std(errors)));
         else:
             frames = range(len(errors))
+            filtered_errors = []
             for s in sec:
-                plt.plot(frames[s[0]:min(s[1],l)],errors[s[0]:min(s[1],l)],label=labl,c=colourMap(i))
+                this_block = errors[s[0]:min(s[1],l)]
+                plt.plot(frames[s[0]:min(s[1],l)],this_block,label=labl,c=colourMap(i))
+                filtered_errors = np.append(filtered_errors,this_block)
+            print("Mean error ("+labl+") = "+ str(np.mean(filtered_errors)));
+            print("Std  error ("+labl+") = "+ str(np.std(filtered_errors)));
 
             
-        print("Mean error ("+labl+") = "+ str(np.mean(errors)));
         i=(i+1)%3
     # plt.legend()
 
@@ -180,41 +186,41 @@ def positionalHeadRelativeErrorAnalysis(folder,ghost_trace=False):
     # =======================
     # 3D
     # =======================
-    # fig = plt.figure()
-    # ax = fig.gca(projection='3d')
-    # ax.set_xlabel("x")
-    # ax.set_ylabel("y")
-    # ax.set_zlabel("z")
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("z")
 
-    # ax.plot([0,10],[0,0],[0,0],c='r')
-    # ax.plot([0,0],[0,10],[0,0],c='g')
-    # ax.plot([0,0],[0,0],[0,10],c='b')
-    # ax.plot([0],[0],[0],marker="o",c='k')
-
-
-    # ax.set_xlim3d(-100,100)
-    # ax.set_ylim3d(-100,100)
-    # ax.set_zlim3d(-100,100)
+    ax.plot([0,10],[0,0],[0,0],c='r')
+    ax.plot([0,0],[0,10],[0,0],c='g')
+    ax.plot([0,0],[0,0],[0,10],c='b')
+    ax.plot([0],[0],[0],marker="o",c='k')
 
 
-    # print("Leap shape = ",leap_log_l.shape,leap_log_r.shape)
-    # scatterUE4Positions(ax,leap_log_l,colormap="hsv",label="leap L",m="o")
-    # scatterUE4Positions(ax,leap_log_r,colormap="hsv",label="leap R",m="o")
-
-    # # print("PN shape = ",PN_log_l.shape,PN_log_r.shape)
-    # # scatterUE4Positions(ax,PN_log_l,colormap="hsv",label="PN L",m="o")
-    # # scatterUE4Positions(ax,PN_log_r,colormap="hsv",label="PN R",m="o")
+    ax.set_xlim3d(-100,100)
+    ax.set_ylim3d(-100,100)
+    ax.set_zlim3d(-100,100)
 
 
-    # # print("Fused shape = ",Fused_log_l.shape,Fused_log_r.shape)
-    # # scatterUE4Positions(ax,Fused_log_l,colormap="Purples",label="Fused L")
-    # # scatterUE4Positions(ax,Fused_log_r,colormap="Oranges",label="Fused R")
+    print("Leap shape = ",leap_log_l.shape,leap_log_r.shape)
+    scatterUE4Positions(ax,leap_log_l,colormap="hsv",label="leap L",m="o")
+    scatterUE4Positions(ax,leap_log_r,colormap="hsv",label="leap R",m="o")
+
+    # print("PN shape = ",PN_log_l.shape,PN_log_r.shape)
+    # scatterUE4Positions(ax,PN_log_l,colormap="hsv",label="PN L",m="o")
+    # scatterUE4Positions(ax,PN_log_r,colormap="hsv",label="PN R",m="o")
 
 
-    # print("Opti shape = ",opdata_l.shape,opdata_r.shape)
-    # # scatterUE4Positions(ax,opdata_l,colormap="hsv",label="Ref L")    
-    # # scatterUE4Positions(ax,opdata_r,colormap="hsv",label="Ref R")
-    # plt.legend()
+    # print("Fused shape = ",Fused_log_l.shape,Fused_log_r.shape)
+    # scatterUE4Positions(ax,Fused_log_l,colormap="Purples",label="Fused L")
+    # scatterUE4Positions(ax,Fused_log_r,colormap="Oranges",label="Fused R")
+
+
+    print("Opti shape = ",opdata_l.shape,opdata_r.shape)
+    # scatterUE4Positions(ax,opdata_l,colormap="hsv",label="Ref L")    
+    # scatterUE4Positions(ax,opdata_r,colormap="hsv",label="Ref R")
+    plt.legend()
 
     # =======================
 
@@ -269,6 +275,6 @@ def positionalHeadRelativeErrorAnalysis(folder,ghost_trace=False):
 
 
 positionalHeadRelativeErrorAnalysis("test1")
-# positionalHeadRelativeErrorAnalysis("test2")
-# positionalHeadRelativeErrorAnalysis("balltest",ghost_trace=True)
-plt.show()
+positionalHeadRelativeErrorAnalysis("test2")
+positionalHeadRelativeErrorAnalysis("balltest",ghost_trace=True)
+# plt.show()
