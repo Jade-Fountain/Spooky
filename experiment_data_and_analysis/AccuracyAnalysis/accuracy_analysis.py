@@ -42,14 +42,22 @@ def plotPairedErrors(title,lefthand,righthand,leftref,rightref):
     plt.xlabel("Frame")
     # plt.title(title)
 
-def plotErrors(title,labels,data_streams,ref):
+def plotErrors(title,labels,data_streams,ref,sections=[[],[],[]]):
     # print(data_streams.shape)
     print("Error analysis ("+title+")")
     i = 0
-    for labl,data in zip(labels,data_streams):
+    for labl,data,sec in zip(labels,data_streams,sections):
         l = np.min([len(data),len(ref)])
         errors = np.linalg.norm(data[0:l]-ref[0:l],axis=1)
-        plt.plot(errors,label=labl,c=colourMap(i))
+
+        if(len(sec)==0):
+            plt.plot(errors,label=labl,c=colourMap(i))
+        else:
+            frames = range(len(errors))
+            for s in sec:
+                plt.plot(frames[s[0]:min(s[1],l)],errors[s[0]:min(s[1],l)],label=labl,c=colourMap(i))
+
+            
         print("Mean error ("+labl+") = "+ str(np.mean(errors)));
         i=(i+1)%3
     plt.legend()
@@ -207,9 +215,9 @@ def positionalHeadRelativeErrorAnalysis(folder):
     # =======================
 
     plt.figure()
-    plotErrors("Left Hand",["LP","PN","FT"],[leap_log_l,PN_log_l,Fused_log_l],opdata_l)
+    plotErrors("Left Hand",["LP","PN","FT"],[leap_log_l,PN_log_l,Fused_log_l],opdata_l,sections=[leap_secL,[],[]])
     plt.figure()
-    plotErrors("Right Hand",["LP","PN","FT"],[leap_log_r,PN_log_r,Fused_log_r],opdata_r)
+    plotErrors("Right Hand",["LP","PN","FT"],[leap_log_r,PN_log_r,Fused_log_r],opdata_r,sections=[leap_secR,[],[]])
 
 
 positionalHeadRelativeErrorAnalysis("test1")
