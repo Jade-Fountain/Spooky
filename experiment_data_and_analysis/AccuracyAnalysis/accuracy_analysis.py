@@ -1,9 +1,10 @@
 # This import registers the 3D projection, but is otherwise unused.
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 
+from matplotlib2tikz import save as tikz_save
 import numpy as np
 import matplotlib.pyplot as plt
-import copy 
+import copy,os
 
 # Analyse the accuracy of fused tracking vs individuals
 def colourMap(i):
@@ -16,6 +17,19 @@ def colourMap(i):
 
 CL = '#1f77b4'
 CR = '#ff7f0e'
+
+thesis_folder = "/Users/jake/MEGA/PhD/Documents/Thesis/chapters/user_study/figure/accuracy/"
+table_folder = "/Users/jake/MEGA/PhD/Documents/Thesis/chapters/user_study/table/accuracy/"
+
+def saveFigure(name,pgf=True):
+    print("Saving ",name)
+    if(pgf):
+        tikz_save("figure/"+name+".tex")
+        if(os.name=='posix'):
+            tikz_save(thesis_folder+name+".tex")
+    plt.savefig("figure/"+name+".pdf")
+    if(os.name=='posix'):
+        plt.savefig(thesis_folder+name+".pdf")
 
 def getDataFromFile(file,names,converters=[]):
     return np.array(genfromtxt(file,
@@ -161,26 +175,26 @@ def positionalHeadRelativeErrorAnalysis(folder):
     # =======================
     # 3D
     # =======================
-    # fig = plt.figure()
-    # ax = fig.gca(projection='3d')
-    # ax.set_xlabel("x")
-    # ax.set_ylabel("y")
-    # ax.set_zlabel("z")
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("z")
 
-    # ax.plot([0,10],[0,0],[0,0],c='r')
-    # ax.plot([0,0],[0,10],[0,0],c='g')
-    # ax.plot([0,0],[0,0],[0,10],c='b')
-    # ax.plot([0],[0],[0],marker="o",c='k')
-
-
-    # ax.set_xlim3d(-100,100)
-    # ax.set_ylim3d(-100,100)
-    # ax.set_zlim3d(-100,100)
+    ax.plot([0,10],[0,0],[0,0],c='r')
+    ax.plot([0,0],[0,10],[0,0],c='g')
+    ax.plot([0,0],[0,0],[0,10],c='b')
+    ax.plot([0],[0],[0],marker="o",c='k')
 
 
-    # print("Leap shape = ",leap_log_l.shape,leap_log_r.shape)
-    # scatterUE4Positions(ax,leap_log_l,colormap="Purples",label="leap L")
-    # scatterUE4Positions(ax,leap_log_r,colormap="Oranges",label="leap R")
+    ax.set_xlim3d(-100,100)
+    ax.set_ylim3d(-100,100)
+    ax.set_zlim3d(-100,100)
+
+
+    print("Leap shape = ",leap_log_l.shape,leap_log_r.shape)
+    scatterUE4Positions(ax,leap_log_l,colormap="Purples",label="leap L")
+    scatterUE4Positions(ax,leap_log_r,colormap="Oranges",label="leap R")
 
     # print("PN shape = ",PN_log_l.shape,PN_log_r.shape)
     # scatterUE4Positions(ax,PN_log_l,colormap="Purples",label="PN L")
@@ -192,10 +206,10 @@ def positionalHeadRelativeErrorAnalysis(folder):
     # scatterUE4Positions(ax,Fused_log_r,colormap="Oranges",label="Fused R")
 
 
-    # print("Opti shape = ",opdata_l.shape,opdata_r.shape)
-    # scatterUE4Positions(ax,opdata_l,colormap="Blues",label="Ref L")    
-    # scatterUE4Positions(ax,opdata_r,colormap="Reds",label="Ref R")
-    # plt.legend()
+    print("Opti shape = ",opdata_l.shape,opdata_r.shape)
+    scatterUE4Positions(ax,opdata_l,colormap="Blues",label="Ref L")    
+    scatterUE4Positions(ax,opdata_r,colormap="Reds",label="Ref R")
+    plt.legend()
 
     # =======================
 
@@ -203,10 +217,18 @@ def positionalHeadRelativeErrorAnalysis(folder):
     # 2D Traces
     # =======================
     plot2DTraces("LP",leap_log_l,leap_log_r,opdata_l,opdata_r,secL=leap_secL,secR=leap_secR)
-    # plot2DTraces("LP",leap_log_l,leap_log_r,opdata_l,opdata_r)
+    saveFigure("LPWristTrace("+folder+")")
+
+    plot2DTraces("LP",leap_log_l,leap_log_r,opdata_l,opdata_r)
     plot2DTraces("PN",PN_log_l,PN_log_r,opdata_l,opdata_r)
+    saveFigure("PNWristTrace("+folder+")")
+
     plot2DTraces("FT",Fused_log_l,Fused_log_r,opdata_l,opdata_r)
+    saveFigure("FTWristTrace("+folder+")")
+
     plot2DTraces("GT",opdata_l,opdata_r)
+    saveFigure("GTWristTrace("+folder+")")
+
     # =======================
 
 
@@ -216,8 +238,12 @@ def positionalHeadRelativeErrorAnalysis(folder):
 
     plt.figure()
     plotErrors("Left Hand",["LP","PN","FT"],[leap_log_l,PN_log_l,Fused_log_l],opdata_l,sections=[leap_secL,[],[]])
+    saveFigure("LeftHandErrors("+folder+")")
+
     plt.figure()
     plotErrors("Right Hand",["LP","PN","FT"],[leap_log_r,PN_log_r,Fused_log_r],opdata_r,sections=[leap_secR,[],[]])
+    saveFigure("RightHandErrors("+folder+")")
+
 
 
 positionalHeadRelativeErrorAnalysis("test1")
