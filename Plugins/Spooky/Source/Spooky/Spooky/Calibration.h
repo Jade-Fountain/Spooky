@@ -112,12 +112,12 @@ namespace spooky {
 									bool clearMeasurementsWhenDone = true);
 
 		//Counts the number of measurements that will be returned by getRelevantMeasurements
-		std::pair<int, int> Calibrator::countRelevantSynchronisedMeasurements(SystemDescriptor system1,
+		std::pair<int, int> countRelevantSynchronisedMeasurements(SystemDescriptor system1,
 																				SystemDescriptor system2,
 																				int minCountPerNode);		
 		
 		//Determines what sensors are available to perform calibrations
-		void Calibrator::determineCalibrationsRequired(SystemDescriptor system1,
+		void determineCalibrationsRequired(SystemDescriptor system1,
 																	SystemDescriptor system2,
 																	int minCountPerNode);
 

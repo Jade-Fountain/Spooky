@@ -60,10 +60,10 @@ namespace spooky {
 		std::string name;
 
 		//Overloaded operators check for valid system name and check equality
-		bool SystemDescriptor::operator==(const SystemDescriptor &other) const {
+		bool operator==(const SystemDescriptor &other) const {
 			return name.size() > 0 && other.name.size() > 0 && name.compare(other.name) == 0;  // Compare the values, and return a bool result.
 		}
-		bool SystemDescriptor::operator!=(const SystemDescriptor &other) const {
+		bool operator!=(const SystemDescriptor &other) const {
 			return !(*this == other);
 		}
 		//Comparators for maps
