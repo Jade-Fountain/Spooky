@@ -78,6 +78,7 @@ namespace spooky {
 
 	class Calibrator {
 	private:
+
 		//----------------
 		//PRIVATE MEMBERS
 		//----------------
@@ -90,6 +91,7 @@ namespace spooky {
 		//Data for resulting calibrations
 		std::map<SystemPair, CalibrationResult> calibrationResults;
 		
+
 		//----------------
 		//PRIVATE METHODS
 		//----------------
@@ -113,12 +115,12 @@ namespace spooky {
 									bool clearMeasurementsWhenDone = true);
 
 		//Counts the number of measurements that will be returned by getRelevantMeasurements
-		std::pair<int, int> Calibrator::countRelevantSynchronisedMeasurements(SystemDescriptor system1,
+		std::pair<int, int> countRelevantSynchronisedMeasurements(SystemDescriptor system1,
 																				SystemDescriptor system2,
 																				int minCountPerNode);		
 		
 		//Determines what sensors are available to perform calibrations
-		void Calibrator::determineCalibrationsRequired(SystemDescriptor system1,
+		void determineCalibrationsRequired(SystemDescriptor system1,
 																	SystemDescriptor system2,
 																	int minCountPerNode);
 
@@ -139,7 +141,7 @@ namespace spooky {
 		CalibrationResult calPos(const std::vector<Measurement::Ptr>& measurements1, const std::vector<Measurement::Ptr>& measurements2, const CalibrationResult& calib) const;
 
 		//Calibrate two rigidly linked 6DoF sensors
-		CalibrationResult cal6DoF(const std::vector<Measurement::Ptr>& m1, const std::vector<Measurement::Ptr>& m2, const CalibrationResult & currentCalibration) const;
+		CalibrationResult cal6DoF(const std::vector<Measurement::Ptr>& m1, const std::vector<Measurement::Ptr>& m2, const CalibrationResult & currentCalibration, const bool& includePosition) const;
 
 		//Estimate latencies of multiple concatenated streams of measurements
 		float estimateLatencies(const std::vector<Measurement::Ptr>& m1, const std::vector<Measurement::Ptr>& m2);
@@ -147,6 +149,7 @@ namespace spooky {
 		//Returns the estimated latency l between two streams: m2[t] <-> m1[t+l]
 		//Aka, m2 lags begind by l
 		float estimateLatency(const std::vector<Measurement::Ptr>& m1, const std::vector<Measurement::Ptr>& m2);
+
 
 	public:
 		//Config		
@@ -176,7 +179,7 @@ namespace spooky {
 			// CalibrationResult Calibrator::updateCalibration(const CalibrationResult& newCalibration, const CalibrationResult& currentCalibration) const{
 			//TODO: make these some logical values
 			//TODO: make this different for each system pair
-			float initial_quality_threshold = 0.5;
+			float initial_quality_threshold = 0.1;
 			float quality_convergence_threshold = 0.01;
 			float fault_hysteresis_rate = 0.25;
 			float relevance_decay_rate = 0.1;
@@ -206,6 +209,10 @@ namespace spooky {
 
 		//Gets string summarising state of calibrator
 		std::string getStateSummary();
+
+		//bound functions
+		std::function<Transform3D (const NodeDescriptor&)> getNodeGlobalPose;
+		std::function<Transform3D (const NodeDescriptor&)> getNodeLocalPose;
 
 	};
 

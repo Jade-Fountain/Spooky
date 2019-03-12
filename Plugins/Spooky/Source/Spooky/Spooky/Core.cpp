@@ -19,6 +19,12 @@
 #include <chrono>
 
 namespace spooky {
+	Core::SpookyConfig Core::config;
+
+	Core::Core(){
+		calibrator.getNodeGlobalPose = std::bind(&Core::getNodeGlobalPose, this, std::placeholders::_1);
+		calibrator.getNodeLocalPose = std::bind(&Core::getNodeLocalPose, this, std::placeholders::_1);
+	}
 	
 	void Core::addFixedNode(const NodeDescriptor & node, const NodeDescriptor & parent,
 							 const Transform3D& pose)
@@ -30,28 +36,28 @@ namespace spooky {
 	void Core::addBoneNode(const NodeDescriptor & node, const NodeDescriptor & parent,
 							 const Transform3D& boneTransform,
 							 const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
-							 const float& process_noise)
+							 const Eigen::MatrixXf& process_noise, const bool& modelVelocity)
 	{
 		skeleton.addNode(node, parent);
-		skeleton.setBoneForNode(node, boneTransform, Node::State::Parameters(constraint_centre, constraint_variance), process_noise);
+		skeleton.setBoneForNode(node, boneTransform, Node::State::Parameters(constraint_centre, constraint_variance), process_noise, modelVelocity);
 	}
 
 	void Core::addPoseNode(const NodeDescriptor & node, const NodeDescriptor & parent,
 							 const Transform3D& poseInitial,
 							 const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
-							 const float& process_noise)
+							 const Eigen::MatrixXf& process_noise, const bool& modelVelocity)
 	{
 		skeleton.addNode(node, parent);
-		skeleton.setPoseNode(node, poseInitial, Node::State::Parameters(constraint_centre, constraint_variance), process_noise);
+		skeleton.setPoseNode(node, poseInitial, Node::State::Parameters(constraint_centre, constraint_variance), process_noise, modelVelocity);
 	}
 
 	void Core::addScalePoseNode(const NodeDescriptor & node, const NodeDescriptor & parent,
-							 const Transform3D& poseInitial, const Eigen::Vector3f& scaleInitial,
+							 const Transform3D& poseInitial,
 							 const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
-							 const float& process_noise)
+							 const Eigen::MatrixXf& process_noise, const bool& modelVelocity)
 	{
 		skeleton.addNode(node, parent);
-		skeleton.setScalePoseNode(node, poseInitial, scaleInitial, Node::State::Parameters(constraint_centre, constraint_variance),process_noise);
+		skeleton.setScalePoseNode(node, poseInitial, Node::State::Parameters(constraint_centre, constraint_variance),process_noise, modelVelocity);
 	}
 
 
@@ -67,6 +73,8 @@ namespace spooky {
 			sensors[system][sensorID]->id = sensorID;
 			//If we have system latencies for this system, use those and override with individual sensor latencies
 			sensors[system][sensorID]->latency = sysLatencies.count(system) == 0 ? 0 : sysLatencies[system];
+			sensors[system][sensorID]->rootNode = rootNodes.count(system) == 0 ? NodeDescriptor("") : rootNodes[system];
+
 		}
 	}
 
@@ -76,11 +84,25 @@ namespace spooky {
 	}
 
 	void Core::setSystemLatency(const SystemDescriptor& system, const float& latency){
+		//Set existing sensors
+		for(auto& sensor : utility::safeAccess(sensors,system)){
+			sensor.second->latency = latency;
+		}
+		//Record for future sensors 
 		sysLatencies[system] = latency;
 	}
 	
 	void Core::setJointStiffness(const float& stiffness) {
 		skeleton.setAllJointStiffness(stiffness);
+	}
+	
+	void Core::setSystemRootNode(const SystemDescriptor& system, const NodeDescriptor& node){
+		//Set existing sensors
+		for(auto& sensor : utility::safeAccess(sensors,system)){
+			sensor.second->rootNode = node;
+		}
+		//Record for future sensors 
+		rootNodes[system] = node;
 	}
 
 
@@ -145,39 +167,79 @@ namespace spooky {
 
 	//Computes data added since last fuse() call. Should be called repeatedly	
 	void Core::fuse(const float& time) {
+		utility::Profiler::getInstance().startTimer("CoreMainLoop");
+
+		frame_count++;
+		if(time != last_time){
+			framerate = 1 / (time - last_time);
+		} else {
+			framerate = -1;
+		}
+		last_time = time;
 		//TODO: add ifdefs for profiling
-		//Add new data to calibration, with checking for usefulness
-		utility::profiler.startTimer("Correlator");
-		utility::profiler.startTimer("All");
-		//SPOOKY_LOG("Fusing: " + std::to_string(measurement_buffer.size()) + "measurements");
 
 		//Get measurements offset by the largest latency so all measurements are valid
-		utility::profiler.startTimer("Sync (Offset)");
+		utility::Profiler::getInstance().startTimer("Sync (Offset)");
 		std::vector<Measurement::Ptr> sync_measurements = measurement_buffer.getOffsetSynchronizedMeasurements(time);
-		utility::profiler.endTimer("Sync (Offset)");
-		correlator.addMeasurementGroup(sync_measurements);
-		correlator.identify();
-		utility::profiler.endTimer("Correlator");
-		if(correlator.isStable() || true){
-			utility::profiler.startTimer("Calibrator add");
-			calibrator.addMeasurementGroup(sync_measurements);
-			utility::profiler.endTimer("Calibrator add");
-			utility::profiler.startTimer("Calibrate");
-			calibrator.calibrate();
-			utility::profiler.endTimer("Calibrate");
-			if(calibrator.isStable() || true){
-				utility::profiler.startTimer("Fuse");
-				auto lastMeasurements = measurement_buffer.getLatestMeasurements();
-				skeleton.addMeasurementGroup(lastMeasurements);
+		utility::Profiler::getInstance().endTimer("Sync (Offset)");
 
-				//FOR LATENCY TESTING:
-				//skeleton.addMeasurementGroup(sync_measurements);
-				skeleton.fuse(calibrator);
-				utility::profiler.endTimer("Fuse");
+		///////////////////////
+		// FUSE
+		///////////////////////
+		utility::Profiler::getInstance().startTimer("Fuse");
+		auto lastMeasurements = measurement_buffer.getLatestMeasurements();
+		skeleton.addMeasurementGroup(lastMeasurements);
+
+		//DEBUG FOR LATENCY TESTING:
+		//skeleton.addMeasurementGroup(sync_measurements);
+		skeleton.fuse(calibrator);
+		utility::Profiler::getInstance().endTimer("Fuse");
+		///////////////////////
+		
+
+		for(auto& m : sync_measurements){
+			NodeDescriptor rootNode = m->getSensor()->getRootNode();
+			if(rootNode.name.size() != 0){
+				if(rootPoses.count(rootNode) == 0){
+					rootPoses[rootNode] = DataBuffer<Transform3D>();
+				}
+				rootPoses[rootNode].time_width = std::fmax(m->getLatency(),rootPoses[rootNode].time_width);
+				//Insert current pose of root node based on 
+				rootPoses[rootNode].insert(skeleton.getNodeLastFusionTime(rootNode), getNodeGlobalPose(rootNode), time);
+				//Search back in time for 
+				bool valid = false;
+				Transform3D p = rootPoses[rootNode].get(m->getTimestamp() - m->getLatency(), &valid);
+				if(valid){
+					m->setRootNodePose(p);
+				}
 			}
-		}	
-		//TODO: do this less often
-		utility::profiler.endTimer("All");
+		}
+
+
+		///////////////////////
+		// CORRELATE
+		///////////////////////
+		//utility::Profiler::getInstance().startTimer("Correlator");
+		//correlator.addMeasurementGroup(sync_measurements);
+		//correlator.identify();
+		//utility::Profiler::getInstance().endTimer("Correlator");
+		///////////////////////
+		
+
+		///////////////////////
+		// CALIBRATE
+		///////////////////////
+		utility::Profiler::getInstance().startTimer("Calibrator add");
+		calibrator.addMeasurementGroup(sync_measurements);
+		utility::Profiler::getInstance().endTimer("Calibrator add");
+
+		utility::Profiler::getInstance().startTimer("Calibrate");
+		calibrator.calibrate();
+		utility::Profiler::getInstance().endTimer("Calibrate");
+		///////////////////////
+
+	
+		utility::Profiler::getInstance().endTimer("CoreMainLoop");
 	}
 
 	CalibrationResult Core::getCalibrationResult(SystemDescriptor s1, SystemDescriptor s2) {
@@ -217,6 +279,10 @@ namespace spooky {
 	}
 
 	std::string Core::getTimingSummary() {
-		return utility::profiler.getReport();
+		return utility::Profiler::getInstance().getReport() + "\n FPS = "  + std::to_string(framerate) + " (avg: " + std::to_string(frame_count / last_time) + ")";
+	}
+
+	ArticulatedModel& Core::getSkeleton() {
+		return skeleton;
 	}
 }

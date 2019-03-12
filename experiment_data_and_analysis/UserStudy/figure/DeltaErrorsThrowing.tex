@@ -1,0 +1,93 @@
+% This file was created by matplotlib2tikz v0.6.17.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{1,0.498039215686275,0.0549019607843137}
+
+\begin{axis}[
+xmin=0.5, xmax=2.5,
+ymin=-16.3, ymax=12.3,
+xtick={1,2},
+xticklabels={FT$-$LP$^\dagger$,FT$-$PN},
+tick align=outside,
+tick pos=left,
+x grid style={white!69.019607843137251!black},
+y grid style={white!69.019607843137251!black}
+]
+\addplot [black, forget plot]
+table {%
+0.55 -5.75
+1.45 -5.75
+1.45 1
+0.55 1
+0.55 -5.75
+};
+\addplot [black, forget plot]
+table {%
+1 -5.75
+1 -15
+};
+\addplot [black, forget plot]
+table {%
+1 1
+1 10
+};
+\addplot [black, forget plot]
+table {%
+0.775 -15
+1.225 -15
+};
+\addplot [black, forget plot]
+table {%
+0.775 10
+1.225 10
+};
+\addplot [black, forget plot]
+table {%
+1.55 -2.75
+2.45 -2.75
+2.45 3
+1.55 3
+1.55 -2.75
+};
+\addplot [black, forget plot]
+table {%
+2 -2.75
+2 -8
+};
+\addplot [black, forget plot]
+table {%
+2 3
+2 11
+};
+\addplot [black, forget plot]
+table {%
+1.775 -8
+2.225 -8
+};
+\addplot [black, forget plot]
+table {%
+1.775 11
+2.225 11
+};
+\addplot [black, mark=*, mark size=3, mark options={solid,fill opacity=0}, only marks, forget plot]
+table {%
+2 -15
+};
+\addplot [color0, forget plot]
+table {%
+0.55 -2.5
+1.45 -2.5
+};
+\addplot [color0, forget plot]
+table {%
+1.55 -1
+2.45 -1
+};
+\addplot [black, dashed, forget plot]
+table {%
+0 0
+3 0
+};
+\end{axis}
+
+\end{tikzpicture}

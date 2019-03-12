@@ -53,8 +53,19 @@ namespace spooky {
 
 		//Latency data per system
 		std::map<SystemDescriptor, float> sysLatencies;
+		std::map<SystemDescriptor, NodeDescriptor> rootNodes;
+
+		//Debug/Stats
+		float framerate = 0;
+		float last_time = 0;
+		long int frame_count = 0;
+
+		//Root node poses:
+		std::map<NodeDescriptor,DataBuffer<Transform3D>> rootPoses;
 		
 	public:
+
+		Core();
 
 		struct SpookyConfig{
 			//Units config
@@ -66,7 +77,8 @@ namespace spooky {
 			Correlator::Config correlator;
 			//Calibrator config
 			Calibrator::Config calibrator;
-		} config;
+		};
+		static SpookyConfig config;
 
 
 
@@ -78,13 +90,13 @@ namespace spooky {
 		void addFixedNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& pose);
 		void addBoneNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& boneTransform,
 							const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
-					 		const float& process_noise);
+					 		const Eigen::MatrixXf& process_noise, const bool& modelVelocity);
 		void addPoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial,
 							const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
-					 		const float& process_noise);
-		void addScalePoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial, const Eigen::Vector3f& scaleInitial,
+					 		const Eigen::MatrixXf& process_noise, const bool& modelVelocity);
+		void addScalePoseNode(const NodeDescriptor& node, const NodeDescriptor& parent, const Transform3D& poseInitial,
 							const Eigen::VectorXf& constraint_centre, const Eigen::MatrixXf& constraint_variance,
-					 		const float& process_noise);
+					 		const Eigen::MatrixXf& process_noise, const bool& modelVelocity);
 		
 		//Sets the reference system for the fused skeleton
 		//Joint values will be reported relative to this system
@@ -109,6 +121,9 @@ namespace spooky {
 
 		//Set fusion joint stiffness
 		void setJointStiffness(const float& stiffness);
+
+		//Sets the (possibly moving) node which the sensor system is attached
+		void setSystemRootNode(const SystemDescriptor& system, const NodeDescriptor& node);
 
 		////////////////////////////////////////////////////
 		//					Input at runtime
@@ -144,8 +159,12 @@ namespace spooky {
 
 		//Returns a string summarising the state of calibration in the system
 		std::string getCalibratorStateSummary();
+		
 		//Returns info on compute time
 		std::string getTimingSummary();
+
+		//Return the fused skeleton
+		ArticulatedModel& getSkeleton();
 
 	};
 

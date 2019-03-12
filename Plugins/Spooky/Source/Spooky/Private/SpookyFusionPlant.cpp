@@ -16,8 +16,10 @@
 */
 
 #include "Spooky.h"
+#include "Spooky/FusionTypes.h"
 #include "SpookyFusionPlant.h"
 #include "Spooky/Utilities/TimeProfiling.h"
+#include "Spooky/Utilities/DataStructures.h"
 #include <iostream>
 
 
@@ -25,7 +27,6 @@ using spooky::Measurement;
 //===========================
 //Setup and initialisation
 //===========================
-
 
 // Sets default values for this component's properties
 USpookyFusionPlant::USpookyFusionPlant()
@@ -55,28 +56,28 @@ void USpookyFusionPlant::TickComponent( float DeltaTime, ELevelTick TickType, FA
 
 UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::Configure(float input_units_m, float output_units_m)
 {
-	spookyCore.config.units.input_m = input_units_m;
-	spookyCore.config.units.output_m = output_units_m;
+	spooky::Core::config.units.input_m = input_units_m;
+	spooky::Core::config.units.output_m = output_units_m;
 	/*
-	spookyCore.config.correlator.ambiguous_threshold = correlator_ambiguous_threshold;
-	spookyCore.config.correlator.elimination_threshold = correlator_elimination_threshold;
-	spookyCore.config.correlator.diff_threshold = correlator_diff_threshold;
+	spooky::Core::config.correlator.ambiguous_threshold = correlator_ambiguous_threshold;
+	spooky::Core::config.correlator.elimination_threshold = correlator_elimination_threshold;
+	spooky::Core::config.correlator.diff_threshold = correlator_diff_threshold;
 
-	spookyCore.config.calibrator.diff_threshold = calibration_diff_threshold;
-	spookyCore.config.calibrator.min_count_per_node = calibration_min_count_per_node;
-	spookyCore.config.calibrator.count_threshold = 
+	spooky::Core::config.calibrator.diff_threshold = calibration_diff_threshold;
+	spooky::Core::config.calibrator.min_count_per_node = calibration_min_count_per_node;
+	spooky::Core::config.calibrator.count_threshold = 
 		{	
 			{spooky::CalibrationResult::State::UNCALIBRATED,100},
 			{spooky::CalibrationResult::State::REFINING,100 },
 			{spooky::CalibrationResult::State::CALIBRATED,100}
 		};
-	spookyCore.config.calibrator.initial_quality_threshold = calibration_initial_quality_threshold;
-	spookyCore.config.calibrator.quality_convergence_threshold = calibration_quality_convergence_threshold;
-	spookyCore.config.calibrator.fault_hysteresis_rate = calibration_fault_hysteresis_rate;
-	spookyCore.config.calibrator.relevance_decay_rate = calibration_relevance_decay_rate;
-	spookyCore.config.calibrator.settle_threshold = calibration_settle_threshold;
-	spookyCore.config.calibrator.fault_angle_threshold = calibration_fault_angle_threshold;
-	spookyCore.config.calibrator.fault_distance_threshold = calibration_fault_distance_threshold;*/
+	spooky::Core::config.calibrator.initial_quality_threshold = calibration_initial_quality_threshold;
+	spooky::Core::config.calibrator.quality_convergence_threshold = calibration_quality_convergence_threshold;
+	spooky::Core::config.calibrator.fault_hysteresis_rate = calibration_fault_hysteresis_rate;
+	spooky::Core::config.calibrator.relevance_decay_rate = calibration_relevance_decay_rate;
+	spooky::Core::config.calibrator.settle_threshold = calibration_settle_threshold;
+	spooky::Core::config.calibrator.fault_angle_threshold = calibration_fault_angle_threshold;
+	spooky::Core::config.calibrator.fault_distance_threshold = calibration_fault_distance_threshold;*/
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::SetJointStiffness(float stiffness) {
@@ -87,12 +88,27 @@ UFUNCTION(BlueprintCallable, Category = "Spooky") void USpookyFusionPlant::AddSk
 {
 	//Add skeleton reference
 	skeletal_spirits.push_back(spooky_skeletal_mesh);
+	//Set the root node of the system associated with the skeleton
+	SetSystemRootNode(spooky_skeletal_mesh->system_name, spooky_skeletal_mesh->root_node, spooky_skeletal_mesh->root_node_offset);
 	return;
+}
+
+UFUNCTION(BlueprintCallable, Category = "Spooky")
+void USpookyFusionPlant::SetSystemRootNode(FString system, FString rootNode, const FTransform& rootNodeOffset) {
+	spooky::SystemDescriptor sys(TCHAR_TO_UTF8(*system));
+	spooky::NodeDescriptor root(TCHAR_TO_UTF8(*rootNode));
+	//Add node representing offset from the root node
+	//The node has the same as the system with the suffix "_root"
+	if (root.name != "" && root != spooky::SPOOKY_WORLD_ROOT_DESC) {
+		spookyCore.addFixedNode(spooky::NodeDescriptor(sys.name + "_root"), root, convert(rootNodeOffset.ToMatrixWithScale()));
+		//Attach to sensor model
+		spookyCore.setSystemRootNode(sys, spooky::NodeDescriptor(sys.name + "_root"));
+	} 
 }
 
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh, const TArray<FName>& fixedJoints, float default_constraint_flexibility, float default_process_noise)
+void USpookyFusionPlant::AddOutputTarget(USpookySkeletalMeshComponent * skeletal_mesh)
 {
 	TArray<FMeshBoneInfo> boneInfo = skeletal_mesh->SkeletalMesh->RefSkeleton.GetRefBoneInfo();
 	for (int i = 0; i < boneInfo.Num(); i++) {
@@ -100,7 +116,6 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh,
 		//TODO: make more efficient
 		FTransform b = FTransform(skeletal_mesh->SkeletalMesh->GetRefPoseMatrix(i));
 		//Scale to spooky units
-		b.SetTranslation(b.GetTranslation() * spookyCore.config.units.input_m);
 		spooky::Transform3D bonePoseLocal = convert(b.ToMatrixWithScale());
 		//Set parent
 		spooky::NodeDescriptor parent_desc = (bone.ParentIndex >= 0) ?
@@ -108,28 +123,41 @@ void USpookyFusionPlant::AddOutputTarget(USkeletalMeshComponent * skeletal_mesh,
 			spooky::NodeDescriptor();
 		//Set bone name		
 		spooky::NodeDescriptor bone_desc = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
-		//Set different node types
-		if (i == 0 || fixedJoints.Contains(bone.Name)) {
-			//Root node - doesnt move but has a typically has a constant scale component
-			//TODO: use this skeletal_mesh->GetComponentTransform();
-			spookyCore.addFixedNode(bone_desc, parent_desc, bonePoseLocal);
+
+
+		ESpookyFusionType fusionType = skeletal_mesh->GetBoneInputFusionType(bone.Name);
+		switch(fusionType){
+			case(ESpookyFusionType::FIXED):
+			{
+				spookyCore.addFixedNode(bone_desc, parent_desc, bonePoseLocal);
+			}break;
+			case(ESpookyFusionType::BONE):
+			{
+				spookyCore.addBoneNode(bone_desc, parent_desc, bonePoseLocal,
+						skeletal_mesh->GetInputConstraintCentre(bone.Name), 
+						skeletal_mesh->GetInputConstraintVariance(bone.Name), 
+						skeletal_mesh->GetInputProcessNoise(bone.Name),
+						skeletal_mesh->DoesBoneInputModelVelocity(bone.Name));
+			}break;
+			case(ESpookyFusionType::POSE):
+			{
+				spookyCore.addPoseNode(bone_desc, parent_desc, bonePoseLocal,
+						skeletal_mesh->GetInputConstraintCentre(bone.Name), 
+						skeletal_mesh->GetInputConstraintVariance(bone.Name), 
+						skeletal_mesh->GetInputProcessNoise(bone.Name),
+						skeletal_mesh->DoesBoneInputModelVelocity(bone.Name));
+			}break;
+			case(ESpookyFusionType::SCALE_POSE):
+			{
+				spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal,
+						skeletal_mesh->GetInputConstraintCentre(bone.Name), 
+						skeletal_mesh->GetInputConstraintVariance(bone.Name), 
+						skeletal_mesh->GetInputProcessNoise(bone.Name),
+						skeletal_mesh->DoesBoneInputModelVelocity(bone.Name));
+			}break;
 		}
-		else if (bone.Name.GetPlainNameString() == "pelvis") {
-			//TODO: find better way to do this check for pose nodes
-			//The pelvis has 6DoF pose and 3DoF scale
-			Eigen::MatrixXf constraint_variance = Eigen::MatrixXf::Identity(9,9) * default_constraint_flexibility * 10000;
-			Eigen::VectorXf constraint_centre = Eigen::VectorXf::Zero(9);
-			constraint_centre.tail(3) = Eigen::Vector3f::Ones(); // Centre at unit scale
-			spookyCore.addScalePoseNode(bone_desc, parent_desc, bonePoseLocal, Eigen::Vector3f::Ones(), constraint_centre, constraint_variance, default_process_noise);
-		}
-		else {
-			//TODO: read constraint and process noise from USpookySkeletalMeshComponent
-			Eigen::Matrix3f constraint_variance = Eigen::Matrix3f::Identity() * default_constraint_flexibility;
-			//x axis can pivot arbitrarily
-			//constraint_variance(0, 0) = 100000;
-			Eigen::Vector3f constraint_centre = Eigen::Vector3f::Zero();
-			spookyCore.addBoneNode(bone_desc, parent_desc, bonePoseLocal, constraint_centre, constraint_variance, default_process_noise);
-		}
+
+
 		SPOOKY_LOG("Adding Bone: " + bone_desc.name + ", parent = " + parent_desc.name);
 	}
 }
@@ -161,75 +189,144 @@ void USpookyFusionPlant::SetSystemLatency(FString system_name, float latency){
 
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddPositionMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, bool globalSpace, float confidence)
+void USpookyFusionPlant::AddPositionMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, FSpookyMeasurementFlags flags, float confidence)
 {
 	Measurement::Ptr m = CreatePositionMeasurement(systemName, sensorID, timestamp_sec, measurement, covariance, confidence);
-	m->globalSpace = globalSpace;
+	setFlags(m,flags);
 	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddRotationMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FRotator measurement, FVector4 covariance, bool globalSpace, float confidence)
+void USpookyFusionPlant::AddRotationMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FRotator measurement, FVector4 covariance, FSpookyMeasurementFlags flags, float confidence)
 {
 	Measurement::Ptr m = CreateRotationMeasurement(systemName,sensorID,timestamp_sec, measurement.Quaternion(),covariance,confidence);
-	m->globalSpace = globalSpace;
+	setFlags(m,flags);	
 	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddPoseMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FTransform measurement, FVector position_var, FVector4 quaternion_var, bool globalSpace, float confidence)
+void USpookyFusionPlant::AddPoseMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FTransform measurement, FVector position_var, FVector4 quaternion_var, FSpookyMeasurementFlags flags, float confidence)
 {
 	Measurement::Ptr m = CreatePoseMeasurement(systemName, sensorID, timestamp_sec, measurement.GetTranslation(), measurement.GetRotation(), position_var, quaternion_var, confidence);
-	m->globalSpace = globalSpace;
+	setFlags(m,flags);	
 	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
-void USpookyFusionPlant::AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, float confidence)
+void USpookyFusionPlant::AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, FSpookyMeasurementFlags flags, float confidence)
 {
 	Measurement::Ptr m = CreateScaleMeasurement(systemName, sensorID, timestamp_sec, measurement, covariance, confidence);
+	setFlags(m,flags);	
 	//Scales always local to the node
 	m->globalSpace = false;
 	spookyCore.addMeasurement(m, convertToNodeDescriptors(nodeNames));
 }
 
+
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 	//For each bone
-	auto& skeleton = skeletal_spirits[skel_index];
+	USpookySkeletalMeshComponent* skeleton = skeletal_spirits[skel_index];
 	TArray<FMeshBoneInfo> boneInfo = skeleton->SkeletalMesh->RefSkeleton.GetRefBoneInfo();
+	TArray<FTransform> componentSpaceTransforms = skeleton->GetComponentSpaceTransforms();
 	for (int i = 0; i < boneInfo.Num(); i++) {
 		//Bone info
 		FMeshBoneInfo& bone = boneInfo[i];
 		spooky::NodeDescriptor bone_name = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.Name.GetPlainNameString())));
 		//If this bone is active then make new measurement
-		if (skeleton->isBoneActive(bone.Name)) {
-			const FTransform& localTransform = skeleton->BoneSpaceTransforms[i];
-			const FSpookySkeletonBoneInfo& spookyBoneInfo = skeleton->getSpookyBoneInfo(bone.Name);
+		//TODO: search other way around
+		if (skeleton->isBoneOutputActive(bone.Name)) {
+			spooky::NodeDescriptor targetNode = skeleton->getOutputTargetNode(bone.Name);
+			FTransform T = skeleton->BoneSpaceTransforms[i];
+			const FSpookySkeletonBoneOutputParams& spookyBoneInfo = skeleton->getSpookyBoneOutputParams(bone.Name);
 
 			//Create measurement
 			Measurement::Ptr m;
+			bool dontcare;
+			FRotator retargetRotationOffset = skeleton->getOutputRetargetRotator(bone.Name, &dontcare);
+			//Retarget either globally or locally
+			if(spookyBoneInfo.flags.globalSpace){
+				T = componentSpaceTransforms[i];
+				/////WARNING////
+				//For some fucking reason UE4 FTransforms multiply backwards!!!
+				//That is, A*B applies A first and then B. 
+				//HOWEVER, FQuats rotate in the expected order
+				/////WARNING////
+				T.SetRotation(T.GetRotation() * retargetRotationOffset.Quaternion());
+			}
+			else {
+				//Retarget to new skeleton
+				//Requires knowledge of parent rotator relationship
+				bool parent_rotator_set = false;
+				int current_bone = i;
+				/////WARNING////
+				//For some fucking reason UE4 FTransforms multiply backwards!!!
+				//That is, A*B applies A first and then B. 
+				/////WARNING////
+				FTransform parentRetargetRotator = skeleton->BoneSpaceTransforms[i];
+				while (!parent_rotator_set && current_bone >= 0) {
+					//Get next bone
+					current_bone = boneInfo[current_bone].ParentIndex;
+					if (current_bone < 0) {
+						break;
+					}
+					//Find parent retargetor
+					FRotator A = skeleton->getOutputRetargetRotator(boneInfo[current_bone].Name, &parent_rotator_set);
+					if (parent_rotator_set) {
+						parentRetargetRotator = parentRetargetRotator * FTransform(A.GetInverse());
+					}
+					else {
+						parentRetargetRotator = parentRetargetRotator * skeleton->BoneSpaceTransforms[current_bone];
+					}
+				}
+				/////WARNING////
+				//For some fucking reason UE4 FTransforms multiply backwards!!!
+				//That is, A*B applies A first and then B. 
+				/////WARNING////
+				T = FTransform(retargetRotationOffset) * parentRetargetRotator;
+			}
+			
+
+			if (spookyBoneInfo.flags.filterUnchanged) {
+				if (skeleton->lastHash.count(bone_name) == 0) {
+					skeleton->lastHash[bone_name] = hashFTransform(skeleton->BoneSpaceTransforms[i]);
+					continue;
+				} else if (skeleton->lastHash[bone_name] == hashFTransform(skeleton->BoneSpaceTransforms[i])){
+					continue;
+				} else {
+					skeleton->lastHash[bone_name] = hashFTransform(skeleton->BoneSpaceTransforms[i]);
+				}
+			}
+
+			if (spookyBoneInfo.flags.accumulateOffsets) {
+				//T = S(t) * X (so reverse, because unreal is dumb)
+				T = skeleton->GetAccumulatedOffset(bone.Name) * T;
+			}
+
+			bool addMeas = true;
 			switch (spookyBoneInfo.measurementType) {
 				//TODO: local vs global variance?
 				case(ESpookyMeasurementType::GENERIC):
 					//TODO: support generic measurement
-					m = CreatePositionMeasurement(spookyBoneInfo.system_name, i, spookyBoneInfo.timestamp_sec, localTransform.GetTranslation(), spookyBoneInfo.position_var, spookyBoneInfo.confidence);
+					//m = CreatePositionMeasurement(skeleton->system_name, i, spookyBoneInfo.timestamp_sec, T.GetTranslation(), spookyBoneInfo.position_var, spookyBoneInfo.confidence);
+					addMeas = false;
 					break;
 				case(ESpookyMeasurementType::POSITION):
-					m = CreatePositionMeasurement(spookyBoneInfo.system_name, i, spookyBoneInfo.timestamp_sec,localTransform.GetTranslation(), spookyBoneInfo.position_var, spookyBoneInfo.confidence);
+					m = CreatePositionMeasurement(skeleton->system_name, i, spookyBoneInfo.timestamp_sec,T.GetTranslation(), spookyBoneInfo.position_var, spookyBoneInfo.confidence);
 					break;
 				case(ESpookyMeasurementType::ROTATION):
-					m = CreateRotationMeasurement(spookyBoneInfo.system_name, i, spookyBoneInfo.timestamp_sec, localTransform.GetRotation(), spookyBoneInfo.quaternion_var, spookyBoneInfo.confidence);
+					m = CreateRotationMeasurement(skeleton->system_name, i, spookyBoneInfo.timestamp_sec, T.GetRotation(), spookyBoneInfo.quaternion_var, spookyBoneInfo.confidence);
 					break;
 				case(ESpookyMeasurementType::RIGID_BODY):
-					m = CreatePoseMeasurement(spookyBoneInfo.system_name, i, spookyBoneInfo.timestamp_sec, localTransform.GetTranslation(), localTransform.GetRotation(), spookyBoneInfo.position_var, spookyBoneInfo.quaternion_var, spookyBoneInfo.confidence);
+					m = CreatePoseMeasurement(skeleton->system_name, i, spookyBoneInfo.timestamp_sec, T.GetTranslation(), T.GetRotation(), spookyBoneInfo.position_var, spookyBoneInfo.quaternion_var, spookyBoneInfo.confidence);
 					break;
 				case(ESpookyMeasurementType::SCALE):
-					m = CreateScaleMeasurement(spookyBoneInfo.system_name, i, spookyBoneInfo.timestamp_sec, localTransform.GetScale3D(),  spookyBoneInfo.scale_var, spookyBoneInfo.confidence);
+					m = CreateScaleMeasurement(skeleton->system_name, i, spookyBoneInfo.timestamp_sec, T.GetScale3D(),  spookyBoneInfo.scale_var, spookyBoneInfo.confidence);
 					break;
 			}
-			m->globalSpace = false;
-			spookyCore.addMeasurement(m, bone_name);
+			if (!addMeas) continue;
+			setFlags(m, spookyBoneInfo.flags);
+			spookyCore.addMeasurement(m, targetNode);
 		}
 	}
 }
@@ -237,13 +334,16 @@ void USpookyFusionPlant::addSkeletonMeasurement(int skel_index) {
 UFUNCTION(BlueprintCallable, Category = "Spooky")
 void USpookyFusionPlant::Fuse(float current_time)
 {
-	spooky::utility::profiler.startTimer("AAA FUSION TIME");
+	spooky::utility::Profiler::getInstance().startTimer("ZZZ USpookyFusionPlant::Fuse");
 	for (int i = 0; i < skeletal_spirits.size(); i++) {
 		addSkeletonMeasurement(i);
 	}
 	spookyCore.fuse(current_time);
-	spooky::utility::profiler.endTimer("AAA FUSION TIME");
-	//SPOOKY_LOG(spooky::utility::profiler.getReport());
+
+	for (auto& skel : skeletal_spirits) {
+		skel->AccumulateOffsets(spookyCore.getSkeleton(), current_time);
+	}
+	spooky::utility::Profiler::getInstance().endTimer("ZZZ USpookyFusionPlant::Fuse");
 }
 
 UFUNCTION(BlueprintCallable, Category = "Spooky")
@@ -251,7 +351,6 @@ FTransform USpookyFusionPlant::getBoneTransform(const FString& name) {
 	spooky::NodeDescriptor bone_name = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(name)));
 	spooky::Transform3D T = spookyCore.getNodeLocalPose(bone_name);
 	FTransform result(convert(T));
-	result.SetTranslation(result.GetTranslation() / spookyCore.config.units.output_m);
 	return result;
 }
 
@@ -264,7 +363,7 @@ FCalibrationResult USpookyFusionPlant::getCalibrationResult(FString s1, FString 
 {
 	spooky::CalibrationResult T = spookyCore.getCalibrationResult(spooky::SystemDescriptor(TCHAR_TO_UTF8(*s1)),spooky::SystemDescriptor(TCHAR_TO_UTF8(*s2)));
 	Eigen::Quaternionf q(T.transform.matrix().block<3,3>(0,0));
-	Eigen::Vector3f v(T.transform.matrix().block<3, 1>(0, 3) / spookyCore.config.units.output_m);
+	Eigen::Vector3f v(T.transform.matrix().block<3, 1>(0, 3) / spooky::Core::config.units.output_m);
 	FQuat fq(q.x(), q.y(), q.z(), q.w());
 	
 	FCalibrationResult result;
@@ -286,10 +385,8 @@ FString USpookyFusionPlant::getCorrelationResult(FString s1, int sensorID)
 FTransform USpookyFusionPlant::getNodeGlobalPose(FString node)
 {
 	spooky::Transform3D result = spookyCore.getNodeGlobalPose(spooky::NodeDescriptor(TCHAR_TO_UTF8(*node)));
-	FMatrix unrealMatrix = convert(result);
-	unrealMatrix.ScaleTranslation(FVector(1,1,1) * 1 / spookyCore.config.units.output_m);
 	//UE_LOG(LogTemp, Warning, TEXT("getNodePose : %s"), *(unrealMatrix.ToString()));
-	return FTransform(unrealMatrix);
+	return convert(result);
 }
 //===========================
 //Data saving/loading functions
@@ -331,7 +428,7 @@ Measurement::Ptr USpookyFusionPlant::CreatePositionMeasurement(FString system_na
 {
 	//Create basic measurement
 	Eigen::Vector3f meas(position[0],position[1],position[2]);
-	meas = meas * spookyCore.config.units.input_m;
+	meas = meas * spooky::Core::config.units.input_m;
 
 	Eigen::Matrix<float, 3, 3> un = Eigen::Matrix<float,3,3>::Identity();
 	un.diagonal() = Eigen::Vector3f(uncertainty[0], uncertainty[1], uncertainty[2]);
@@ -376,7 +473,7 @@ Measurement::Ptr USpookyFusionPlant::CreatePoseMeasurement(FString system_name, 
 {
 	//Convert transform to state vector (v,q)
 	Eigen::Vector3f ev(&v[0]);
-	ev = ev * spookyCore.config.units.input_m;
+	ev = ev * spooky::Core::config.units.input_m;
 	//BEWARE: dumb format mismatch:
 	Eigen::Quaternionf eq(q.W,q.X,q.Y,q.Z);
 	//Create basic measurement
@@ -416,18 +513,39 @@ std::vector<spooky::NodeDescriptor> USpookyFusionPlant::convertToNodeDescriptors
 	return result;
 }
 
-FMatrix USpookyFusionPlant::convert(const spooky::Transform3D& T) {
+FTransform USpookyFusionPlant::convert(const spooky::Transform3D& T) {
 	FMatrix unrealMatrix;
 	memcpy(&(unrealMatrix.M[0][0]), T.data(), sizeof(float) * 16);
-	return unrealMatrix;
+	FTransform m(unrealMatrix);
+	m.SetTranslation(m.GetTranslation() / spooky::Core::config.units.output_m);
+	return m;
 }
 
 spooky::Transform3D USpookyFusionPlant::convert(const FMatrix& T) {
 	spooky::Transform3D matrix;
 	memcpy(matrix.data(), &(T.M[0][0]), sizeof(float) * 16);
+	matrix.translation() *= spooky::Core::config.units.input_m;
 	return matrix;
 }
+	
+size_t USpookyFusionPlant::hashFTransform(const FTransform& T){
+	size_t result = 0;
+	FMatrix Tmat = T.ToMatrixWithScale();
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 4; j++) {
+			//XOR
+			result = result ^ (std::hash<float>{}(Tmat.GetColumn(j)[i]) << 1);
+		}
+	}
+	return result;
+}
 
+void USpookyFusionPlant::setFlags(spooky::Measurement::Ptr m, const FSpookyMeasurementFlags& flags){
+	m->globalSpace = flags.globalSpace;
+	m->relaxConstraints = flags.relaxConstraints;
+	m->sensorDrifts = flags.sensorDrifts;
+	m->accumulateOffset = flags.accumulateOffsets;
+}
 //===========================
 //DEBUG
 //===========================

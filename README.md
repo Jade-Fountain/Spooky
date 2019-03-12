@@ -25,6 +25,8 @@ Unreal Plugin Dependencies:
  - [Kinect4Unreal](http://www.opaque.media/kinect-4-unreal/) for using the Microsoft Kinect v2
  - [OptiTrack](http://optitrack.com/downloads/plugins.html) for using with an OptiTrack motion capture system
  - VR systems are also supported through UE4 native support VR support (e.g. Oculus Rift w. Touch, HTC Vive, SteamVR, etc.)
+ - [Leap Motion](https://developer.leapmotion.com/unreal) for Leap Motion optical hand tracking
+ - [Perception Neuron](https://neuronmocap.com/content/unreal-plugin) for Perception Neuron inertial hand and body tracking
  
 In the future, each of the above dependencies will be optional.
 
@@ -37,6 +39,24 @@ In the future, each of the above dependencies will be optional.
 5. Open Spooky.uproject in the same version of UE4 Editor that you are using for your project. It will prompt you to build - accept and wait for it to build. 
 	- If building fails, then try opening Spooky.sln in Microsoft Visual Studio 2015 and build manually with Ctrl+Shift+B. Then reopen Spooky.project.
 	- If you get the error "ERROR: Couldn't find module rules file for module 'Kinect4Unreal'.", copy the directory (including contents) Plugins/Kinect4Unreal/Source in this repo to the Plugins/Kinect4Unreal directory where you installed Kinect4Unreal.
+after about a minute.
+> The project should open to Content/Spooky/Maps/LeapVRTest.umap.
+> This map combines the Leap Motion with VR headset tracking and the Spooky Skeleton model to estimate the body pose of the user and represent it with the UE4 Mannequin avatar.
+> Click the dropdown menu next to the play button and select VR preview.
+> When the Leap Motion sensor is attached to the head, you should be able to see your hands and interact with the ball and cube with a pinch gesture.
+6. To use with your own project:
+    * Copy Plugins/Spooky to either your \<ProjectName\>/Plugins folder or Engine/Plugins folder. Go to the Plugins settings and enable Spooky. Restart the editor when prompted.
+    * Merge the Content folder with your \<ProjectName\>/Content folder
+
+## Spooky Soccer
+To try the Spooky Soccer demo in the video at the top of this Readme, you have to use an old version of Spooky. This is because I haven't had time to make kinect code compatible with the new fusion code (tested only on Leap Motion and Perception Neuron). Furthermore, downloading the release itself ([Spooky Soccer Release](https://github.com/JakeFountain/Spooky/releases/tag/spookysoccer_v1.0)) will not work since Github releases don't support git-lfs. To use SpookySoccer:
+	
+1. Clone the Spooky repo and checkout the branch **SpookySoccer**
+	
+	$ git checkout branch SpookySoccer
+	
+2. Follow the instructions in the How to Use section.
+3. Playing Spooky Soccer:
 > The project should open to Content/Spooky/Maps/SpookySoccer.umap.
 > Ensure SteamVR or Oculus clients are running and the Kinect v2 is connected, then click the dropdown next to the play button and select VR preview.
 > Face the Kinect v2 and hold the VR controllers in the correct hands (check thumb polarity). 
@@ -45,24 +65,20 @@ In the future, each of the above dependencies will be optional.
 > Spawn more balls by clicking the touchpad or thumbstick.
 > Spooky saves the latest config in \<ProjectName\>/Saved/System1_System2.spky by default, in a human readable format. 
 > This location can be changed in the VRGraveyard blueprint at the SpookyFusionPlant->SetSaveDirectory() function call.
-> Spooky will automatically detect changes in the position of the Kinect v2 or in the VR tracking space and recalibration will occur after about a minute.
-6. To use with your own project:
-    * Copy Plugins/Spooky to either your \<ProjectName\>/Plugins folder or Engine/Plugins folder. Go to the Plugins settings and enable Spooky. Restart the editor when prompted.
-    * Merge the Content folder with your \<ProjectName\>/Content folder
-
+> Spooky will automatically detect changes in the position of the Kinect v2 or in the VR tracking space and recalibration will occur 
 ## Spooky Blueprint Structure
 
 Terms and definitions:
 
 #### Spooky Fusion Plant
 Main class for interacting with Spooky.
-#### Spirit
+#### Spooky Spirit
 A blueprint which sends data from a tracking device to a Spooky Fusion Plant.
-#### Skeleton 
+#### Spooky Skeleton 
 A blueprint class which serves as the output of the Spooky Fusion Plant.
-#### Graveyard 
+#### Spooky Graveyard 
 A blueprint which links together multiple spirits and a single skeleton to configure the sensor fusion process.
-#### Toys
+#### Spooky Toys
 Extra UE4 assets designed for demonstrating Spooky.
 
 

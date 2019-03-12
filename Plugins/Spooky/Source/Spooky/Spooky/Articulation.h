@@ -48,8 +48,8 @@ namespace spooky{
 
 		//Get the transform associated with this articulation
 		template <typename Scalar>
-		Eigen::Transform<Scalar, 3, Eigen::Affine> Articulation::getTransform(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& theta) {
-
+		Eigen::Transform<Scalar, 3, Eigen::Affine> getTransform(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& theta) const{
+			//Theta can include velocity in the second half, so get transform references only from head
 			//TODO: make these cases into methods
 			Eigen::Transform<Scalar, 3, Eigen::Affine> T = Eigen::Transform<Scalar, 3, Eigen::Affine>::Identity();
 			Eigen::Matrix<Scalar, 3, 3> R = Eigen::Matrix<Scalar, 3, 3>::Identity();
@@ -79,7 +79,7 @@ namespace spooky{
 			case(BONE):
 			{
 				//Theta is an axis-angle
-				Eigen::Matrix<Scalar, 3, 1> rw = theta;
+				Eigen::Matrix<Scalar, 3, 1> rw = theta.head(3);
 				T.translate(v.cast<Scalar>());
 				T.matrix().topLeftCorner(3, 3) = utility::rodriguezFormula(rw);
 				break;
@@ -88,7 +88,7 @@ namespace spooky{
 			{
 				//Theta is an axis-angle
 				Eigen::Matrix<Scalar, 3, 1> rw = theta.head(3);
-				Eigen::Matrix<Scalar, 3, 1> pos = theta.tail(3);
+				Eigen::Matrix<Scalar, 3, 1> pos = theta.segment<3>(3);
 				T.translate(pos);
 				T.rotate(Sophus::SO3<Scalar>::exp(rw).matrix());
 				break;
@@ -113,9 +113,9 @@ namespace spooky{
 		static Articulation createScale();
 
 		//Get rotational and translational degrees of freedom
-		int getPDoF(bool hasLeverChild);
-		int getRDoF();
-		int getSDoF();
+		int getPDoF(bool hasLeverChild) const;
+		int getRDoF() const;
+		int getSDoF() const;
 
 		//Get pose variance
 		//Eigen::Matrix<float, 6, 6> getPoseVariance(const Eigen::VectorXf& expectation, const Eigen::MatrixXf& variance);
@@ -125,6 +125,9 @@ namespace spooky{
 
 		//Returns the initial state vector to operate this articulation
 		static Eigen::VectorXf getInitialState(const Articulation::Type & type);
+
+		//Get predicted state
+		Eigen::VectorXf getPredictedExpectation(const Eigen::VectorXf& state, const float& t) const;
 
 		//Accessors
 		const Type& getType() const{

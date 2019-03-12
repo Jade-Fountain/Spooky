@@ -1,0 +1,208 @@
+Table: Case Processing Summary
+,Cases,,,,,
+,Valid,,Missing,,Total,
+,N,Percent,N,Percent,N,Percent
+Mistake_Improvement_Leap_Keyboard,19,100%,0,0%,19,100%
+Mistake_Improvement_Neuron_Keyboard,19,100%,0,0%,19,100%
+Mistake_Improvement_Leap_Sorting,19,100%,0,0%,19,100%
+Mistake_Improvement_Neuron_Sorting,19,100%,0,0%,19,100%
+Mistake_Improvement_Leap_Throwing,19,100%,0,0%,19,100%
+Mistake_Improvement_Neuron_Throwing,19,100%,0,0%,19,100%
+
+Table: Descriptives
+,,,Statistic,Std. Error
+Mistake_Improvement_Leap_Keyboard,Mean,,-5.05,1.61
+,95% Confidence Interval for Mean,Lower Bound,-8.43,
+,,Upper Bound,-1.68,
+,5% Trimmed Mean,,-5.00,
+,Median,,-5.00,
+,Variance,,49.05,
+,Std. Deviation,,7.00,
+,Minimum,,-19.00,
+,Maximum,,8.00,
+,Range,,27.00,
+,Interquartile Range,,7.00,
+,Skewness,,-.33,.52
+,Kurtosis,,.21,1.01
+Mistake_Improvement_Neuron_Keyboard,Mean,,-3.84,2.43
+,95% Confidence Interval for Mean,Lower Bound,-8.95,
+,,Upper Bound,1.27,
+,5% Trimmed Mean,,-4.55,
+,Median,,-3.00,
+,Variance,,112.36,
+,Std. Deviation,,10.60,
+,Minimum,,-21.00,
+,Maximum,,26.00,
+,Range,,47.00,
+,Interquartile Range,,10.00,
+,Skewness,,1.15,.52
+,Kurtosis,,2.66,1.01
+Mistake_Improvement_Leap_Sorting,Mean,,2.42,.60
+,95% Confidence Interval for Mean,Lower Bound,1.16,
+,,Upper Bound,3.68,
+,5% Trimmed Mean,,2.41,
+,Median,,3.00,
+,Variance,,6.81,
+,Std. Deviation,,2.61,
+,Minimum,,-2.00,
+,Maximum,,7.00,
+,Range,,9.00,
+,Interquartile Range,,4.00,
+,Skewness,,-.37,.52
+,Kurtosis,,-.37,1.01
+Mistake_Improvement_Neuron_Sorting,Mean,,-1.42,.34
+,95% Confidence Interval for Mean,Lower Bound,-2.13,
+,,Upper Bound,-.71,
+,5% Trimmed Mean,,-1.30,
+,Median,,-1.00,
+,Variance,,2.15,
+,Std. Deviation,,1.46,
+,Minimum,,-5.00,
+,Maximum,,.00,
+,Range,,5.00,
+,Interquartile Range,,2.00,
+,Skewness,,-1.06,.52
+,Kurtosis,,.57,1.01
+Mistake_Improvement_Leap_Throwing,Mean,,2.42,1.47
+,95% Confidence Interval for Mean,Lower Bound,-.67,
+,,Upper Bound,5.51,
+,5% Trimmed Mean,,2.41,
+,Median,,2.00,
+,Variance,,41.15,
+,Std. Deviation,,6.41,
+,Minimum,,-10.00,
+,Maximum,,15.00,
+,Range,,25.00,
+,Interquartile Range,,9.00,
+,Skewness,,.32,.52
+,Kurtosis,,-.05,1.01
+Mistake_Improvement_Neuron_Throwing,Mean,,.37,1.31
+,95% Confidence Interval for Mean,Lower Bound,-2.39,
+,,Upper Bound,3.12,
+,5% Trimmed Mean,,.19,
+,Median,,1.00,
+,Variance,,32.69,
+,Std. Deviation,,5.72,
+,Minimum,,-11.00,
+,Maximum,,15.00,
+,Range,,26.00,
+,Interquartile Range,,6.00,
+,Skewness,,.53,.52
+,Kurtosis,,1.62,1.01
+
+Table: Ranks
+,,N,Mean Rank,Sum of Ranks
+Mistake_Leap_Keyboard - Mistake_Fused_Keyboard,Negative Ranks,15,9.70,145.50
+,Positive Ranks,3,8.50,25.50
+,Ties,1,,
+,Total,19,,
+Mistake_Neuron_Keyboard - Mistake_Fused_Keyboard,Negative Ranks,14,8.50,119.00
+,Positive Ranks,3,11.33,34.00
+,Ties,2,,
+,Total,19,,
+Mistake_Leap_Sorting - Mistake_Fused_Sorting,Negative Ranks,3,3.00,9.00
+,Positive Ranks,14,10.29,144.00
+,Ties,2,,
+,Total,19,,
+Mistake_Neuron_Sorting - Mistake_Fused_Sorting,Negative Ranks,13,7.00,91.00
+,Positive Ranks,0,NaN,.00
+,Ties,6,,
+,Total,19,,
+Mistake_Leap_Throwing - Mistake_Fused_Throwing,Negative Ranks,7,6.21,43.50
+,Positive Ranks,10,10.95,109.50
+,Ties,2,,
+,Total,19,,
+Mistake_Neuron_Throwing - Mistake_Fused_Throwing,Negative Ranks,8,10.44,83.50
+,Positive Ranks,10,8.75,87.50
+,Ties,1,,
+,Total,19,,
+
+Table: Test Statistics
+,Mistake_Leap_Keyboard - Mistake_Fused_Keyboard,Mistake_Neuron_Keyboard - Mistake_Fused_Keyboard,Mistake_Leap_Sorting - Mistake_Fused_Sorting,Mistake_Neuron_Sorting - Mistake_Fused_Sorting,Mistake_Leap_Throwing - Mistake_Fused_Throwing,Mistake_Neuron_Throwing - Mistake_Fused_Throwing
+Z,-2.62,-2.01,-3.23,-3.22,-1.56,-.09
+Asymp. Sig. (2-tailed),.009,.044,.001,.001,.118,.930
+
+Table: Paired Sample Statistics
+,,Mean,N,Std. Deviation,S.E. Mean
+Pair 1,Mistake_Neuron_Throwing,14.21,19,5.03,1.15
+,Mistake_Fused_Throwing,13.84,19,3.47,.80
+
+Table: Paired Samples Correlations
+,,N,Correlation,Sig.
+Pair 1,Mistake_Neuron_Throwing & Mistake_Fused_Throwing,19,.13,.588
+
+Table: Paired Samples Test
+,,Paired Differences,,,,,,,
+,,,,,95% Confidence Interval of the Difference,,,,
+,,Mean,Std. Deviation,Std. Error Mean,Lower,Upper,t,df,Sig. (2-tailed)
+Pair 1,Mistake_Neuron_Throwing - Mistake_Fused_Throwing,.37,5.72,1.31,-2.39,3.12,.28,18,.782
+
+.206-226: error: T-TEST: Variable Mistake_Fused_Keyboard appears twice in variable list.
+
+.250-271: error: T-TEST: Variable Mistake_Fused_Sorting appears twice in variable list.
+
+.296: error: T-TEST: Variable Mistake_Fused_Throwing appears twice in variable list.
+
+.9: error: T-TEST: PAIRED was specified but the number of variables preceding WITH (6) did not match the number following (3).
+
+.206-226: error: T-TEST: Variable Mistake_Fused_Keyboard appears twice in variable list.
+
+.250-271: error: T-TEST: Variable Mistake_Fused_Sorting appears twice in variable list.
+
+.296: error: T-TEST: Variable Mistake_Fused_Throwing appears twice in variable list.
+
+.9: error: T-TEST: PAIRED was specified but the number of variables preceding WITH (6) did not match the number following (3).
+
+.206-226: error: T-TEST: Variable Mistake_Fused_Keyboard appears twice in variable list.
+
+.250-271: error: T-TEST: Variable Mistake_Fused_Sorting appears twice in variable list.
+
+.296: error: T-TEST: Variable Mistake_Fused_Throwing appears twice in variable list.
+
+.9: error: T-TEST: PAIRED was specified but the number of variables preceding WITH (6) did not match the number following (3).
+
+Table: Paired Sample Statistics
+,,Mean,N,Std. Deviation,S.E. Mean
+Pair 1,Mistake_Leap_Keyboard,8.21,19,5.00,1.15
+,Mistake_Fused_Keyboard,13.26,19,6.81,1.56
+Pair 2,Mistake_Leap_Sorting,6.05,19,2.37,.54
+,Mistake_Fused_Sorting,3.63,19,1.38,.32
+Pair 3,Mistake_Leap_Throwing,16.26,19,5.38,1.24
+,Mistake_Fused_Throwing,13.84,19,3.47,.80
+
+Table: Paired Samples Correlations
+,,N,Correlation,Sig.
+Pair 1,Mistake_Leap_Keyboard & Mistake_Fused_Keyboard,19,.33,.172
+Pair 2,Mistake_Leap_Sorting & Mistake_Fused_Sorting,19,.11,.660
+Pair 3,Mistake_Leap_Throwing & Mistake_Fused_Throwing,19,.00,.988
+
+Table: Paired Samples Test
+,,Paired Differences,,,,,,,
+,,,,,95% Confidence Interval of the Difference,,,,
+,,Mean,Std. Deviation,Std. Error Mean,Lower,Upper,t,df,Sig. (2-tailed)
+Pair 1,Mistake_Leap_Keyboard - Mistake_Fused_Keyboard,-5.05,7.00,1.61,-8.43,-1.68,-3.14,18,.006
+Pair 2,Mistake_Leap_Sorting - Mistake_Fused_Sorting,2.42,2.61,.60,1.16,3.68,4.04,18,.001
+Pair 3,Mistake_Leap_Throwing - Mistake_Fused_Throwing,2.42,6.41,1.47,-.67,5.51,1.65,18,.117
+
+Table: Paired Sample Statistics
+,,Mean,N,Std. Deviation,S.E. Mean
+Pair 1,Mistake_Neuron_Keyboard,9.42,19,8.71,2.00
+,Mistake_Fused_Keyboard,13.26,19,6.81,1.56
+Pair 2,Mistake_Neuron_Sorting,2.21,19,.54,.12
+,Mistake_Fused_Sorting,3.63,19,1.38,.32
+Pair 3,Mistake_Neuron_Throwing,14.21,19,5.03,1.15
+,Mistake_Fused_Throwing,13.84,19,3.47,.80
+
+Table: Paired Samples Correlations
+,,N,Correlation,Sig.
+Pair 1,Mistake_Neuron_Keyboard & Mistake_Fused_Keyboard,19,.08,.735
+Pair 2,Mistake_Neuron_Sorting & Mistake_Fused_Sorting,19,.04,.885
+Pair 3,Mistake_Neuron_Throwing & Mistake_Fused_Throwing,19,.13,.588
+
+Table: Paired Samples Test
+,,Paired Differences,,,,,,,
+,,,,,95% Confidence Interval of the Difference,,,,
+,,Mean,Std. Deviation,Std. Error Mean,Lower,Upper,t,df,Sig. (2-tailed)
+Pair 1,Mistake_Neuron_Keyboard - Mistake_Fused_Keyboard,-3.84,10.60,2.43,-8.95,1.27,-1.58,18,.132
+Pair 2,Mistake_Neuron_Sorting - Mistake_Fused_Sorting,-1.42,1.46,.34,-2.13,-.71,-4.23,18,.001
+Pair 3,Mistake_Neuron_Throwing - Mistake_Fused_Throwing,.37,5.72,1.31,-2.39,3.12,.28,18,.782

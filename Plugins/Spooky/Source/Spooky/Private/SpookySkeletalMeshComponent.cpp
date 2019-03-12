@@ -19,37 +19,57 @@ limitations under the License.
 #include "Spooky.h"
 #include "Logging.h"
 #include "SpookySkeletalMeshComponent.h"
+#include "SpookyFusionPlant.h"
+#include "Classes/Kismet/KismetMathLibrary.h"
 
 USpookySkeletalMeshComponent::USpookySkeletalMeshComponent(class FObjectInitializer const &)
 {
 }
 
 
+void USpookySkeletalMeshComponent::SetSystemInfo(const FString& systemName, const FString& rootNode, const FTransform& rootNodeOffset){
+	system_name = systemName;
+	root_node = rootNode;
+	root_node_offset = rootNodeOffset;
+	setup = true;
+}
 
-void USpookySkeletalMeshComponent::SetDefaultBoneInfo(const FSpookySkeletonBoneInfo& info){
-	defaultBoneInfo = std::make_unique<FSpookySkeletonBoneInfo>(info);
+void USpookySkeletalMeshComponent::SetDefaultBoneOutputParams(const FSpookySkeletonBoneOutputParams& info){
+	defaultBoneOutputParams = std::make_unique<FSpookySkeletonBoneOutputParams>(info);
+}
+
+void USpookySkeletalMeshComponent::SetDefaultBoneInputParams(const FSpookyBoneInputParams& params){
+	defaultBoneInputParams = std::make_unique<FSpookyBoneInputParams>(params);
 }
 
 
-void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, ESpookyReturnStatus& branch){
-	bool bones_exist = true;
-	if(!defaultBoneInfo){
+void USpookySkeletalMeshComponent::AddOutputBones(const TArray<FName>& bones, const TArray<FName>& boneTargetNodes, const TArray<FRotator>& boneRetargetRotators, ESpookyReturnStatus& branch){
+	if(!defaultBoneOutputParams){
 		branch = ESpookyReturnStatus::Failure;
 		SPOOKY_LOG("ERROR: NO DEFAULT BONE INFO SET SO CANNOT ADD ACTIVE BONES");
 		return;	
 	}
 	std::vector<FName> missingBones;
 	for(int i = 0; i < bones.Num(); i++){
-		bool thisBoneExists = this->SkeletalMesh->RefSkeleton.FindBoneIndex(bones[i]) != INDEX_NONE;
-		if (thisBoneExists) {
-			activeBones[bones[i]] = *defaultBoneInfo;
+		int id = this->SkeletalMesh->RefSkeleton.FindBoneIndex(bones[i]);
+		if (id != INDEX_NONE) {
+			outputBones[bones[i]] = *defaultBoneOutputParams;
+			outputBones[bones[i]].id = id;
+			if (i < boneTargetNodes.Num() && boneTargetNodes[i].Compare("") != 0) {
+				targetNodes[bones[i]] = spooky::NodeDescriptor(TCHAR_TO_UTF8(*(boneTargetNodes[i].ToString())));
+			}
+			if (i < boneRetargetRotators.Num()) {
+				retargetRotators[bones[i]] = boneRetargetRotators[i];
+			}
+			if (outputBones[bones[i]].flags.accumulateOffsets) {
+				outputOffsets[bones[i]] = spooky::Transform3D::Identity();
+			}
 		}
 		else {
 			missingBones.push_back(bones[i]);
-			bones_exist = false;
 		}
 	}
-	if (!bones_exist) {
+	if (missingBones.size() > 0) {
 		branch = ESpookyReturnStatus::Failure;
 		SPOOKY_LOG("ERROR: THE FOLLOWING REQUESTED ACTIVE BONES DO NOT EXIST: ");
 		for (auto& b : missingBones) {
@@ -61,30 +81,227 @@ void USpookySkeletalMeshComponent::AddActiveBones(const TArray<FName>& bones, ES
 	}
 }
 
-void USpookySkeletalMeshComponent::SetBoneInfo(const FSpookySkeletonBoneInfo& info, ESpookyReturnStatus& branch){
-	if(activeBones.count(info.name) == 0){
+void USpookySkeletalMeshComponent::AddInputBones(const TArray<FName>& bones, ESpookyReturnStatus& branch){
+	if(!defaultBoneInputParams){
+		branch = ESpookyReturnStatus::Failure;
+		SPOOKY_LOG("ERROR: NO DEFAULT BONE INFO SET SO CANNOT ADD ACTIVE BONES");
+		return;	
+	}
+	std::vector<FName> missingBones;
+	for(int i = 0; i < bones.Num(); i++){
+		bool thisBoneExists = this->SkeletalMesh->RefSkeleton.FindBoneIndex(bones[i]) != INDEX_NONE;
+		if (thisBoneExists) {
+			inputBones[bones[i]] = *defaultBoneInputParams;
+		}
+		else {
+			missingBones.push_back(bones[i]);
+		}
+	}
+	if (missingBones.size() > 0) {
+		branch = ESpookyReturnStatus::Failure;
+		SPOOKY_LOG("ERROR: THE FOLLOWING REQUESTED ACTIVE BONES DO NOT EXIST: ");
+		for (auto& b : missingBones) {
+			SPOOKY_LOG(TCHAR_TO_UTF8(*(b.ToString())));
+		}
+	}
+	else {
+		branch = ESpookyReturnStatus::Success;
+	}
+}
+
+
+void USpookySkeletalMeshComponent::SetBoneOutputParams(const FSpookySkeletonBoneOutputParams& info, ESpookyReturnStatus& branch){
+	int id = this->SkeletalMesh->RefSkeleton.FindBoneIndex(info.name);
+	if(outputBones.count(info.name) == 0 || id == INDEX_NONE){
 		branch = ESpookyReturnStatus::Failure;
 	} else {
 		branch = ESpookyReturnStatus::Success;
-		activeBones[info.name] = info;
+		auto info_ = info;
+		info_.id = id;
+		outputBones[info.name] = info_;
+		if (outputBones[info.name].flags.accumulateOffsets) {
+			outputOffsets[info.name] = spooky::Transform3D::Identity();
+		}
+	}
+}
+
+void USpookySkeletalMeshComponent::SetMultiBoneOutputParams(const TArray<FName>& bones, const FSpookySkeletonBoneOutputParams& info, ESpookyReturnStatus& branch) {
+	FSpookySkeletonBoneOutputParams infodummy = info;
+	bool allSuccess = true;
+	for (int i = 0; i < bones.Num(); i++) {
+		infodummy.name = bones[i];
+		ESpookyReturnStatus success;
+		SetBoneOutputParams(infodummy, success);
+		allSuccess = allSuccess && success == ESpookyReturnStatus::Success;
+	}
+	branch = allSuccess ? ESpookyReturnStatus::Success : ESpookyReturnStatus::Failure;
+}
+
+void USpookySkeletalMeshComponent::SetBoneInputParams(const FSpookyBoneInputParams& info, ESpookyReturnStatus& branch){
+	if(inputBones.count(info.name) == 0){
+		branch = ESpookyReturnStatus::Failure;
+	} else {
+		branch = ESpookyReturnStatus::Success;
+		inputBones[info.name] = info;
 	}
 }
 
 
 
 void USpookySkeletalMeshComponent::UpdateTimestamp(const FName& bone,const float& t_sec){
-	activeBones[bone].timestamp_sec = t_sec;
+	if(!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
+	outputBones[bone].timestamp_sec = t_sec;
 }
 
 
 void USpookySkeletalMeshComponent::UpdateAllTimestamps(const float& t_sec){
-	for(auto& bone : activeBones){
+	if(!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
+	for(auto& bone : outputBones){
 		bone.second.timestamp_sec = t_sec;
 	}
 }
 
 
-void USpookySkeletalMeshComponent::UpdateConfidence(const FName& bone,const float& confidence){
-	activeBones[bone].confidence = confidence;
+void USpookySkeletalMeshComponent::UpdateOutputConfidence(const FName& bone,const float& confidence){
+	if(!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
+	outputBones[bone].confidence = confidence;
 }
+//TODO: have bone not found checks here
+void USpookySkeletalMeshComponent::UpdateOutputVariances(const FName& bone, const FVector& position_var, const FVector4& quaternion_var, const FVector& scale_var) {
+	if (!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
+	outputBones[bone].position_var = position_var;
+	outputBones[bone].quaternion_var = quaternion_var;
+	outputBones[bone].scale_var = scale_var;
+}
+
+void USpookySkeletalMeshComponent::SetAllFlags(const FSpookyMeasurementFlags& flags) {
+	if (!setup) throw "SpookySkeletalMeshComponent - not set up!!!!!!!!!!!";
+	for (auto& bone : outputBones) {
+		bone.second.flags = flags;
+	}
+}
+
+void USpookySkeletalMeshComponent::AccumulateOffsets(spooky::ArticulatedModel& skeleton, const float& t) {
+	TArray<FTransform> componentSpaceTransforms = GetComponentSpaceTransforms();
+	for (auto& bone : outputBones) {
+		if (bone.second.flags.accumulateOffsets) {
+			spooky::NodeDescriptor boneDesc = targetNodes.count(bone.first) == 0 ? 
+				spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.first.ToString()))):
+				targetNodes[bone.first];
+			float conf = skeleton.getNodeNonOffsetConfidence(boneDesc, t);
+			//Dont correct for offset
+			if (conf < bone.second.offsetConfidenceThreshold) continue;
+			//T, true state of bone
+			spooky::Transform3D currentPose = bone.second.flags.globalSpace ?
+				skeleton.getNodeGlobalPose(boneDesc):
+				skeleton.getNodeLocalPose(boneDesc);
+			//S, sensed pose
+			spooky::Transform3D sensedPose = USpookyFusionPlant::convert(
+				bone.second.flags.globalSpace ?
+				componentSpaceTransforms[bone.second.id].ToMatrixWithScale() :
+				BoneSpaceTransforms[bone.second.id].ToMatrixWithScale()
+			);
+			//new offset based on difference
+			spooky::Transform3D newOffset;
+			if (bone.second.flags.globalSpace) {
+				bool success = false;
+				FRotator retargetRinv = getOutputRetargetRotator(bone.first, &success).GetInverse();
+				FTransform retargetTinv;
+				retargetTinv.SetRotation(retargetRinv.Quaternion());
+				newOffset = USpookyFusionPlant::convert(retargetTinv.ToMatrixWithScale()) * sensedPose.inverse() * currentPose;
+			}
+			else {
+				throw std::runtime_error("SpookySkeletalMeshComponent - local space offset accumulation not yet supported");
+			}
+			outputOffsets[bone.first] = spooky::utility::slerpTransform3D(outputOffsets[bone.first], newOffset, bone.second.offsetLearningRate * conf);
+		}
+	}
+}
+
+
+spooky::NodeDescriptor USpookySkeletalMeshComponent::getOutputTargetNode(const FName& bone) {
+	if (targetNodes.count(bone) > 0) {
+		return targetNodes[bone];
+	}
+	else {
+		return spooky::NodeDescriptor(TCHAR_TO_UTF8(*(bone.ToString())));
+	}
+}
+
+FRotator USpookySkeletalMeshComponent::getOutputRetargetRotator(const FName& bone, bool* found) {
+	if (retargetRotators.count(bone) > 0) {
+		*found = true;
+		return retargetRotators[bone];
+	}
+	else {
+		*found = false;
+		return FRotator(0,0,0);
+	}
+}
+
+
+ESpookyFusionType USpookySkeletalMeshComponent::GetBoneInputFusionType(const FName& bone){
+	if(inputBones.count(bone) == 0){
+		return ESpookyFusionType::FIXED;
+	} else {
+		return inputBones[bone].fusion_type;
+	}
+}
+
+Eigen::VectorXf USpookySkeletalMeshComponent::GetInputConstraintCentre(const FName& bone){
+	if(inputBones.count(bone) == 0){
+		//TODO: make this nicer
+		throw ("Bone " + bone.ToString() + " doesn't exist! - tried to access fusion parameters!");
+	} else {
+		TArray<float> v_ = inputBones[bone].constraint_centre;
+		Eigen::VectorXf v(v_.Num());
+		for (int i = 0; i < v_.Num(); i++) {
+			v[i] = v_[i];
+		}
+		return v;
+	}
+
+}
+
+Eigen::MatrixXf USpookySkeletalMeshComponent::GetInputConstraintVariance(const FName& bone){
+	if(inputBones.count(bone) == 0){
+		throw ("Bone " + bone.ToString() + " doesn't exist! - tried to access fusion parameters!");
+	} else {
+		TArray<float> v_ = inputBones[bone].constraint_var;
+		Eigen::VectorXf v(v_.Num());
+		for (int i = 0; i < v_.Num(); i++) {
+			v[i] = v_[i];
+		}
+		return v.asDiagonal(); 
+	}
+}
+
+Eigen::MatrixXf USpookySkeletalMeshComponent::GetInputProcessNoise(const FName& bone){
+	if(inputBones.count(bone) == 0){
+		throw ("Bone " + bone.ToString() + " doesn't exist! - tried to access fusion parameters!");
+	} else {		
+		TArray<float> v_ = inputBones[bone].process_noise;
+		Eigen::VectorXf v(v_.Num());
+		for (int i = 0; i < v_.Num(); i++) {
+			v[i] = v_[i];
+		}
+		return v.asDiagonal(); 
+	}
+}
+
+bool USpookySkeletalMeshComponent::DoesBoneInputModelVelocity(const FName& bone){
+	if(inputBones.count(bone) == 0){
+		throw ("Bone " + bone.ToString() + " doesn't exist! - tried to access fusion parameters!");
+	} else {		
+		return inputBones[bone].model_velocity;
+	}
+}
+FTransform USpookySkeletalMeshComponent::GetAccumulatedOffset(const FName& bone) {
+	if (outputOffsets.count(bone) == 0) {
+		outputOffsets[bone] = spooky::Transform3D::Identity();
+	}
+	return USpookyFusionPlant::convert(outputOffsets[bone]);
+	
+}
+
 

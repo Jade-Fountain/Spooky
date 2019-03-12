@@ -124,7 +124,7 @@ namespace spooky{
 		return result;
 	}
 
-	int Articulation::getPDoF(bool hasLeverChild){
+	int Articulation::getPDoF(bool hasLeverChild) const {
 		  switch (type) {
             case(FIXED):
             	return 0;
@@ -144,7 +144,7 @@ namespace spooky{
 		}
 		return 0;
 	}
-	int Articulation::getRDoF(){
+	int Articulation::getRDoF() const {
 		if(type == SCALE || type == FIXED){
 			return 0;
 		}
@@ -157,7 +157,7 @@ namespace spooky{
 			return 3;
 		}
 	}
-	int Articulation::getSDoF(){
+	int Articulation::getSDoF() const {
 		if(type == SCALE){
 			return 3;
 		} else {
@@ -248,4 +248,49 @@ namespace spooky{
         }
 		return Eigen::VectorXf::Zero(1);
     }
+
+	Eigen::VectorXf Articulation::getPredictedExpectation(const Eigen::VectorXf& state, const float& t) const {
+		Eigen::VectorXf new_state = state;
+		switch (type) {
+			case(AXIAL):
+			case(TWIST):
+			{
+				if (state.size() == 2) {
+					new_state[0] += new_state[1] * t;
+				}
+				//Single angle per articulation
+			}
+			break;
+			case(BONE):
+			{
+				//quaternion representation
+				if(state.size() == 6) {
+					//exp(w') = exp(w)exp(dw_dt *t)
+					new_state.head(3) = utility::composeTwists(state.tail(3) * t, state.head(3));
+				}
+			}
+			break;
+			case(POSE):
+			{
+				if (state.size() == 12) {
+					//exp(w') = exp(w)exp(dw_dt *t)
+					new_state.head(3) = utility::composeTwists(state.tail(3) * t, state.head(3));
+					new_state.segment(6, 3) += new_state.segment(9, 3) * t;
+				}
+				//pos_quat representation
+			}
+			break;
+			case(SCALE):
+			{
+				if (state.size() == 6) {
+					new_state.head(3) += new_state.tail(3) * t;
+				}
+			}
+			break;
+		}
+		return new_state;
+
+	}
+
+
 }

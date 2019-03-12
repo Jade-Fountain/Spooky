@@ -321,11 +321,14 @@ namespace FusionTesting
 			spooky::Core core;
 			spooky::Transform3D bonePose = spooky::Transform3D::Identity();
 			bonePose.translate(Eigen::Vector3f(1, 0, 0));
-			Eigen::Matrix3f c_var = Eigen::Matrix3f::Identity();
-			Eigen::Vector3f c_centre = Eigen::Vector3f::Zero();
-			core.addBoneNode(spooky::NodeDescriptor("bone1"), spooky::NodeDescriptor(""), bonePose, c_centre, c_var, 0.1);
-			core.addBoneNode(spooky::NodeDescriptor("bone2"), spooky::NodeDescriptor("bone1"), bonePose, c_centre, c_var, 0.1);
-			core.addBoneNode(spooky::NodeDescriptor("bone3"), spooky::NodeDescriptor("bone2"), bonePose, c_centre, c_var, 0.1);
+			bool modelVelocity = true;
+			int dim = modelVelocity ? 6 : 3;
+			Eigen::MatrixXf c_var = Eigen::MatrixXf::Identity(dim, dim);
+			Eigen::MatrixXf process_noise = Eigen::MatrixXf::Identity(dim, dim) * 0.1;
+			Eigen::VectorXf c_centre = Eigen::VectorXf::Zero(dim);
+			core.addBoneNode(spooky::NodeDescriptor("bone1"), spooky::NodeDescriptor(""), bonePose, c_centre, c_var, process_noise,modelVelocity);
+			core.addBoneNode(spooky::NodeDescriptor("bone2"), spooky::NodeDescriptor("bone1"), bonePose, c_centre, c_var, process_noise, modelVelocity);
+			core.addBoneNode(spooky::NodeDescriptor("bone3"), spooky::NodeDescriptor("bone2"), bonePose, c_centre, c_var, process_noise, modelVelocity);
 			core.setReferenceSystem(spooky::NodeDescriptor("sys1"));
 			core.finaliseSetup();
 
@@ -489,6 +492,7 @@ namespace FusionTesting
 						ss2 << "w_new.norm = " << std::endl << w_new.norm() << std::endl;
 						ss2 << "w_t2 = " << std::endl << w_t2.transpose() << std::endl;
 						ss2 << "w_t2.norm = " << std::endl << w_t2.norm() << std::endl;
+						ss2 << "(w_new - w_t2).norm() = " << std::endl << (w_new - w_t2).norm() << std::endl;
 						ss2 << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
 					}
 					w_t1 = w_new;

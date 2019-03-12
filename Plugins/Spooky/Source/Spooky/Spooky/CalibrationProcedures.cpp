@@ -144,11 +144,6 @@ namespace spooky {
 			inverse_variances[i] = (m1[i]->getPositionVar() + m2[i]->getPositionVar()).inverse();
 		}
 
-		//Build chunked lists for later:
-		//Groups the measurement data by node
-		std::vector<std::vector<Eigen::Vector3f>> chunked_pos1;
-		std::vector<std::vector<Eigen::Vector3f>> chunked_pos2;
-		Measurement::chunkMeasurements<Eigen::Vector3f, &Measurement::getPosition>(m1,m2,&chunked_pos1,&chunked_pos2);
 
 		//Initialise current results
 		CalibrationResult result;
@@ -166,9 +161,20 @@ namespace spooky {
 		//Compute point cloud results
 		//result.transform = utility::calibration::Position::calibrateWeightedIdenticalPair(pos1, pos2, inverse_variances, &result.error);
 		result.transform = utility::calibration::Position::calibrateIdenticalPairTransform_Arun(pos1, pos2, &result.error);
+		result.quality = utility::qualityFromError(result.error, qualityScaleFactor);
+		result.relevance = Transform3D::Identity();
+		result.weight = m1.size();
 
+		//------------------------------------------------------------------
+		//TODO:clean this up:
 		//TODO: check if error is high enough and correct for rigid link
 		//TODO: This doesnt even help Arun is too good already
+		
+		//Build chunked lists for later:
+		//Groups the measurement data by node
+		// std::vector<std::vector<Eigen::Vector3f>> chunked_pos1;
+		// std::vector<std::vector<Eigen::Vector3f>> chunked_pos2;
+		// Measurement::chunkMeasurements<Eigen::Vector3f, &Measurement::getPosition>(m1,m2,&chunked_pos1,&chunked_pos2);
 
 		//Refine with rigid link model
 		//for (int i = 0; i < 1; i++) {
@@ -194,11 +200,7 @@ namespace spooky {
 		//	}
 		//	result.transform = utility::getMeanTransform(transforms, weights);
 
-		//	//TODO:clean up
-		//}
-		result.quality = utility::qualityFromError(result.error, qualityScaleFactor);
-		result.relevance = Transform3D::Identity();
-		result.weight = m1.size();
+		//------------------------------------------------------------------
 
 		SPOOKY_LOG("Performed calibration on new data. error: " + std::to_string(result.error) + ", quality = " + std::to_string(result.quality) + " result.weight = " + std::to_string(result.weight));
 
@@ -213,19 +215,25 @@ namespace spooky {
 		return updateCalibration(result, currentCalibration);
 	}
 
-	CalibrationResult Calibrator::cal6DoF(const std::vector<Measurement::Ptr>& m1, const std::vector<Measurement::Ptr>& m2, const CalibrationResult& currentCalibration)const
+	CalibrationResult Calibrator::cal6DoF(const std::vector<Measurement::Ptr>& m1, const std::vector<Measurement::Ptr>& m2, const CalibrationResult& currentCalibration, const bool& includePosition)const
 	{
 		float qualityScaleFactor = 1;
 
 		//Debug
 		std::stringstream ss;
-		ss << "cal6Dof[" << m1.front()->getSensor()->system.name << ", " << m2.front()->getSensor()->system.name << "], samples =[" << m1.size() << ", " << m2.size() << "]" << std::endl;
+		ss  << "cal6Dof" << (includePosition ? "(Pos+Rot)":"(Just Rotation)") << "[" << m1.front()->getSensor()->system.name << ", " << m2.front()->getSensor()->system.name 
+			<< "], samples =[" << m1.size() << ", " << m2.size() << "]" << std::endl;
 
 		//Chunk measurements based on node
 		std::vector<std::vector<Eigen::Matrix4f>> pos1;
 		std::vector<std::vector<Eigen::Matrix4f>> pos2;
 
-		Measurement::chunkMeasurements<Eigen::Matrix4f,&Measurement::getTransformMatrix>(m1,m2,&pos1,&pos2);
+		if (includePosition) {
+			Measurement::chunkMeasurements<Eigen::Matrix4f, &Measurement::getTransformMatrix>(m1, m2, &pos1, &pos2);
+		}
+		else {
+			Measurement::chunkMeasurements<Eigen::Matrix4f, &Measurement::getRotationTransformMatrix>(m1, m2, &pos1, &pos2);
+		}
 
 		//Initialise new result metadata
 		CalibrationResult result;
@@ -239,20 +247,20 @@ namespace spooky {
 			float error = 100;
 			// pos1[i][k] * X = Y * pos2[i][k] 
 			//Y:System2->System1
-			auto group_result = utility::calibration::Transform::twoSystems_Kronecker_Shah2013(pos1[i], pos2[i], &error);
+			auto group_result = utility::calibration::Transform::twoSystems_Kronecker_Shah2013(pos1[i], pos2[i], &error, includePosition);
+			if (group_result.first.matrix().hasNaN() || group_result.second.matrix().hasNaN()) continue;
 			transformsX.push_back(group_result.first);
 			transformsY.push_back(group_result.second);
 			weights.push_back(utility::qualityFromError(error, qualityScaleFactor));
 		}
 		//Compute mean transforms over each group
-		Transform3D transformX = utility::getMeanTransform(transformsX, weights);
 		Transform3D transformY = utility::getMeanTransform(transformsY, weights);
 		result.transform = transformY.inverse(); //Y':System1->System2
 
 		//Compute error
 		result.error = 0;
 		for (int i = 0; i < pos1.size(); i++) {
-			result.error += utility::calibration::Transform::getTwoSystemsError(transformX, transformY, pos1[i], pos2[i]);
+			result.error += utility::calibration::Transform::getTwoSystemsError(transformsX[i], transformY, pos1[i], pos2[i]);
 		}
 		result.error = result.error / pos1.size();
 
@@ -261,7 +269,6 @@ namespace spooky {
 		result.state = CalibrationResult::State::CALIBRATED;
 		result.weight = m1.size();
 		
-		ss << "Result: transformX = " << std::endl << transformX.matrix() << std::endl;
 		ss << "Result: transformY = " << std::endl << transformY.matrix() << std::endl;
 		ss << "Result: transform[" << result.systems.first.name << "->" << result.systems.second.name << "] = " << std::endl << result.transform.matrix() << std::endl;
 		ss << "Result: error[" << result.systems.first.name << "->" << result.systems.second.name << "] = " << std::endl << result.error << std::endl;

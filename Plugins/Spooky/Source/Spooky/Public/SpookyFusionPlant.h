@@ -57,6 +57,7 @@ class USpookyFusionPlant : public UActorComponent
 	//Input Skeletons
 	std::vector<USpookySkeletalMeshComponent*> skeletal_spirits;
 
+
 public:	
 
 	// Sets default values for this component's properties
@@ -83,9 +84,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
 	void AddSkeleton(USpookySkeletalMeshComponent* spooky_skeletal_mesh);
 
+	//Sets the name of the root node of a system
+	UFUNCTION(BlueprintCallable, Category = "Spooky")
+	void SetSystemRootNode(FString system, FString rootNode, const FTransform& rootNodeOffset);
+
 	//Set the output target which will have the complete fused skeleton pose applied
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddOutputTarget(USkeletalMeshComponent* skeletal_mesh, const TArray<FName>& fixedJoints, float default_constraint_flexibility = 1, float default_process_noise = 0.1);
+	void AddOutputTarget(USpookySkeletalMeshComponent * skeletal_mesh);
 	
 	//Perform some setup postprocessing
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
@@ -115,19 +120,19 @@ public:
 //===========================
 	//Add vec3 measurement
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddPositionMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, bool globalSpace = true, float confidence = 1);
+	void AddPositionMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance,  FSpookyMeasurementFlags flags, float confidence = 1);
 	
 	//Add rotation quaternion method
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddRotationMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FRotator measurement, FVector4 covariance, bool globalSpace = true, float confidence = 1);
+	void AddRotationMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FRotator measurement, FVector4 covariance,  FSpookyMeasurementFlags flags, float confidence = 1);
 
 	//Add transform measurement
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddPoseMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FTransform measurement, FVector position_var, FVector4 quaternion_var, bool globalSpace = true, float confidence = 1);
+	void AddPoseMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FTransform measurement, FVector position_var, FVector4 quaternion_var,  FSpookyMeasurementFlags flags, float confidence = 1);
 	
 	//Add scale measurement in local space
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
-	void AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance, float confidence = 1);
+	void AddScaleMeasurement(TArray<FString> nodeNames, FString systemName, int sensorID, float timestamp_sec, FVector measurement, FVector covariance,  FSpookyMeasurementFlags flags, float confidence = 1);
 
 	//Adds measurements for whole skeleton
 	UFUNCTION(BlueprintCallable, Category = "Spooky")
@@ -201,8 +206,15 @@ public:
 	std::vector<spooky::NodeDescriptor> convertToNodeDescriptors(const TArray<FString>& names);
 
 	//Convert Transform3D to FMatrix
-	FMatrix convert(const spooky::Transform3D& T);
-	spooky::Transform3D convert(const FMatrix& T);
+	static FTransform convert(const spooky::Transform3D& T);
+	static spooky::Transform3D convert(const FMatrix& T);
+
+	//Hashing for change checking
+	static size_t hashFTransform(const FTransform& T);
+
+	//Sets flags for measurement m
+	static void setFlags(spooky::Measurement::Ptr m, const FSpookyMeasurementFlags& flags);
+
 
 //===========================
 //DEBUG

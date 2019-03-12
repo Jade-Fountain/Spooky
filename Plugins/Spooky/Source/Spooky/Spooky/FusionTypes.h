@@ -62,10 +62,10 @@ namespace spooky {
 		std::string name;
 
 		//Overloaded operators check for valid system name and check equality
-		bool SystemDescriptor::operator==(const SystemDescriptor &other) const {
+		bool operator==(const SystemDescriptor &other) const {
 			return name.size() > 0 && other.name.size() > 0 && name.compare(other.name) == 0;  // Compare the values, and return a bool result.
 		}
-		bool SystemDescriptor::operator!=(const SystemDescriptor &other) const {
+		bool operator!=(const SystemDescriptor &other) const {
 			return !(*this == other);
 		}
 		//Comparators for maps
@@ -80,6 +80,8 @@ namespace spooky {
 	public:
 		NodeDescriptor(std::string n = "") :  SystemDescriptor(n){}
 	};
+
+	static const NodeDescriptor SPOOKY_WORLD_ROOT_DESC = "SPOOKY_WORLD_ROOT_DESC";
 
 	//Map key types
 	typedef std::pair<SystemDescriptor, SystemDescriptor> SystemPair;
@@ -223,9 +225,14 @@ namespace spooky {
 		//Typedef ptr to this class for neater code later
 		typedef std::shared_ptr<Sensor> Ptr;
 
+		//Root node from to which the sensor is attached
+		//Defaults to the first node in the model
+		NodeDescriptor rootNode = "";
+
 		//Accessors:
 		bool isResolved() { return utility::setDiff(nodes, eliminatedNodes).size() == 1; }
 		bool isAmbiguous() { return nodes.size() != 1; }
+		NodeDescriptor getRootNode(){return rootNode;}
 
 		//Returns a valid node only when there is only one possibility
 		NodeDescriptor getNode() {
@@ -309,6 +316,11 @@ namespace spooky {
 		//Timestamp (sec; from device)
 		//TODO: ensure double precision input
 		double timestamp = -1;
+
+		//Root node transform 
+		bool rootNodeTransformSet = false;
+		Transform3D rootNodeTransform;
+
 	public:
 
 		//Confidence in T in [0,1]
@@ -317,8 +329,23 @@ namespace spooky {
 		//Type of measurement
 		Type type;
 
+		//--------------------
+		//Postprocessing flags
+		//--------------------
 		//Is measurement in global or parent relative space
 		bool globalSpace = true;
+
+		//Should the skeletal constraints and prior be relaxed during multiple fusion steps?
+		bool relaxConstraints = false;
+
+		//Should we use velocity measurements if possible?
+		bool sensorDrifts = false;
+
+		//Does the sensor accumulate offset?
+		bool accumulateOffset = false;
+		//--------------------
+
+
 
 		//=========================
 		//			Methods
@@ -358,6 +385,11 @@ namespace spooky {
 
 		Transform3D getTransform();
 		Eigen::Matrix4f getTransformMatrix() { return getTransform().matrix(); }
+		Eigen::Matrix4f getRotationTransformMatrix() { 
+			auto M = getTransform().matrix(); 
+			M.col(3).head(3) = Eigen::Vector3f(0,0,0);
+			return M;
+		}
 
 
 		//=========================
@@ -468,6 +500,16 @@ namespace spooky {
 			return sensor->getLatency();
 		}
 
+		void setRootNodePose(const Transform3D& T){
+			rootNodeTransform = T;
+			rootNodeTransformSet = true;
+		}
+
+		Transform3D getRootNodePose(bool* valid){
+			*valid = rootNodeTransformSet;
+			return rootNodeTransform;
+		}
+
 		int getRequiredPDoF(){
 			switch(type){
 				case(Type::POSITION):
@@ -476,9 +518,9 @@ namespace spooky {
 					return data.size();
 				case(Type::RIGID_BODY):
 					return 3;
-				case(ROTATION):
+				case(Type::ROTATION):
 					return 0;
-				case(SCALE):
+				case(Type::SCALE):
 					return 0;
 			}
 			return 0;
@@ -491,9 +533,9 @@ namespace spooky {
 					return data.size();
 				case(Type::RIGID_BODY):
 					return 3;
-				case(ROTATION):
+				case(Type::ROTATION):
 					return 3;
-				case(SCALE):
+				case(Type::SCALE):
 					return 0;
 			}
 			return 0;
@@ -506,6 +548,21 @@ namespace spooky {
   				return 0;
 			}
 		}
+		bool calibrationCompatible(const Type& other_type) {
+			switch (type) {
+				case(Type::POSITION):
+					return other_type == Type::POSITION || other_type == Type::RIGID_BODY;
+				case(Type::GENERIC):
+					return false;
+				case(Type::RIGID_BODY):
+					return other_type == Type::ROTATION || other_type == Type::POSITION;
+				case(Type::ROTATION):
+					return other_type == Type::ROTATION || other_type == Type::RIGID_BODY;
+				case(Type::SCALE):
+					return false;
+			}
+			return false;
+		}
 	};
 
 	class MeasurementBuffer {
@@ -516,7 +573,6 @@ namespace spooky {
 		float expiry = 0.1; 
 		
 
-		//TODO: support multiple measurements per sensor OR add another sensor for hip scale... wait it already has its own sensor id. WTF
 		struct MeasurementsWithCounter {
 			Measurement::Ptr meas;
 			int count = 0;
@@ -630,4 +686,76 @@ namespace spooky {
 			return getSynchronizedMeasurements(t-maximum_latency);
 		}
 	};
+
+	//Simpler buffer class for generic data objects
+	template <class Data>
+	class DataBuffer {
+	private:
+		//Timestamped data
+		std::map<float,Data> buffer;
+		float expiry = 0.1;
+
+	public:
+		//How far back in time to store data
+		float time_width = 0;
+
+		void insert(const float& timestamp, const Data& d, const float& time_now){
+			if(time_now - timestamp <= time_width + expiry){
+				buffer[timestamp] = d;				
+			}
+		}
+		
+
+		Data get(const float& t, bool* valid){
+			//Binary search for closest values to the requested time t
+			//WARNING: cpp lower_bound(t) gets "container whose key is not considered to go before t" aka lower bound of set bounded by t
+			//I would call that the upper bound if you ask me (ub)
+			auto ub = buffer.lower_bound(t);
+			auto lb = std::prev(ub);
+			*valid = true;
+
+			if (lb == buffer.end() && ub == buffer.end()) {
+				*valid = false;
+				return Data();
+			} else if(ub == buffer.end()){
+				//Dont include old data
+				if (std::abs(lb->first - t) > expiry) {
+					*valid = false;
+				}
+				//If lb is the last measurement, return it
+				return lb->second;
+			}
+			else if (lb == buffer.end()) {
+				//Dont include data from too far in the future
+				if (std::abs(ub->first - t) > expiry) {
+					valid = false;
+				}
+				//If ub is the next measurement, return it
+				return ub->second;
+			}
+			else {
+				//TODO: interpolate
+				float alpha = (t - lb->first) / (ub->first - lb->first);
+				if(alpha > 0.5){
+					return ub->second;
+				} else {
+					return lb->second;
+				}
+			}
+		}
+
+		void clearOld(const float& time_now){
+			auto iter = buffer.begin();
+			while (iter != buffer.end()) {
+				thisiter = iter;
+				iter = std::next(iter);
+				if (time_now - thisiter->first > time_width + expiry)
+				{
+					buffer.erase(thisiter);
+				}
+			}
+		}
+
+	};
+
 }

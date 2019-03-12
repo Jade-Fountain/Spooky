@@ -47,7 +47,7 @@ namespace spooky {
 
 		//Loading objects
 		template <class T>
-		bool SaveManager::load(T * current)
+		bool load(T * current)
 		{
 			//Get save location
 			std::string pathname = getPath(*current);
@@ -67,7 +67,7 @@ namespace spooky {
 
 		//Saving objects
 		template <class T>
-		bool SaveManager::save(const T & result)
+		bool save(const T & result)
 		{
 			//Get save location
 			std::string pathname = getPath(result);
